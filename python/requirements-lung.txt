@@ -1,0 +1,6 @@
+# Offline preparation/evaluation only; no PYNQ or deep-learning dependency.
+# Tested together on Python 3.11 in the current workstation.
+numpy>=1.26,<3
+scipy>=1.11,<2
+pydicom>=3.0,<4
+matplotlib>=3.8,<4

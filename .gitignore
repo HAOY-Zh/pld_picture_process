@@ -1,0 +1,87 @@
+# Local environments and editor settings
+.venv*/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.vscode/
+.idea/
+.ipynb_checkpoints/
+
+# Medical images, labels, experiment outputs and model weights stay local.
+# Keep the source code and data preparation instructions, not patient data.
+/data/
+*.dcm
+*.dicom
+*.nii
+*.nii.gz
+*.nrrd
+*.mha
+*.mhd
+*.npy
+*.npz
+*.mat
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.whl
+*.zip
+*.tar
+*.tar.gz
+
+# Generated MATLAB/RTL image samples
+/matlab/hu_input.txt
+/matlab/matlab_expected.txt
+/matlab/rtl_output.txt
+
+# Vivado source files (.v, .tcl, .xpr, .bd, .xci, .xdc) are retained.
+# Generated products can be regenerated with Vivado.
+.Xil/
+*.cache/
+*.runs/
+*.gen/
+*.sim/
+*.hw/
+*.ip_user_files/
+ip_user_files/
+*.jou
+*.log
+*.str
+*.rpt
+*.pb
+*.bit
+*.bin
+*.hwh
+*.dcp
+*.edf
+*.edn
+*.ltx
+*.wdb
+*.vcd
+*.bda
+*.ui
+*.xpr.lock
+
+# Unrelated earlier classroom project; retained locally, not in this upload.
+/fpga/Lab_9/
+
+# Backups, temporary files, credentials and OS metadata
+*.bak
+*.backup
+*.tmp
+*.swp
+*~
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+credentials.json
+Thumbs.db
+.DS_Store
