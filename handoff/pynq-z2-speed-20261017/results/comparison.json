@@ -1,0 +1,200 @@
+{
+  "actual_PL_execution": true,
+  "bit_sha256": "d33786c2f16f8cf717ee4231a1d85ebb4d8c66ea95891df2c723730c137e0913",
+  "model_checkpoint_sha256": "fc07ccb94fed013cbb87665ed4d2b498d8fa12e7bd8a1bbd42fbe481990da6cb",
+  "pl_clock_mhz": 50.0,
+  "cpu_clock_mhz": 650.0,
+  "pynq": "3.1.1",
+  "python": "3.10.4",
+  "all_outputs_bit_exact": true,
+  "summary": [
+    {
+      "stage": "legacy48",
+      "mean_frame_ms": 760.2535310000178,
+      "mean_speedup_vs_legacy48": 1.0
+    },
+    {
+      "stage": "fast48",
+      "mean_frame_ms": 659.7522149999975,
+      "mean_speedup_vs_legacy48": 1.1523331710170743
+    },
+    {
+      "stage": "fast58",
+      "mean_frame_ms": 559.4501530000286,
+      "mean_speedup_vs_legacy48": 1.358932433377055
+    },
+    {
+      "stage": "compact58",
+      "mean_frame_ms": 523.2258854999827,
+      "mean_speedup_vs_legacy48": 1.4530184979365754
+    }
+  ],
+  "rows": [
+    {
+      "patient": "C067",
+      "stage": "legacy48",
+      "tile": 48,
+      "tiles": 121,
+      "repeats": 5,
+      "median_frame_ms": 760.745949000011,
+      "p95_frame_ms": 770.0710043999607,
+      "fps": 1.3144992770773012,
+      "speedup_vs_legacy48": 1.0,
+      "bit_exact": true,
+      "trials_ms": [
+        747.0930079999789,
+        770.2592789999585,
+        769.3179059999693,
+        749.7221339999669,
+        760.745949000011
+      ]
+    },
+    {
+      "patient": "C067",
+      "stage": "fast48",
+      "tile": 48,
+      "tiles": 121,
+      "repeats": 5,
+      "median_frame_ms": 660.6879750000303,
+      "p95_frame_ms": 662.3525787999938,
+      "fps": 1.5135737864760657,
+      "speedup_vs_legacy48": 1.1514451265742744,
+      "bit_exact": true,
+      "trials_ms": [
+        660.6879750000303,
+        659.2528489999836,
+        661.1521899999957,
+        659.7062199999755,
+        662.6526759999933
+      ]
+    },
+    {
+      "patient": "C067",
+      "stage": "fast58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 5,
+      "median_frame_ms": 560.4188610000165,
+      "p95_frame_ms": 583.248858200011,
+      "fps": 1.7843796302922263,
+      "speedup_vs_legacy48": 1.3574595752229486,
+      "bit_exact": true,
+      "trials_ms": [
+        588.6235620000093,
+        549.1499070000145,
+        560.4188610000165,
+        559.2178020000347,
+        561.7500430000177
+      ]
+    },
+    {
+      "patient": "C067",
+      "stage": "compact58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 5,
+      "median_frame_ms": 524.5081470000059,
+      "p95_frame_ms": 543.9867521999986,
+      "fps": 1.9065480788423077,
+      "speedup_vs_legacy48": 1.4503987275530392,
+      "bit_exact": true,
+      "trials_ms": [
+        513.6249650000195,
+        532.9801410000528,
+        524.5081470000059,
+        522.4285159999909,
+        546.738404999985
+      ]
+    },
+    {
+      "patient": "C077",
+      "stage": "legacy48",
+      "tile": 48,
+      "tiles": 121,
+      "repeats": 5,
+      "median_frame_ms": 759.7611130000246,
+      "p95_frame_ms": 782.4453427999742,
+      "fps": 1.3162031892516295,
+      "speedup_vs_legacy48": 1.0,
+      "bit_exact": true,
+      "trials_ms": [
+        759.7611130000246,
+        786.6370879999636,
+        758.2853040000259,
+        765.6783620000169,
+        747.5653960000272
+      ]
+    },
+    {
+      "patient": "C077",
+      "stage": "fast48",
+      "tile": 48,
+      "tiles": 121,
+      "repeats": 5,
+      "median_frame_ms": 658.8164549999647,
+      "p95_frame_ms": 659.9391092000133,
+      "fps": 1.5178734417009265,
+      "speedup_vs_legacy48": 1.153221215459874,
+      "bit_exact": true,
+      "trials_ms": [
+        659.4737899999927,
+        655.9729399999696,
+        658.8164549999647,
+        650.8211990000063,
+        660.0554390000184
+      ]
+    },
+    {
+      "patient": "C077",
+      "stage": "fast58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 5,
+      "median_frame_ms": 558.4814450000408,
+      "p95_frame_ms": 559.277679200045,
+      "fps": 1.790569783388107,
+      "speedup_vs_legacy48": 1.360405291531161,
+      "bit_exact": true,
+      "trials_ms": [
+        558.4814450000408,
+        547.9476239999599,
+        557.4012110000126,
+        559.1897040000049,
+        559.299673000055
+      ]
+    },
+    {
+      "patient": "C077",
+      "stage": "compact58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 5,
+      "median_frame_ms": 521.9436239999595,
+      "p95_frame_ms": 523.1005492000236,
+      "fps": 1.9159157311596502,
+      "speedup_vs_legacy48": 1.4556382683201117,
+      "bit_exact": true,
+      "trials_ms": [
+        522.6212980000469,
+        523.2203620000178,
+        509.1013040000121,
+        521.9436239999595,
+        519.5140359999755
+      ]
+    }
+  ],
+  "case_metrics": [
+    {
+      "patient": "C067",
+      "rmse_hu": 76.12333697427083,
+      "input_sha256": "e16449859520898f6abaf7736710019cbc5213a7bdaae869d6e7ed294847abd7"
+    },
+    {
+      "patient": "C077",
+      "rmse_hu": 70.76221371424151,
+      "input_sha256": "07a05ba4283765214012e104b7527e632a9aa936198425c3efd49ae733e43a53"
+    }
+  ],
+  "scope": "Two demonstration slices; same frozen old model in all stages. No new-training quality claim.",
+  "timing": "Frame packing, DMA/cache, PL compute, polling and assembly; excludes files, reference computation and display."
+}
