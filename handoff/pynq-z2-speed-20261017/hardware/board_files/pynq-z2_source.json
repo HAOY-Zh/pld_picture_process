@@ -1,0 +1,19 @@
+{
+  "download_url": "https://dpoauwgwqsy2x.cloudfront.net/Download/pynq-z2.zip",
+  "source_page": "https://discuss.pynq.io/t/link-to-download-pynq-z2-board-file-invalid/2684",
+  "download_date": "2026-10-17",
+  "archive_sha256": "6fba4c40db5a0c480ca96b2f41719f57e83728a54ac9823578ac21667b2e4e7f",
+  "files_sha256": {
+    "board.xml": "a565dcb39737d551cbbbb73c0053b973c40bb3dce2274943370d3032c0fea9ae",
+    "part0_pins.xml": "3c809473938e135a925b563b5371c8687ee05c4089376e7318c0c56524cc8a0f",
+    "preset.xml": "18528f84aea4da503cdb3104f7706fabfb3b6ad09b78b25199cc316afa4c8cfe",
+    "pynq_z2.jpg": "b6cf32febf4b1995f33c3372ef72f390abf4a5596c73a6fd36810a45ccd0e1f7"
+  },
+  "vendor": "tul.com.tw",
+  "device": "xc7z020clg400-1",
+  "board_part": "tul.com.tw:pynq-z2:part0:1.0",
+  "vivado_checked": "2018.2 64-bit",
+  "ps_and_ddr_preset_applied": true,
+  "scope": "Board recognition and PS preset only; no synthesis, bitstream or hardware execution",
+  "board_repo_path": "D:\\PLD\\board_files"
+}
