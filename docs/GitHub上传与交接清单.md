@@ -1,3 +1,5 @@
+> Update 2026-10-18: full runtime assets are now included. Follow [the current delivery guide](CT_Studio完整运行交付_20261018.md). Earlier statements below about missing/unpublished assets describe the previous source-only handoff.
+
 # GitHub上传与交接清单
 
 核对日期：2026-10-18。本页最初为上传前范围盘点；后续经用户授权增加电脑启动模式并准备独立分支发布，实际提交/推送状态以Git记录为准。未发布带私有凭据的运行包。

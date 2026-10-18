@@ -1,3 +1,5 @@
+> 2026-10-18: Complete host + PYNQ runtime assets are included in this branch. Start with [CT Studio full delivery instructions](docs/CT_Studio完整运行交付_20261018.md). The public archive contains synthetic self-tests and no deployment credentials.
+
 # PYNQ-Z2 医学图像处理项目
 
 基于 PYNQ-Z2 / Zynq-7000 的医学图像处理工程，包含 Verilog 图像处理模块、

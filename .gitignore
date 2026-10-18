@@ -91,3 +91,6 @@ id_ed25519*
 credentials.json
 Thumbs.db
 .DS_Store
+
+# Reviewed synthetic runtime delivery; no patient data or credentials.
+!/runtime/ct_studio_20261018/ct_studio_runtime_20261018.zip

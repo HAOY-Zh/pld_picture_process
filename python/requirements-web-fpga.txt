@@ -1,0 +1,4 @@
+# Host only: the original Torch affine quantizer and mask restoration.
+# Install on a Python 3.11 desktop. PYNQ is installed ONLY on the board image.
+-r requirements-web.txt
+torch==2.8.0
