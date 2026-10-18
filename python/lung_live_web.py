@@ -256,6 +256,7 @@ class Controller:
             scores = ({name: overlap_metrics(mask, self.expert[z]) for name, mask in
                 [('raw', raw), ('body', body)]} if self.expert is not None else {})
             receipt.update(slice_index=int(z), body_plan=plan, case_id=self.status['case_id'],
+                           analysis_source=copy.deepcopy(self.details.get('analysis_source',{'source_id':'original'})),
                            job_id=job_id, source_hu_sha256=self.details['hu_sha256'],
                            source_slice_index=self.details['source_slice_indices'][z])
             if scores:

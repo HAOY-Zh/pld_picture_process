@@ -1,15 +1,16 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="ui-token" content="__UI_TOKEN__"><title>CT Studio · 医学影像处理工作台</title>
-<link rel="stylesheet" href="/workspace.css"><script src="/workspace.js" defer></script></head>
+<link rel="stylesheet" href="/workspace.css"><link rel="stylesheet" href="/ldct.css"><script src="/workspace.js" defer></script><script src="/ldct.js" defer></script></head>
 <body>
 <aside class="sidebar">
   <a class="brand" href="/" aria-label="CT Studio 首页"><span class="brand-mark">CT</span><span>CT Studio<small>医学影像处理工作台</small></span></a>
   <div class="nav-caption">工作区</div>
   <nav aria-label="工作区切换">
-    <button class="nav-item active" data-tab="basic" aria-selected="true"><span class="nav-icon">◫</span>基础处理<span class="nav-number">01</span></button>
-    <button class="nav-item" data-tab="segmentation" aria-selected="false"><span class="nav-icon">◈</span>智能分割与三维<span class="nav-number">02</span></button>
-    <button class="nav-item" data-tab="performance" aria-selected="false"><span class="nav-icon">▥</span>性能记录<span class="nav-number">03</span></button>
+    <button class="nav-item" data-tab="ldct" aria-selected="false"><span class="nav-icon">◉</span>LDCT 增强<span class="nav-number">01</span></button>
+    <button class="nav-item active" data-tab="basic" aria-selected="true"><span class="nav-icon">◫</span>基础处理<span class="nav-number">02</span></button>
+    <button class="nav-item" data-tab="segmentation" aria-selected="false"><span class="nav-icon">◈</span>智能分割与三维<span class="nav-number">03</span></button>
+    <button class="nav-item" data-tab="performance" aria-selected="false"><span class="nav-icon">▥</span>性能记录<span class="nav-number">04</span></button>
   </nav>
   <div class="source-card"><div class="eyebrow">当前输入</div><strong id="caseLabel">尚未加载 CT</strong><p id="sourceInfo">加载一次，在各工作区共享。</p><span class="chip" id="expertBadge">未加载标注</span></div>
   <div class="sidebar-bottom"><span class="status-dot" id="boardDot"></span><span id="boardLabel">FPGA 未连接</span><button id="connect" class="text-button">连接</button><button id="connectFast" class="button secondary wide" hidden>连接新版基础加速服务</button><p id="executionNote">智能分割由实际 FPGA 执行。<br>基础处理与分割共用统一 PL 服务。</p></div>
@@ -22,8 +23,31 @@
     <button id="load" class="button primary">加载影像 <span>→</span></button>
     <details class="input-options"><summary>标注与输入选项</summary><div class="options-grid"><label class="checkbox"><input id="loadExpert" type="checkbox" checked>加载专家标注（仅用于对照）</label><input id="expertPath" placeholder="专家标注路径，可留空自动查找匹配的 RTSTRUCT" aria-label="专家标注路径"><label class="checkbox"><input id="confirm" type="checkbox">确认 NIfTI / NPZ 为 CT HU，空间单位 mm</label><input id="uid" placeholder="可选：DICOM Series UID" aria-label="DICOM Series UID"></div></details>
   </section>
+  <div class="workflow-strip" aria-label="影像处理流程"><button id="flowLoad"><b>1</b>载入影像</button><span>→</span><button id="flowEnhance"><b>2</b>LDCT 增强 <small>可选</small></button><span>→</span><button id="flowAnalyze"><b>3</b>分析与三维</button><span>→</span><button id="flowExport"><b>4</b>记录与导出</button></div>
+  <div class="analysis-source-bar"><div><strong>当前分析输入</strong><p id="analysisSourceNote">加载后可直接分析原始 CT，也可先增强再分析。</p></div><label class="source-select-label" for="analysisSource">影像来源<select id="analysisSource" disabled><option value="original">原始 CT</option></select></label><span class="chip" id="analysisSourceBadge">等待载入</span></div>
   <div class="status-line" role="status" aria-live="polite"><span class="status-dot" id="taskDot"></span><span id="message">加载 CT 并连接统一 FPGA 服务，即可运行基础处理与智能分割。</span><progress id="progress" hidden max="1" value="0"></progress></div>
   <main>
+    <section id="tab-ldct" class="tab-content" hidden>
+      <div class="section-heading"><div><span class="eyebrow">LOW-DOSE CT ENHANCEMENT</span><h2>LDCT 增强</h2><p>保留原始影像，在相同 HU 与坐标下增强，再送入后续分析。</p></div><span class="chip amber" id="ldctBackendBadge">电脑整数参考</span></div>
+      <div class="ldct-layout">
+        <section class="controls card"><div class="card-heading"><span class="step">2</span><h3>增强设置</h3></div>
+          <label class="field-label" for="ldctBackend">执行位置</label><select id="ldctBackend"><option value="CPU_REFERENCE">电脑整数参考</option><option value="FPGA_LDCT" disabled>FPGA · 待连接统一服务</option></select>
+          <p class="helper" id="ldctBackendNote">电脑模式可验证增强和后续分析流程，耗时单独标记。</p>
+          <label class="field-label" for="ldctMethod">增强方法</label><select id="ldctMethod"><option value="cnn">Tiny CNN · 主模型</option><option value="gaussian5">高斯滤波 · 对照</option><option value="bilateral5">双边滤波 · 对照</option><option value="bypass">直通 · 输入核验</option></select>
+          <button id="ldctPreview" class="button secondary wide" disabled>预览当前切片</button>
+          <button id="ldctRunVolume" class="button primary wide" disabled>增强已载入范围</button>
+          <button id="ldctCancel" class="text-button" hidden>完成当前层后停止</button>
+          <div class="ldct-progress"><strong id="ldctProgress">尚未增强</strong><p class="helper">载入范围全部增强完成后，可选择这份增强 CT 进行基础处理、分割与三维。单层预览可先观察效果。</p></div>
+          <button id="ldctUse" class="button primary wide" disabled>使用增强影像分析 →</button>
+          <details class="ldct-details"><summary>模型与执行信息</summary><p id="ldctModelInfo" class="helper">正在读取模型信息。</p><p class="helper">FPGA 主版为 100 MHz；50 MHz 保留回退。电脑参考耗时不代表 FPGA 性能。未提供配对参考图时不显示 PSNR、SSIM。</p></details>
+        </section>
+        <section class="ldct-comparison"><div class="ldct-toolbar"><label for="ldctSlice">轴位切片<input id="ldctSlice" type="number" min="0" value="0" disabled></label><label for="ldctWl">窗位 WL<input id="ldctWl" type="number" value="-600"></label><label for="ldctWw">窗宽 WW<input id="ldctWw" type="number" min="1" max="65535" value="1500"></label></div>
+          <div class="ldct-pair"><article><header><strong>原始低剂量 CT</strong><span>输入保留</span></header><canvas id="ldctOriginal" width="512" height="512" aria-label="原始低剂量 CT"></canvas></article><article><header><strong>LDCT 增强结果</strong><span id="ldctResultBadge">等待增强</span></header><canvas id="ldctEnhanced" width="512" height="512" aria-label="LDCT 增强结果"></canvas></article></div>
+          <p id="ldctResultInfo" class="ldct-result-info">加载 CT 后先预览，或直接增强已载入范围。两幅图使用相同显示窗。</p>
+          <div id="ldctHistory" class="card ldct-history"><h3>本次增强记录</h3><p class="helper">完成后显示各层来源与耗时，原始 CT 和旧分析结果分别保留。</p></div>
+        </section>
+      </div>
+    </section>
     <section id="tab-basic" class="tab-content">
       <div class="section-heading"><div><span class="eyebrow">IMAGE PROCESSING</span><h2>基础处理</h2><p>同一切片，查看参数变化与处理结果。</p></div><span class="chip teal" id="basicBackendBadge">真实 FPGA PL · 待连接</span></div>
       <div class="basic-layout">
@@ -47,6 +71,7 @@
     </section>
     <section id="tab-segmentation" class="tab-content" hidden><div class="section-heading compact"><div><span class="eyebrow">INTELLIGENT ANALYSIS</span><h2>智能分割与三维</h2></div><span class="chip teal">真实 FPGA 推理 · 共享当前 CT</span></div><div class="segmentation-shell"><iframe id="segmentationFrame" loading="lazy" title="智能分割、三维重构与多平面联动" src="/segmentation"></iframe></div></section>
     <section id="tab-performance" class="tab-content" hidden><div class="section-heading"><div><span class="eyebrow">PERFORMANCE & EVIDENCE</span><h2>性能记录</h2><p>本次运行与历史基准分别展示，便于追溯。</p></div><span class="chip">测量范围明确</span></div>
+      <section class="card evidence"><h3>LDCT 增强与分析来源</h3><p id="ldctPerformance">尚未执行增强。</p><p class="helper">电脑参考与实际 FPGA 分开记录；逐层运算时间不等于整机交互时间。当前影像来源及各层模型、输入、输出哈希随会话导出。</p></section>
       <div class="metrics"><article class="card metric"><span>当前已计算层数</span><strong id="metricSlices">—</strong><small>来自本次真实分割结果</small></article><article class="card metric"><span>最近单层 FPGA 推理</span><strong id="metricPL">—</strong><small>网络壁钟 · 含板端调度</small></article><article class="card metric"><span>最近通信往返</span><strong id="metricRoundtrip">—</strong><small>含板端推理 · 不与推理耗时相加</small></article><article class="card metric"><span id="metricBasicCaption">基础处理 · 点击至显示</span><strong id="metricBasic">—</strong><small id="metricBasicNote">本浏览器实际测量，含等待、取图与绘制</small></article><article class="card metric"><span id="metricBasicKernelCaption">基础 PL / DMA</span><strong id="metricBasicKernel">—</strong><small id="metricBasicKernelNote">仅运算阶段，不代表网页响应时间</small></article></div>
       <section class="card evidence"><h3>基础处理耗时范围</h3><p id="basicTiming">尚无实际结果。</p><p class="helper">点击至显示包含通信、bit切换、校验、保存、轮询等待和图像绘制。板端往返已包含bit切换与DMA，多个耗时范围有重叠，不能相加。不同方法目前使用独立bit；同方法连续处理可复用已加载配置。</p></section>
       <section class="card evidence"><h3>历史实板基准</h3><p>同板 ARM INT8 与 FPGA INT8，对同一验证切片预热3次、正式测量20次。不是当前网页的端到端 FPS。</p><div class="table-scroll"><table><thead><tr><th>配置</th><th>ARM INT8</th><th>FPGA INT8</th><th>CPU / PL</th><th>状态</th></tr></thead><tbody id="benchmarkRows"><tr><td colspan="5">读取已核验记录…</td></tr></tbody></table></div><p class="helper">剪枝版为实验候选，存在病例精度退化；不会因速度较快自动用于分割。当前服务仍沿用已绑定的原模型版本。</p></section>
