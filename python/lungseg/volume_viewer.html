@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>肺区三维与切片对照</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Microsoft YaHei",sans-serif;color:#e7edf7;background:#111723}
+*{box-sizing:border-box}body{margin:0;padding:10px;height:100vh;height:100dvh;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+header{flex:none}h1{font-size:20px;margin:0 0 3px}h2{font-size:15px;margin:0}
+.muted{color:#a9b8d0;font-size:12px}.panel{background:#1a2434;border:1px solid #35445e;border-radius:8px;padding:8px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px}.controls label{display:flex;gap:5px;align-items:center}
+select,input,button{font:inherit;background:#111b2c;color:#edf4ff;border:1px solid #637795;border-radius:4px;padding:4px}
+input[type=number]{width:70px}input[type=range]{padding:0;width:130px}button{cursor:pointer;background:#26486b}
+.metrics{display:flex;flex-wrap:wrap;gap:6px;flex:none;font-size:12px}.metric{padding:5px 8px;background:#0e1829;border-radius:5px}
+.cyan{color:#00e5e5}.orange{color:#ffa63e}.green{color:#46d26e}.blue{color:#3399ff}.red{color:#ff6666}
+#status{color:#bed5ff;font-size:11px;margin-top:3px}#subtitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toolbar{flex:none;position:relative;z-index:2}.advanced{position:relative;margin-left:auto}.advanced summary{cursor:pointer;padding:5px;color:#bed5ff}
+.advanced-panel{position:absolute;right:0;top:100%;width:440px;max-width:85vw;box-shadow:0 8px 25px #0009;padding:12px;display:flex;flex-direction:column;gap:10px}
+.advanced-panel .muted{line-height:1.6}.workspace{flex:1;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px}
+.view{min-width:0;min-height:0;display:flex;flex-direction:column;gap:5px;background:#121c2a;border:1px solid #35445e;border-radius:8px;padding:8px;overflow:hidden}
+.view.active{border-color:#e484e9}.view-title{display:flex;gap:12px;align-items:center;flex:none}.view-title .controls{flex:1;flex-wrap:nowrap;min-width:0}
+.slice input[type=range]{flex:1;min-width:40px;width:80px}.slice input[type=number]{width:62px}.readout{font-size:11px;line-height:1.35;color:#c4d5ee;flex:none}
+.canvaswrap{flex:1;min-height:0;min-width:0;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden}
+canvas{display:block;image-rendering:pixelated;cursor:crosshair;flex:none}#plot{flex:1;min-height:0;width:100%}.legend{font-size:11px;flex:none}
+#disclaimer{flex:none;font-size:10px;line-height:1.3;margin:0}
+html.embedded header h1{display:none}html.embedded body{padding:7px;gap:6px}
+@media(max-width:899px),(max-height:599px){body{height:auto;min-height:100dvh;overflow:auto}.workspace{flex:none;grid-auto-rows:360px;grid-template-rows:repeat(2,360px)}.advanced{margin-left:0}}
+@media(max-width:599px){.workspace{grid-template-columns:1fr;grid-template-rows:repeat(4,360px)}}
+@media(min-width:900px) and (min-height:520px) and (max-height:599px){html.embedded body{height:100dvh;overflow:hidden}html.embedded .workspace{flex:1;grid-template-rows:repeat(2,minmax(0,1fr))}}
+</style></head><body>
+<header>
+<h1>肺区三维对照与 MPR 切片联动</h1>
+<div id="subtitle" class="muted">正在加载离线数据……</div>
+<div id="status" role="status">首次打开需要解压 CT 和网格，请稍候。</div>
+</header>
+<div id="metrics" class="metrics"></div>
+<div class="panel controls toolbar">
+<label>三维模式<select id="mode"><option value="overlay">专家＋模型叠加</option><option value="expert">仅专家</option><option value="prediction">仅模型</option></select></label>
+<label>模型结果<select id="variant"><option value="original">原始预测</option><option value="body">二维人体约束</option><option value="body_cleaned">人体约束＋三维清理</option><option value="cleaned">仅三维清理（旧对照）</option></select></label>
+<label>切片显示<select id="display"><option value="alpha">CT＋肺区色块</option><option value="contour">CT＋专家/模型轮廓</option><option value="error">误差图：红多分／蓝漏分／灰重合</option><option value="ct">仅原 CT</option></select></label>
+<label>切片肺区<select id="sliceSource"><option value="overlay">专家＋模型对比</option><option value="expert">仅专家</option><option value="prediction">仅模型</option></select></label>
+<label>窗位 WL<input id="wl" type="number" value="-300" min="-3000" max="10000"></label>
+<label>窗宽 WW<input id="ww" type="number" value="1400" min="1" max="20000"></label>
+<button id="fullscreen">全屏查看</button>
+<details class="advanced"><summary>更多设置／说明</summary><div class="panel advanced-panel">
+<label>表面不透明度<input id="opacity" type="range" min="0.1" max="1" step="0.05" value="0.55"></label>
+<label>切片色块不透明度<input id="maskOpacity" type="range" min="0" max="1" step="0.05" value="0.45"><output id="maskOpacityValue">45%</output></label>
+<label>观察剖切<select id="cut"><option value="off">不剖切</option><option value="low">保留当前平面低索引侧</option><option value="high">保留当前平面高索引侧</option></select></label>
+<label><input id="plane" type="checkbox" checked>显示选中切片平面</label>
+<label><input id="bodyBox" type="checkbox">显示轴位人体包围框（黄色，非皮肤轮廓）</label>
+<button id="reset">重置三维视角</button>
+<button id="lungwindow">恢复默认窗</button>
+<div class="muted">拖动三维图旋转，滚轮缩放；点击任意切片更新交叉定位。紫色平面表示正在操作的切片位置。<br>“三维模式”只控制三维，“切片肺区”独立控制三个切片。仅专家显示完整专家肺区（青色），仅模型显示完整模型肺区（橙色）。对比色块青色＝专家有／模型无，橙色＝模型有／专家无，绿色＝两者重合。<br>轮廓对比模式白线＝边界重合。误差图始终对比两份掩膜，红＝多分，蓝＝漏分，灰＝重合；误差图和原 CT 模式下暂时禁用“切片肺区”。切面 Dice 等指标始终按两份完整掩膜计算。<br>色块不透明度 0% 为原 CT，100% 为实心色块；不改变掩膜或 Dice，也不影响三维透明度。<br>原始表面未平滑、填孔或删除孤岛。观察剖切不补盖；三维外壳不能替代切片核查。窄屏自动改为滚动布局。</div>
+</div></details>
+</div>
+<div class="legend" id="sliceLegend"><span class="cyan">切片色块：青＝仅专家／漏分</span>　<span class="orange">橙＝仅模型／多分</span>　<span class="green">绿＝两者重合</span>　紫色十字＝定位</div>
+<main class="workspace" id="workspace">
+<section class="view" id="view3d"><div class="view-title"><h2>三维肺区</h2><span class="muted">旋转／缩放 · 与切片联动</span></div><div id="plot"></div><div class="legend"><span class="cyan">青色：专家</span>　<span class="orange">橙色：模型</span>　紫色：当前切片平面</div></section>
+<section class="view slice" id="slice0"><div class="view-title"><h2>轴位 · Z</h2><div class="controls"><input id="range0" type="range" min="0" aria-label="轴位切片"><input id="number0" type="number" min="0" aria-label="轴位索引"></div></div><div class="canvaswrap"><canvas id="canvas0"></canvas></div><div id="readout0" class="readout"></div></section>
+<section class="view slice" id="slice1"><div class="view-title"><h2>冠状位 · Y</h2><div class="controls"><input id="range1" type="range" min="0" aria-label="冠状位切片"><input id="number1" type="number" min="0" aria-label="冠状位索引"></div></div><div class="canvaswrap"><canvas id="canvas1"></canvas></div><div id="readout1" class="readout"></div></section>
+<section class="view slice" id="slice2"><div class="view-title"><h2>矢状位 · X</h2><div class="controls"><input id="range2" type="range" min="0" aria-label="矢状位切片"><input id="number2" type="number" min="0" aria-label="矢状位索引"></div></div><div class="canvaswrap"><canvas id="canvas2"></canvas></div><div id="readout2" class="readout"></div></section>
+</main>
+<footer class="muted" id="disclaimer">仅用于工程教学与算法演示，不作为临床诊断依据。该页面不运行 FPGA 或重新分割；窗宽窗位只影响显示，不修改原始 HU 或掩膜。</footer>
+<script>__PLOTLY__</script>
+<script id="dataset" type="application/json">__PAYLOAD__</script>
+<script>
+'use strict';
+document.documentElement.classList.toggle('embedded',window.parent!==window);
+const $=id=>document.getElementById(id);
+let D,HU,E,P,meshData,shape,position,active=0,ready=false,plotTimer,rawP,cleanedP,rawMesh,cleanedMesh,variantMasks={},variantMeshes={};
+const camera={eye:{x:1.4,y:-1.9,z:.8},up:{x:0,y:0,z:1}};
+async function decode(item){
+  const text=atob(item.gzip_base64), bytes=new Uint8Array(text.length);
+  for(let i=0;i<text.length;i++)bytes[i]=text.charCodeAt(i);
+  const buffer=await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();
+  let result;
+  if(item.dtype==='bits'){
+    const packed=new Uint8Array(buffer);result=new Uint8Array(item.elements);
+    for(let i=0;i<result.length;i++)result[i]=(packed[i>>3]>>(i&7))&1;
+  }else{
+    const Type={int16:Int16Array,float32:Float32Array,uint32:Uint32Array}[item.dtype];
+    if(!Type)throw Error('Unsupported dtype: '+item.dtype);result=new Type(buffer);
+  }
+  if(result.length!==item.elements)throw Error('Decoded data length mismatch');return result;
+}
+function world(z,y,x){const g=D.geometry,b=g.basis_lps_zyx,o=g.origin_lps_mm;return b.map((r,i)=>o[i]+r[0]*z+r[1]*y+r[2]*x)}
+function offset(z,y,x){return (z*shape[1]+y)*shape[2]+x}
+function size(axis){return axis===0?[shape[1],shape[2]]:axis===1?[shape[0],shape[2]]:[shape[0],shape[1]]}
+function voxel(axis,row,col){return axis===0?[position[0],row,col]:axis===1?[shape[0]-1-row,position[1],col]:[shape[0]-1-row,col,position[2]]}
+function planeMasks(axis){
+  const [h,w]=size(axis),a=new Uint8Array(h*w),b=new Uint8Array(h*w),hu=new Float32Array(h*w);
+  for(let r=0;r<h;r++)for(let c=0;c<w;c++){const i=r*w+c,n=offset(...voxel(axis,r,c));a[i]=E[n];b[i]=P[n];hu[i]=HU[n]}
+  return {h,w,a,b,hu};
+}
+function edge(a,r,c,h,w){const i=r*w+c;return a[i]&&(r===0||c===0||r===h-1||c===w-1||!a[i-w]||!a[i+w]||!a[i-1]||!a[i+1])}
+function sliceFill(reference,prediction,source){
+  if(source==='expert')return reference?[0,230,230]:null;
+  if(source==='prediction')return prediction?[255,165,60]:null;
+  return reference&&prediction?[70,210,110]:reference?[0,230,230]:prediction?[255,165,60]:null;
+}
+function fitCanvas(axis){
+  if(!ready)return;const canvas=$('canvas'+axis),box=canvas.parentElement,[h,w]=size(axis);
+  const s=D.geometry.spacing_zyx_mm,sy=axis===0?s[1]:s[0],sx=axis===2?s[1]:s[2];
+  const scale=Math.min(box.clientWidth/(w*sx),box.clientHeight/(h*sy));
+  canvas.style.width=Math.max(1,w*sx*scale)+'px';canvas.style.height=Math.max(1,h*sy*scale)+'px';
+}
+function draw(axis){
+  const {h,w,a,b,hu}=planeMasks(axis),canvas=$('canvas'+axis),ctx=canvas.getContext('2d');canvas.width=w;canvas.height=h;
+  fitCanvas(axis);
+  const image=ctx.createImageData(w,h),pixels=image.data,wl=Number($('wl').value),ww=Math.max(1,Number($('ww').value)),mode=$('display').value;
+  const alpha=Math.max(0,Math.min(1,Number($('maskOpacity').value)));
+  const source=$('sliceSource').value;
+  let tp=0,fp=0,fn=0,ea=0,pa=0;
+  for(let r=0;r<h;r++)for(let c=0;c<w;c++){
+    const i=r*w+c,j=i*4,gray=Math.max(0,Math.min(255,(hu[i]-(wl-ww/2))*255/ww));let color=[gray,gray,gray];
+    if(a[i])ea++;if(b[i])pa++;if(a[i]&&b[i])tp++;else if(b[i])fp++;else if(a[i])fn++;
+    if(mode==='error')color=a[i]&&b[i]?[150,150,150]:b[i]?[255,40,40]:a[i]?[30,130,255]:[0,0,0];
+    if(mode==='alpha'){const fill=sliceFill(a[i],b[i],source);if(fill)color=color.map((g,k)=>(1-alpha)*g+alpha*fill[k])}
+    if(mode==='contour'){const ae=source!=='prediction'&&edge(a,r,c,h,w),pe=source!=='expert'&&edge(b,r,c,h,w);if(ae||pe)color=ae&&pe?[255,255,255]:ae?[0,235,235]:[255,165,60]}
+    pixels[j]=color[0];pixels[j+1]=color[1];pixels[j+2]=color[2];pixels[j+3]=255;
+  }
+  ctx.putImageData(image,0,0);
+  const cx=axis===2?position[1]:position[2],cy=axis===0?position[1]:shape[0]-1-position[0];
+  ctx.strokeStyle='rgba(239,139,235,.75)';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(cx+.5,0);ctx.lineTo(cx+.5,h);ctx.moveTo(0,cy+.5);ctx.lineTo(w,cy+.5);ctx.stroke();
+  if(axis===0&&D.body_geometry&&$('bodyBox').checked){
+    const [y0,y1,x0,x1]=D.body_geometry.plans[position[0]].box_y0_y1_x0_x1;
+    ctx.strokeStyle='#ffff66';ctx.lineWidth=1.5;ctx.strokeRect(x0+.5,y0+.5,x1-x0-1,y1-y0-1);
+  }
+  const denom=2*tp+fp+fn,dice=denom?(2*tp/denom).toFixed(4):'双方为空（不记作1）',lps=world(...position);
+  $('readout'+axis).textContent=`索引 ${position[axis]} / ${shape[axis]-1} · 切面 Dice ${dice} · 专家 ${ea} / 模型 ${pa} 像素 · FP ${fp} / FN ${fn}；定位 LPS(mm) ${lps.map(v=>v.toFixed(1)).join(', ')}`;
+}
+function coordinates(item){const x=new Float32Array(item.world.length/3),y=new Float32Array(x.length),z=new Float32Array(x.length);for(let i=0;i<x.length;i++){x[i]=item.world[i*3];y[i]=item.world[i*3+1];z[i]=item.world[i*3+2]}return{x,y,z}}
+function faces(item){
+  const ijk=[[],[],[]],cut=$('cut').value,sign=cut==='low'?-1:1,index=position[active];
+  for(let n=0;n<item.faces.length;n+=3){
+    const a=item.faces[n],b=item.faces[n+1],c=item.faces[n+2];
+    if(cut!=='off'&&[a,b,c].some(v=>sign*(item.voxels[v*3+active]-index)<0))continue;
+    ijk[0].push(a);ijk[1].push(b);ijk[2].push(c);
+  }
+  return{i:ijk[0],j:ijk[1],k:ijk[2]};
+}
+function trace(name){
+  const item=meshData[name],mode=$('mode').value;
+  return {type:'mesh3d',name:name==='expert'?'专家':'模型（'+$('variant').selectedOptions[0].textContent+'）',...item.coords,...faces(item),
+    color:name==='expert'?'#00dede':'#ffa63e',opacity:Number($('opacity').value),visible:mode==='overlay'||mode===name,
+    flatshading:true,hoverinfo:'name',lighting:{ambient:.6,diffuse:.7,specular:.1,roughness:.85}};
+}
+function planeTrace(){
+  const axes=[0,1,2].filter(i=>i!==active),corners=[];
+  for(const [u,v] of [[0,0],[1,0],[1,1],[0,1]]){const point=position.slice();point[axes[0]]=u?shape[axes[0]]-.5:-.5;point[axes[1]]=v?shape[axes[1]]-.5:-.5;corners.push(world(...point))}
+  return {type:'mesh3d',name:'当前切片平面',x:corners.map(p=>p[0]),y:corners.map(p=>p[1]),z:corners.map(p=>p[2]),i:[0,0],j:[1,2],k:[2,3],color:'#df70df',opacity:.13,visible:$('plane').checked,hoverinfo:'skip',showscale:false};
+}
+function boundaryTrace(name){
+  const {h,w,a,b}=planeMasks(active),mask=name==='expert'?a:b,points=[];
+  for(let r=0;r<h;r++)for(let c=0;c<w;c++)if(edge(mask,r,c,h,w))points.push(world(...voxel(active,r,c)));
+  const mode=$('mode').value;
+  return {type:'scatter3d',name:name==='expert'?'专家切面边界':'模型切面边界',mode:'markers',x:points.map(p=>p[0]),y:points.map(p=>p[1]),z:points.map(p=>p[2]),
+    marker:{size:2,color:name==='expert'?'#00ffff':'#ffc052'},visible:$('plane').checked&&(mode==='overlay'||mode===name),hoverinfo:'skip',showlegend:false};
+}
+async function updatePlot(){
+  if(!ready)return;const start=performance.now();
+  const layout={paper_bgcolor:'#1a2434',font:{color:'#dbe7fb'},margin:{l:0,r:0,t:8,b:0},uirevision:'keep-camera',
+    scene:{aspectmode:'data',camera,uirevision:'keep-camera',xaxis:{title:{text:'LPS X / mm'}},yaxis:{title:{text:'LPS Y / mm'}},zaxis:{title:{text:'LPS Z / mm'}}},legend:{x:0,y:1}};
+  await Plotly.react('plot',[trace('expert'),trace('prediction'),planeTrace(),boundaryTrace('expert'),boundaryTrace('prediction')],layout,{responsive:true,displaylogo:false});
+  $('status').textContent=`已加载：原尺寸 CT 与掩膜；当前三维联动刷新 ${(performance.now()-start).toFixed(0)} ms（浏览器显示耗时，不是推理/板端耗时）。`;
+}
+function refresh(){
+  if(!ready)return;
+  $('maskOpacityValue').textContent=Math.round(Number($('maskOpacity').value)*100)+'%';
+  const mode=$('display').value,source=$('sliceSource').value;
+  $('sliceSource').disabled=mode==='error'||mode==='ct';
+  $('sliceSource').title=mode==='error'?'误差图始终对比专家与模型':mode==='ct'?'原 CT 不显示肺区':'控制三个二维切片，不影响三维';
+  $('maskOpacity').disabled=mode!=='alpha';
+  let legend;
+  if(mode==='error')legend='<span class="red">误差图：红＝模型多分</span>　<span class="blue">蓝＝模型漏分</span>　灰＝两者重合（始终对比两份掩膜）';
+  else if(mode==='ct')legend='原 CT（不显示分割）';
+  else if(source==='expert')legend='<span class="cyan">仅专家：青色＝完整专家肺区'+(mode==='contour'?'边界':'')+'</span>';
+  else if(source==='prediction')legend='<span class="orange">仅模型：橙色＝完整模型肺区'+(mode==='contour'?'边界':'')+'</span>';
+  else if(mode==='alpha')legend='<span class="cyan">对比色块：青＝专家有／模型无（漏分）</span>　<span class="orange">橙＝模型有／专家无（多分）</span>　<span class="green">绿＝两者重合</span>';
+  else legend='<span class="cyan">切片轮廓：青＝专家</span>　<span class="orange">橙＝模型</span>　白＝边界重合';
+  $('sliceLegend').innerHTML=legend+'　紫色十字＝定位';
+  for(let axis=0;axis<3;axis++){$('range'+axis).value=position[axis];$('number'+axis).value=position[axis];$('slice'+axis).classList.toggle('active',axis===active);draw(axis)}
+  clearTimeout(plotTimer);plotTimer=setTimeout(updatePlot,100);
+}
+function change(axis,value){if(!Number.isFinite(Number(value)))return;position[axis]=Math.max(0,Math.min(shape[axis]-1,Math.round(Number(value))));active=axis;refresh()}
+function updateMetrics(){
+  const original=D.metadata,key=$('variant').value,details=key==='cleaned'?original.cleanup:original.variants?.[key];
+  const m=details?{...original,...details}:original,variant=$('variant').selectedOptions[0].textContent;
+  const stats=[['当前模型结果',variant],['整例 Dice',m.metrics.dice.toFixed(4)],['专家区域体积',m.expert_volume_ml.toFixed(1)+' mL'],['模型区域体积',m.prediction_volume_ml.toFixed(1)+' mL'],['体积差',(100*m.volume_relative_difference).toFixed(2)+'%'],['整例电脑推理',original.computer_inference_ms.toFixed(0)+' ms / '+original.inference_device]];
+  if(details)stats.push(['相对原始删除',details.removed_voxels+' 体素（整例）']);
+  $('metrics').replaceChildren();
+  for(const [label,value]of stats){const node=document.createElement('div');node.className='metric';const strong=document.createElement('strong');strong.textContent=value;node.append(document.createTextNode(label+'　'),strong);$('metrics').append(node)}
+}
+async function init(){
+  if(!window.DecompressionStream)throw Error('请用近期版 Edge 或 Chrome 打开；浏览器缺少离线解压支持。');
+  D=JSON.parse($('dataset').textContent);shape=D.shape;position=[D.metadata.initial_slice,Math.floor(shape[1]/2),Math.floor(shape[2]/2)];
+  HU=await decode(D.hu);E=await decode(D.expert);P=await decode(D.prediction);rawP=P;meshData={};
+  for(const name of ['expert','prediction']){const item={};for(const key of ['voxels','world','faces'])item[key]=await decode(D.meshes[name][key]);item.coords=coordinates(item);meshData[name]=item}
+  rawMesh=meshData.prediction;
+  if(D.cleaned){
+    cleanedP=await decode(D.cleaned);cleanedMesh={};
+    for(const key of ['voxels','world','faces'])cleanedMesh[key]=await decode(D.meshes.cleaned[key]);cleanedMesh.coords=coordinates(cleanedMesh);
+  }
+  variantMasks={original:rawP};variantMeshes={original:rawMesh};
+  if(cleanedP){variantMasks.cleaned=cleanedP;variantMeshes.cleaned=cleanedMesh}
+  for(const name of ['body','body_cleaned'])if(D.variants?.[name]){
+    variantMasks[name]=await decode(D.variants[name]);const item={};
+    for(const key of ['voxels','world','faces'])item[key]=await decode(D.meshes[name][key]);item.coords=coordinates(item);variantMeshes[name]=item;
+  }
+  for(const option of Array.from($('variant').options))if(!variantMasks[option.value])option.remove();
+  $('variant').disabled=Object.keys(variantMasks).length===1;
+  $('bodyBox').disabled=!D.body_geometry;
+  const m=D.metadata;
+  $('subtitle').textContent=`${m.case} · ${m.model} · ${shape.join(' × ')} ZYX · ${D.geometry.spacing_zyx_mm.join(' / ')} mm · ${m.split} 开发病例，不是新盲测`;
+  updateMetrics();
+  $('disclaimer').textContent=m.disclaimer+' 分割体积不是肺功能/肺活量。'+(D.body_geometry?'人体约束是保守包围框，不是精确皮肤分割。':'')+(m.cleanup?'后处理仅开发验证，尚未独立测试。':'')+'显示切换不重新推理、不修改 HU 或原始掩膜。';
+  for(let axis=0;axis<3;axis++){
+    for(const prefix of ['range','number']){const input=$(prefix+axis);input.max=shape[axis]-1;input.value=position[axis];input.addEventListener('input',()=>change(axis,input.value))}
+    $('canvas'+axis).addEventListener('click',event=>{const canvas=event.currentTarget,rect=canvas.getBoundingClientRect(),[h,w]=size(axis);const row=Math.max(0,Math.min(h-1,Math.floor((event.clientY-rect.top)*h/rect.height))),col=Math.max(0,Math.min(w-1,Math.floor((event.clientX-rect.left)*w/rect.width)));position=voxel(axis,row,col);active=axis;refresh()});
+  }
+  for(const id of ['mode','opacity','maskOpacity','cut','plane','bodyBox','display','sliceSource','wl','ww'])$(id).addEventListener('input',refresh);
+  $('variant').addEventListener('input',()=>{
+    const name=$('variant').value;
+    if(!variantMasks[name]){$('variant').value='original';return}
+    P=variantMasks[name];meshData.prediction=variantMeshes[name];
+    updateMetrics();refresh();
+  });
+  $('lungwindow').onclick=()=>{$('wl').value=-300;$('ww').value=1400;refresh()};
+  $('reset').onclick=()=>Plotly.relayout('plot',{'scene.camera':camera});
+  $('fullscreen').onclick=async()=>{
+    try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}
+    catch{ $('fullscreen').textContent='请按 F11 全屏'; }
+  };
+  document.addEventListener('fullscreenchange',()=>{$('fullscreen').textContent=document.fullscreenElement?'退出全屏':'全屏查看'});
+  const resizeObserver=new ResizeObserver(()=>{
+    if(!ready)return;for(let axis=0;axis<3;axis++)fitCanvas(axis);
+    if($('plot')._fullLayout)Plotly.Plots.resize('plot');
+  });
+  resizeObserver.observe($('plot'));for(let axis=0;axis<3;axis++)resizeObserver.observe($('canvas'+axis).parentElement);
+  ready=true;window.viewerReady=true;refresh();clearTimeout(plotTimer);await updatePlot();
+  // Diagnostic API is read-only; supports browser smoke tests, not mask editing.
+  window.viewerInfo=()=>({shape:shape.slice(),position:position.slice(),active,variant:$('variant').value,hu:HU[offset(...position)],expert:E[offset(...position)],prediction:P[offset(...position)]});
+  if(window.parent!==window)window.parent.postMessage({type:'lung-viewer-status',status:'ready',case:m.case},'*');
+}
+window.addEventListener('pagehide',()=>{clearTimeout(plotTimer);ready=false;if($('plot')._fullLayout)Plotly.purge('plot')});
+init().catch(error=>{$('status').textContent='加载失败：'+error.message;window.viewerError=String(error);console.error(error);
+  if(window.parent!==window)window.parent.postMessage({type:'lung-viewer-status',status:'error',case:D?.metadata?.case,error:String(error)},'*');});
+</script></body></html>

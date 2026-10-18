@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-18",
+  "status": "passed_desktop_web_delivery_checks",
+  "scope": "Real desktop software processing with synthetic HU; no neural inference or FPGA validation performed",
+  "environment": {
+    "python": "3.11.7",
+    "packages": {
+      "numpy": "2.4.6",
+      "scipy": "1.17.1",
+      "pydicom": "3.0.2",
+      "matplotlib": "3.11.2",
+      "nibabel": "5.4.2",
+      "scikit-image": "0.26.0",
+      "plotly": "6.9.0"
+    }
+  },
+  "system_site_packages": false,
+  "torch_installed": false,
+  "clean_desktop_unit_tests": 2,
+  "existing_workbench_platform_live_regression_tests": 72,
+  "existing_regression_environment": "original project environment, Torch threads=2",
+  "pip_check": "passed",
+  "default_no_config_startup": "desktop mode",
+  "explicit_missing_config": "rejected, no desktop fallback",
+  "browser": {
+    "status": "passed_real_desktop_server_synthetic_data_no_board",
+    "basicOperations": 8,
+    "mprSliceSynchronization": true,
+    "hardwareActionsRejected": true,
+    "export": true,
+    "mobileNoOverflow": true,
+    "javascriptErrors": [],
+    "scope": "Desktop software UI only; no neural or PL performance claim"
+  },
+  "teammate_main_files_preserved": 22,
+  "source_sha256": {
+    "python/ct_workspace_web.py": "34faa5fb0ee699c7ecfccc31e7d7150f2657deccb7beae705465037f7ade40da",
+    "python/lungseg/workspace/index.html": "ff25b01c7762af22d48e5cfd098cbced71774415485d63401f534c877f1388cf",
+    "python/lungseg/workspace/app.js": "1e4a04478f7f183faa0da50dc45c454dd03229a30c8756536b45c97111d06ff9",
+    "python/lungseg/live_viewer.html": "6b3f1fee31b5db655ac588a4080aea530af64643b0d5a0161aa00683b3827bef",
+    "python/create_demo_ct.py": "5eb24d36723045ac9e1cd6b8b1efec1b9785fda7f1c852bb21aa757bf8fbd4ce",
+    "python/requirements-web.txt": "4a36b624f931fc83cb21d2f7881d791c90c93e45b40c674cb7571d69ff3a392d",
+    "python/tests/test_ct_workspace_desktop.py": "093f853b6da37ede13a37a6096cd80347edcdcb7b874bef0f5ddcdcdff6b7327",
+    "python/tests/desktop_browser_smoke.mjs": "5a6cf13caf0a34bc8c8769d44f55389846593255abf16b4cc4a931ab1889f259"
+  }
+}

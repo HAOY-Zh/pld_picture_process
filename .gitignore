@@ -70,6 +70,12 @@ ip_user_files/
 /fpga/Lab_9/
 
 # Backups, temporary files, credentials and OS metadata
+# Generated processing-system summary; not a source project.
+/NA/
+# Per-installation board service credentials (even outside ignored data/).
+platform_token.txt
+live_token.txt
+*_token.txt
 *.bak
 *.backup
 *.tmp

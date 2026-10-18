@@ -1,0 +1,2 @@
+# Desktop CT workspace only. No PyTorch, PYNQ, model or bitstream is required.
+-r requirements-lung.txt

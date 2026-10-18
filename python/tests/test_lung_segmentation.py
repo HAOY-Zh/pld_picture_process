@@ -1,5 +1,6 @@
 """Synthetic engineering tests; passing does not establish medical accuracy."""
 from pathlib import Path
+import hashlib
 import subprocess
 import sys
 import tempfile
@@ -16,6 +17,7 @@ from lungseg.baseline import BaselineConfig, segment_slice
 from lungseg.dicom_io import (CTVolume, discover, load_ct, patient_to_pixel,
                              polygon_mask, rasterize_lungs)
 from lungseg.metrics import overlap_metrics
+from lung_unet import load_cached_source
 
 
 def file_dataset(path, sop_class, uid):
@@ -88,6 +90,30 @@ def make_case(directory):
 
 
 class GeometryTests(unittest.TestCase):
+    def test_cached_source_revalidates_identity_order_and_geometry(self):
+        with tempfile.TemporaryDirectory() as directory:
+            uid, _ = make_case(directory)
+            series, _, _ = discover(directory)
+            for path, _ in series[uid]:
+                ds = pydicom.dcmread(path)
+                ds.PatientID = 'synthetic-patient'
+                ds.save_as(path, enforce_file_format=True)
+            volume = load_ct(series[uid])
+            path_by_uid = {str(ds.SOPInstanceUID): str(path) for path, ds in series[uid]}
+            record = {'source_ct_files_sorted': [path_by_uid[sop] for sop in volume.sop_uids],
+                      'patient_key': hashlib.sha256(b'synthetic-patient').hexdigest(),
+                      'frame_uid': volume.frame_uid, 'native_shape': list(volume.hu.shape),
+                      'spacing_zyx_mm': volume.spacing.tolist(), 'slices': 2}
+            np.testing.assert_array_equal(load_cached_source(record), volume.hu)
+            with self.assertRaisesRegex(ValueError, 'file order'):
+                load_cached_source(dict(record, source_ct_files_sorted=record['source_ct_files_sorted'][::-1]))
+            with self.assertRaisesRegex(ValueError, 'patient identity'):
+                load_cached_source(dict(record, patient_key='different'))
+            with self.assertRaisesRegex(ValueError, 'frame/shape'):
+                load_cached_source(dict(record, frame_uid='different'))
+            with self.assertRaisesRegex(ValueError, 'spacing'):
+                load_cached_source(dict(record, spacing_zyx_mm=[2, 1, 1]))
+
     def test_reference_overlap_requires_explicit_permission_and_is_preserved(self):
         with tempfile.TemporaryDirectory() as directory:
             uid, rt = make_case(directory)

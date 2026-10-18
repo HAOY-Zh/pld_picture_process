@@ -4,3 +4,7 @@ numpy>=1.26,<3
 scipy>=1.11,<2
 pydicom>=3.0,<4
 matplotlib>=3.8,<4
+nibabel>=5.2,<6
+# Offline native-resolution 3D comparison viewer (not neural/FPGA dependencies).
+scikit-image>=0.25,<0.27
+plotly>=6,<7

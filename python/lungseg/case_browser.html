@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>肺区分析 · 多病例浏览</title>
+<style>
+*{box-sizing:border-box}:root{color-scheme:dark;font-family:system-ui,"Microsoft YaHei",sans-serif;background:#111723;color:#e7edf7}
+body{height:100vh;height:100dvh;margin:0;display:flex;flex-direction:column;overflow:hidden}
+header{padding:7px 10px;border-bottom:1px solid #35445e;background:#1a2434;flex:none}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}h1{font-size:17px;margin:0}
+select,button{font:inherit;padding:4px;border:1px solid #637795;border-radius:4px;background:#111b2c;color:#edf4ff}button{cursor:pointer}
+#caseStatus{color:#bed5ff;font-size:11px}.note{font-size:10px;color:#a9b8d0;margin-top:4px}
+#frameHost{flex:1;min-height:0}iframe{width:100%;height:100%;border:0;display:block;background:#111723}
+@media(max-width:599px){h1{width:100%}.row{gap:6px}}
+</style></head><body>
+<header><div class="row"><h1>肺区分析 · 多病例</h1><label for="caseSelect">选择病例</label><select id="caseSelect"></select>
+<button id="retry">重新加载本例</button><button id="portalFullscreen">全屏</button><span id="caseStatus" role="status">正在打开……</span></div>
+<div class="note">现有验证病例 · 预计算结果 · 切换后重置为原始预测 · 只加载当前一例 · 尚不支持导入未知个体 · 仅教学演示，不用于临床诊断</div></header>
+<main id="frameHost"></main>
+<script id="catalog" type="application/json">__CATALOG__</script>
+<script>
+'use strict';
+const catalog=JSON.parse(document.getElementById('catalog').textContent),select=document.getElementById('caseSelect');
+let currentFrame=null,selected=null,loadingState='loading',loadGeneration=0;
+for(const entry of catalog.cases){const option=document.createElement('option');option.value=entry.case;option.textContent=entry.case;select.append(option)}
+function loadCase(name){
+  const entry=catalog.cases.find(e=>e.case===name);if(!entry)throw Error('Unknown case');
+  if(!/^LCTSC-Train-S\d-\d{3}$/.test(entry.case)||entry.url!==`cases/${entry.case}/viewer.html`)throw Error('Invalid local case URL');
+  selected=name;select.value=name;loadingState='loading';loadGeneration++;
+  document.getElementById('caseStatus').textContent=`正在加载 ${name}（${(entry.bytes/1024**2).toFixed(1)} MiB），请稍候……`;
+  // Remove the old browsing context before loading a new case: no six-volume cache.
+  const host=document.getElementById('frameHost');host.replaceChildren();currentFrame=null;
+  const frame=document.createElement('iframe');frame.title=name+' 三维和切片对照';frame.allowFullscreen=true;
+  frame.setAttribute('sandbox','allow-scripts allow-same-origin');frame.src=entry.url;currentFrame=frame;host.append(frame);
+}
+window.addEventListener('message',event=>{
+  const message=event.data;
+  if(!currentFrame||event.source!==currentFrame.contentWindow||!message||message.type!=='lung-viewer-status'||(message.case&&message.case!==selected))return;
+  if(message.status==='ready'&&message.case===selected){
+    loadingState='ready';document.getElementById('caseStatus').textContent=`${selected} 已加载 · 用下方“模型结果”切换处理阶段`;
+  }else if(message.status==='error'){
+    loadingState='error';document.getElementById('caseStatus').textContent='加载失败：'+String(message.error||'未知错误');
+  }
+});
+select.addEventListener('change',()=>loadCase(select.value));
+document.getElementById('retry').onclick=()=>loadCase(selected);
+document.getElementById('portalFullscreen').onclick=async()=>{
+  try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen()}
+  catch{document.getElementById('portalFullscreen').textContent='请按 F11 全屏'}
+};
+document.addEventListener('fullscreenchange',()=>{document.getElementById('portalFullscreen').textContent=document.fullscreenElement?'退出全屏':'全屏'});
+window.portalState=()=>({case:selected,status:loadingState,generation:loadGeneration,frames:document.querySelectorAll('iframe').length,cases:catalog.cases.map(e=>e.case)});
+loadCase(catalog.default_case);
+</script></body></html>
