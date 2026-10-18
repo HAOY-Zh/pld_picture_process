@@ -42,7 +42,23 @@
     "javascript_errors": [],
     "horizontal_overflow": false,
     "real_fpga_output": false,
-    "neural_segmentation_executed": false
+    "neural_segmentation_executed": false,
+    "display_window_followup": {
+      "default_wl": -300,
+      "default_ww": 1400,
+      "presets": [
+        "comparison",
+        "lung",
+        "soft",
+        "custom"
+      ],
+      "three_presets_checked": true,
+      "input_output_hashes_unchanged": true,
+      "prior_display_range_hu": [
+        -1000,
+        400
+      ]
+    }
   },
   "deployment": {
     "classic": "new package verified; original basic HWH declares 50MHz",
@@ -71,8 +87,8 @@
     "pynq/ct_studio_service.py": "436d8602e9ce7415979afea85f79278c3dc8b6b432c2fec11cf8dac9c4a0381b",
     "python/lungseg/workspace/app.js": "0ce7125ed0f5fca20efc9014aad099ff5402362c956a9ee11d108efa7cea337c",
     "python/lungseg/workspace/index.html": "667940d82abd67a28d57d0eda694af73382f7b0cd74cbe3c8bbe9f14ec8462a5",
-    "python/lungseg/workspace/ldct.js": "12305a49ffde53db7ad86fdc241d382af7049ea5cef6a02cad45cd1cd0538425",
-    "python/lungseg/workspace/ldct.css": "f1ac955945c4106bde657df9ff8266866114e8fc5261757fd94dab2145bcdfd0",
+    "python/lungseg/workspace/ldct.js": "a865598974d6dd3aa8a6aed8f37e8599347042f5543f2b9424181ee725140ef9",
+    "python/lungseg/workspace/ldct.css": "f42d09c5fe30c03c0831698c8b4f4ce8e60d0582a2c35d5b9a74ba1196035ea1",
     "python/tests/test_ct_studio_ldct.py": "76bc07c92f45b3e2acd47dbc61c49429384ab1d6f91d572f35db73b997b00e80"
   }
 }

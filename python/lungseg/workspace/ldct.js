@@ -1,9 +1,20 @@
 'use strict';
 let ldctPayload=null,ldctTicket=0,ldctViewKey=null;
 const ldctBrowserTimings=new Map();
+const ldctWindows={comparison:[-300,1400],lung:[-600,1500],soft:[40,400]};
+function ldctWindowControls(){
+  const toolbar=document.querySelector('.ldct-toolbar'),label=document.createElement('label'),select=document.createElement('select');
+  label.htmlFor='ldctWindowPreset';label.textContent='显示窗';select.id='ldctWindowPreset';
+  for(const [value,text] of [['comparison','对比窗 · 与此前结果一致'],['lung','肺窗 · 观察肺部'],['soft','软组织窗 · 观察软组织'],['custom','自定义']]){const option=document.createElement('option');option.value=value;option.textContent=text;select.append(option);}
+  label.append(select);toolbar.insertBefore(label,$('ldctWl').parentElement);
+  const note=document.createElement('p');note.id='ldctWindowNote';note.className='ldct-window-note';note.setAttribute('aria-live','polite');toolbar.after(note);
+  select.onchange=()=>{const preset=ldctWindows[select.value];if(preset){[$('ldctWl').value,$('ldctWw').value]=preset;ldctDraw();}};
+  select.value='comparison';[$('ldctWl').value,$('ldctWw').value]=ldctWindows.comparison;
+}
 function ldctDraw(){
   const wl=Number($('ldctWl').value),ww=Number($('ldctWw').value);
-  if(!Number.isFinite(wl)||!Number.isFinite(ww)||ww<=0)return;
+  if(!Number.isFinite(wl)||!Number.isFinite(ww)||ww<=0){if($('ldctWindowNote'))$('ldctWindowNote').textContent='请输入有效窗位和大于 0 的窗宽。';return;}
+  if($('ldctWindowNote'))$('ldctWindowNote').textContent=`两图同步显示 ${wl-ww/2}～${wl+ww/2} HU；高于上限显示为白色。调窗只改变显示，不改变 HU 或去噪结果。`;
   for(const [id,key] of [['ldctOriginal','original'],['ldctEnhanced','enhanced']]){
     const canvas=$(id),ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);
     if(!ldctPayload?.[key]){ctx.fillStyle='#8aa5b0';ctx.font='16px sans-serif';ctx.textAlign='center';ctx.fillText(key==='original'?'载入 CT 后显示原图':'等待当前切片增强',256,256);continue;}
@@ -66,7 +77,8 @@ $('ldctCancel').onclick=()=>command('/api/ldct/cancel',{});
 $('ldctUse').onclick=async()=>{await command('/api/analysis-source',{case_id:state.case_id,source_id:$('ldctUse').dataset.source});showTab('basic');};
 $('analysisSource').onchange=()=>command('/api/analysis-source',{case_id:state.case_id,source_id:$('analysisSource').value});
 $('ldctSlice').onchange=()=>setIndex($('ldctSlice').value);
-for(const id of ['ldctWl','ldctWw'])$(id).oninput=ldctDraw;
+ldctWindowControls();
+for(const id of ['ldctWl','ldctWw'])$(id).oninput=()=>{$('ldctWindowPreset').value='custom';ldctDraw();};
 for(const id of ['ldctBackend','ldctMethod'])$(id).onchange=ldctRefresh;
 $('flowLoad').onclick=()=>{$('path').focus();};$('flowEnhance').onclick=()=>showTab('ldct');$('flowAnalyze').onclick=()=>showTab('basic');$('flowExport').onclick=()=>showTab('performance');
 window.addEventListener('ct-state-change',ldctRefresh);window.addEventListener('ct-slice-change',ldctRefresh);
