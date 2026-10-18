@@ -17,7 +17,7 @@ function showTab(name){for(const button of document.querySelectorAll('[data-tab]
 const titles={basic:['基础处理','从一张 CT，开始处理'],ldct:['LDCT 增强','先改善影像，再继续分析'],segmentation:['智能分割与三维','从切片到三维，查看肺区结构'],performance:['性能记录','每次计算，都有据可查']};$('crumb').textContent=titles[name][0];$('title').textContent=titles[name][1];requestAnimationFrame(drawAll);
 $('segmentationFrame').contentWindow?.postMessage({type:'ct-workspace-visible',visible:name==='segmentation'},location.origin);}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
-$('load').onclick=()=>command('/api/load',{path:$('path').value,load_slices:$('loadSlices').value,confirm_hu:$('confirm').checked,series_uid:$('uid').value.trim(),load_expert:$('loadExpert').checked,expert_path:$('expertPath').value});
+$('load').onclick=()=>command('/api/load',{path:$('path').value,load_slices:$('loadSlices').value,confirm_hu:$('confirm').checked,series_uid:$('uid').value.trim(),load_expert:$('loadExpert').checked,expert_path:$('expertPath').value,allow_inconsistent_frame_uids:$('frameUidCompatible')?.checked===true});
 $('connect').onclick=()=>command('/api/connect',{});
 $('connectFast').onclick=()=>command('/api/connect-fast',{});
 function params(){const op=$('operation').value;if(isMorphology())return {...currentMask()?.parameters,operation:op};const p={operation:op},keys=op==='threshold'?['lower','upper']:['wl','ww'];for(const k of keys){const field=$(k);if(!field.checkValidity()||field.value.trim()==='')throw Error('请输入有效的 '+k+' 参数');p[k]=Number(field.value);if(!Number.isInteger(p[k]))throw Error('参数须为整数');}return p;}

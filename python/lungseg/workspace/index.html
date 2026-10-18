@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="ui-token" content="__UI_TOKEN__"><title>CT Studio · 医学影像处理工作台</title>
-<link rel="stylesheet" href="/workspace.css"><link rel="stylesheet" href="/ldct.css"><script src="/workspace.js" defer></script><script src="/ldct.js" defer></script></head>
+<link rel="stylesheet" href="/workspace.css"><link rel="stylesheet" href="/ldct.css"><script src="/workspace.js" defer></script><script src="/ldct.js" defer></script><script src="/series.js" defer></script></head>
 <body>
 <aside class="sidebar">
   <a class="brand" href="/" aria-label="CT Studio 首页"><span class="brand-mark">CT</span><span>CT Studio<small>医学影像处理工作台</small></span></a>
@@ -21,6 +21,8 @@
     <div class="input-heading"><span class="step">1</span><div><strong>影像输入</strong><small>本机 DICOM · NIfTI · NPZ</small></div></div>
     <div class="input-fields"><label for="path">CT 路径</label><input id="path" type="text" placeholder="粘贴这台电脑上的 CT 文件或病例目录路径" autocomplete="off"><label for="loadSlices">读取层号</label><input id="loadSlices" placeholder="全部 / 124-129" aria-label="读取层号"></div>
     <button id="load" class="button primary">加载影像 <span>→</span></button>
+    <div class="series-import-actions"><button id="chooseFolder" class="button secondary">选择 CT 文件夹</button><input id="folderFiles" type="file" webkitdirectory multiple hidden aria-label="选择完整 CT 序列文件夹"><button id="inspectSeries" class="text-button">检查路径中的序列</button><span id="seriesStatus" role="status">整组导入请选择 DICOM 文件夹；读取层号留空表示全部。</span></div>
+    <div id="seriesPanel" class="series-panel" hidden><label for="seriesChoice">待加载序列<select id="seriesChoice"></select></label><p id="seriesAdvice"></p><label id="frameUidChoice" class="checkbox" hidden><input id="frameUidCompatible" type="checkbox">兼容匿名化数据的坐标系标识差异（仅影像处理，不加载专家标注）</label><p class="helper">依照切片空间位置排序，保留原始 HU 与毫米坐标；不把低剂量和正常剂量序列混合。</p></div>
     <details class="input-options"><summary>标注与输入选项</summary><div class="options-grid"><label class="checkbox"><input id="loadExpert" type="checkbox" checked>加载专家标注（仅用于对照）</label><input id="expertPath" placeholder="专家标注路径，可留空自动查找匹配的 RTSTRUCT" aria-label="专家标注路径"><label class="checkbox"><input id="confirm" type="checkbox">确认 NIfTI / NPZ 为 CT HU，空间单位 mm</label><input id="uid" placeholder="可选：DICOM Series UID" aria-label="DICOM Series UID"></div></details>
   </section>
   <div class="workflow-strip" aria-label="影像处理流程"><button id="flowLoad"><b>1</b>载入影像</button><span>→</span><button id="flowEnhance"><b>2</b>LDCT 增强 <small>可选</small></button><span>→</span><button id="flowAnalyze"><b>3</b>分析与三维</button><span>→</span><button id="flowExport"><b>4</b>记录与导出</button></div>

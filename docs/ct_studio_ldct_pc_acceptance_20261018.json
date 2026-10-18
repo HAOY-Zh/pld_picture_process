@@ -7,7 +7,7 @@
   "ldct_default_release_mhz": 100,
   "ldct_50mhz_backup_preserved": true,
   "software_tests": {
-    "affected_regressions": 126,
+    "affected_regressions": 150,
     "isolated_no_torch_desktop": 2,
     "failures": 0,
     "errors": 0,
@@ -21,7 +21,20 @@
       "plotly": "6.9.0",
       "torch": "2.8.0"
     },
-    "hardware_objects": "explicit test doubles only"
+    "hardware_objects": "explicit test doubles only",
+    "series_regression_patterns": [
+      "test_ct_studio_runtime.py",
+      "test_ct_platform*.py",
+      "test_ct_workspace.py",
+      "test_ct_studio_ldct.py",
+      "test_ct_series_import.py",
+      "test_ldct_processor.py",
+      "test_ct_tile_driver.py",
+      "test_lung_live.py",
+      "test_lung_live_reference.py",
+      "test_lung_volume_viewer.py",
+      "test_lung_segmentation.py"
+    ]
   },
   "browser": {
     "real_browser": true,
@@ -77,18 +90,51 @@
   ],
   "source_hash_encoding": "UTF-8 source with CRLF normalized to LF; portable Git comparison",
   "source_sha256_lf": {
-    "python/ct_workspace_web.py": "b1448de5ef80d1a87abcc80e410c816bdafcbad692def38beb7f440b23b9bbef",
-    "python/lung_live_web.py": "7530e658b6224b910fde39a8bd6a16129dafd9327c043ee8f2e1f78863124212",
+    "python/ct_workspace_web.py": "564ac85bb074734931e0b197e3bde899c650e2f91511de211aacd8fc096fe849",
+    "python/lung_live_web.py": "712bbf6ebc2624d342019f0c62c6aafe2d2475377858216dedea1cc39501ef82",
     "python/ct_studio_client.py": "101978df23bdfef8d5647a6b2a1fd157c6e62e17f812d66ad8b9f93bd10c138e",
     "python/ldct_contract.py": "b3d6f7f02508281f8509ecb56043a4efdd8efc0e2c22181a898660d4f65c9670",
     "python/ldct_workspace.py": "a07ecbd808a87dfc2c3457ad4064163e92fe77fa5d0287a959cc9f887820f8d5",
     "python/package_ct_studio.py": "3a46d0ae1bd92724e1afe65aa0db793ea0ed4a6074f321534e3af8dabbd8c8b6",
     "python/verify_ct_studio_board.py": "9baabafc9572b01af32dc4d34ea4a4d17ce4a112e9d958691dc78bed5b5e04c0",
     "pynq/ct_studio_service.py": "436d8602e9ce7415979afea85f79278c3dc8b6b432c2fec11cf8dac9c4a0381b",
-    "python/lungseg/workspace/app.js": "0ce7125ed0f5fca20efc9014aad099ff5402362c956a9ee11d108efa7cea337c",
-    "python/lungseg/workspace/index.html": "667940d82abd67a28d57d0eda694af73382f7b0cd74cbe3c8bbe9f14ec8462a5",
-    "python/lungseg/workspace/ldct.js": "a865598974d6dd3aa8a6aed8f37e8599347042f5543f2b9424181ee725140ef9",
-    "python/lungseg/workspace/ldct.css": "f42d09c5fe30c03c0831698c8b4f4ce8e60d0582a2c35d5b9a74ba1196035ea1",
-    "python/tests/test_ct_studio_ldct.py": "76bc07c92f45b3e2acd47dbc61c49429384ab1d6f91d572f35db73b997b00e80"
+    "python/lungseg/workspace/app.js": "c78bee2fd43ad5a7123a0e5a56e7266dddf9ce8cf0c99d2ad9c807278d53bc1a",
+    "python/lungseg/workspace/index.html": "4fb8f8424b9f37698c1d96eb053b833b6a01ab27bc953a610a06906556ee3f71",
+    "python/lungseg/workspace/ldct.js": "9f7951c629c6990922760153e50f21933886c5b0df5238115e45b30e3824bea9",
+    "python/lungseg/workspace/ldct.css": "9119c3577aee182724b0648269155a8d744dc055c251de5efe4930e358f050f9",
+    "python/tests/test_ct_studio_ldct.py": "76bc07c92f45b3e2acd47dbc61c49429384ab1d6f91d572f35db73b997b00e80",
+    "python/lungseg/dicom_io.py": "7e9cccd1539c57a6b0dee455e2efbbe4b33230ad69a29ba40650c1d58529c074",
+    "python/lung_live_reference.py": "347499eb33b79b674b9899d02fcc488e3a94042d350456d0c745c085169dde75",
+    "python/lungseg/workspace/series.js": "76c3fbaa24e0ffe6d5a4d1957d20e927b5761260e1ec96f12ff3b07d968b183e",
+    "python/tests/test_ct_series_import.py": "b31b3b18ae305cd34dee8668a95c467b9a7f237d73dc3d47f9f9f141f7742b1e",
+    "python/ct_series_import.py": "64b0f1deb9da4987707355fa1b94d3027caf92d7ca16879f7719517d07497f78",
+    "python/lung_live_data.py": "5cb92456c6e8c7ea07dad99ad40aef1b8188c36ad2ef39b5a3a705ffb5ea8c85"
+  },
+  "series_import": {
+    "status": "PASS_PC_BOARD_PENDING",
+    "real_browser_folder_upload": true,
+    "case": "C002",
+    "shape": [
+      280,
+      512,
+      512
+    ],
+    "original_file_bytes_preserved": true,
+    "native_hu_and_geometry_preserved": true,
+    "frame_uid_count": 280,
+    "frame_uid_exception": "explicit image-only compatibility; patient/study and full geometry checked; original per-slice UIDs retained; expert loading refused",
+    "actual_cpu_ldct_slices": 280,
+    "raw_and_enhanced_mpr_axes_exact": [
+      0,
+      1,
+      2
+    ],
+    "original_results_restored": true,
+    "series_selector": true,
+    "missing_duplicate_nonuniform_and_identity_mismatch_rejected": true,
+    "neural_segmentation_executed": false,
+    "board_tested": false,
+    "url": "http://127.0.0.1:8094/",
+    "original_8093_preserved": true
   }
 }

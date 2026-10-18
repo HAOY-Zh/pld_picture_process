@@ -201,7 +201,8 @@ class Controller:
             elif action == 'load':
                 hu, geom, details = read_ct(values['path'].strip().strip('"'),
                     confirm_hu=values.get('confirm_hu') is True, series_uid=values.get('series_uid', ''),
-                    slices=values.get('load_slices', ''))
+                    slices=values.get('load_slices', ''),
+                    allow_inconsistent_frame_uids=values.get('allow_inconsistent_frame_uids') is True)
                 expert, expert_info = read_reference(values.get('expert_path', '').strip().strip('"'),
                     hu.shape, geom, details, enabled=values.get('load_expert', True) is True)
                 details.update(annotations_loaded=expert is not None, expert_reference=expert_info)

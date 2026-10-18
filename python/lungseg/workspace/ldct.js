@@ -60,7 +60,7 @@ function ldctRefresh(){
   $('ldctBackendNote').textContent=hardware?'仅调用匹配的统一 FPGA 服务；失败后保留错误，不自动改用电脑。':'使用同一组量化权重验证增强流程；本次时间属于电脑参考。';
   $('ldctPreview').disabled=$('ldctRunVolume').disabled=!state.shape||!info.available||busy||(hardware&&!fpga);
   $('ldctCancel').hidden=!info.running;$('ldctSlice').disabled=!state.shape;
-  $('ldctSlice').max=state.shape?state.shape[0]-1:0;$('ldctSlice').value=index;
+  $('ldctSlice').max=state.shape?state.shape[0]-1:0;if(document.activeElement!==$('ldctSlice'))$('ldctSlice').value=index;
   $('ldctProgress').textContent=state.shape?`增强完成 ${info.completed_slices||0} / ${info.total_slices||0} 层`:'尚未载入 CT';
   const enhanced=choices.filter(c=>c.source_id!=='original'&&c.group_id===info.group_id).at(-1);
   $('ldctUse').disabled=!enhanced||busy;$('ldctUse').dataset.source=enhanced?.source_id||'';

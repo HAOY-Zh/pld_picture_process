@@ -22,6 +22,7 @@ from ct_basic_processing import OPERATIONS, morphology, parameters, process
 from ct_platform_client import PlatformClient
 from ct_studio_client import StudioClient
 from ldct_workspace import LDCTWorkspaceMixin
+from ct_series_import import FolderImports, inspect_series, MAX_FILE
 from lung_live_web import BoardClient, Controller, MODEL_SHA, handler_for, write_new
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -65,6 +66,7 @@ class WorkspaceController(LDCTWorkspaceMixin, Controller):
         self.history = []
         self.basic_condition = threading.Condition(self.lock)
         self.basic_request_id = None
+        self.folder_imports = FolderImports(self.output.parent/'imports')
 
     def snapshot(self):
         with self.lock:
@@ -294,6 +296,7 @@ workspacePendingSlice=m;workspaceApplySlice();}
     assets = {'/workspace.css': ('style.css', 'text/css; charset=utf-8'),
               '/ldct.js': ('ldct.js', 'text/javascript; charset=utf-8'),
               '/ldct.css': ('ldct.css', 'text/css; charset=utf-8'),
+              '/series.js': ('series.js', 'text/javascript; charset=utf-8'),
               '/workspace.js': ('app.js', 'text/javascript; charset=utf-8')}
 
     class Handler(base):
@@ -313,7 +316,7 @@ workspacePendingSlice=m;workspaceApplySlice();}
                         snapshot = controller.snapshot()
                         return self.send(200, dict(schema='ct_workspace_session_v1', state=snapshot,
                             note='当前会话状态及计算来源；基础PL/DMA与后台耗时分别记录；浏览器导出另附点击至显示计时；分割只显示实际回执'))
-                    q = parse.parse_qs(parts.query)
+                    q = parse.parse_qs(parts.query, keep_blank_values=True)
                     if parts.path == '/api/ldct/image':
                         return self.send(200,controller.ldct_payload(q['series'][0],q['group'][0],int(q['index'][0])))
                     return self.send(200, controller.basic_payload(q['case'][0], q['result'][0]))
@@ -324,6 +327,36 @@ workspacePendingSlice=m;workspaceApplySlice();}
             return super().do_GET()
 
         def do_POST(self):
+            parts = parse.urlsplit(self.path)
+            if parts.path == '/api/import/file':
+                if not self.allowed(True): return
+                try:
+                    length = int(self.headers.get('Content-Length', '0'))
+                    if (self.headers.get('Transfer-Encoding') or self.headers.get('Content-Type') != 'application/dicom'
+                            or not 0 < length <= MAX_FILE):
+                        raise ValueError('单个 DICOM 文件需小于 64MB')
+                    query = parse.parse_qs(parts.query)
+                    raw = self.rfile.read(length)
+                    if len(raw) != length: raise ValueError('文件传输未完成')
+                    value = controller.folder_imports.receive(query['import'][0], int(query['index'][0]), query['name'][0], raw)
+                    return self.send(200, value)
+                except (ValueError, KeyError) as exc:
+                    return self.send(400, dict(error=str(exc)))
+            if parts.path in ('/api/series/inspect', '/api/import/start', '/api/import/finish'):
+                if not self.allowed(True): return
+                try:
+                    length = int(self.headers.get('Content-Length', '0'))
+                    if (self.headers.get('Transfer-Encoding') or self.headers.get('Content-Type') != 'application/json'
+                            or not 0 < length <= 16384): raise ValueError('需要小型 JSON 请求')
+                    values = json.loads(self.rfile.read(length))
+                    if not isinstance(values, dict): raise ValueError('需要 JSON 对象')
+                    if parts.path == '/api/series/inspect':
+                        if not isinstance(values.get('path'), str): raise ValueError('请输入 CT 文件夹路径')
+                        return self.send(200, inspect_series(values['path']))
+                    if parts.path == '/api/import/start': return self.send(200, controller.folder_imports.start(values))
+                    return self.send(200, controller.folder_imports.finish(values.get('import_id')))
+                except (ValueError, KeyError, OSError) as exc:
+                    return self.send(400, dict(error=str(exc)))
             if self.path not in ('/api/basic/run','/api/connect-fast','/api/ldct/run','/api/ldct/cancel','/api/analysis-source'): return super().do_POST()
             if not self.allowed(True): return
             try:

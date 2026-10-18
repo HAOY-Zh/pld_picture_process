@@ -23,7 +23,7 @@ def parse_slices(text, count, empty_all=False):
     """Zero-based, inclusive ranges; sorted/deduplicated, never eval or clipping."""
     if not isinstance(text, str) or len(text) > 8192:
         raise ValueError('层号须为文本，例如 60-90 或 60,65,70-80')
-    if not text.strip():
+    if not text.strip() or (empty_all and text.strip().lower() in ('全部', 'all', '*')):
         if empty_all: return list(range(count))
         raise ValueError('请填写要计算的层号')
     result = set()
@@ -37,7 +37,7 @@ def parse_slices(text, count, empty_all=False):
     return sorted(result)
 
 
-def read_ct(path, confirm_hu=False, series_uid='', slices=''):
+def read_ct(path, confirm_hu=False, series_uid='', slices='', *, allow_inconsistent_frame_uids=False):
     """A single DICOM series, an axial NIfTI, or explicitly described HU NPZ.
 
     No annotations or stored predictions are opened. Non-DICOM input requires
@@ -53,7 +53,7 @@ def read_ct(path, confirm_hu=False, series_uid='', slices=''):
                        partial_input=len(chosen) != count)
         return chosen
     if path.is_dir() or path.suffix.lower() in ('.dcm', '.dicom'):
-        from lungseg.dicom_io import discover, load_ct, orientation_vectors
+        from lungseg.dicom_io import discover, load_ct, orientation_vectors, checked_ct_headers
         series, _, _ = discover(path)
         if series_uid:
             if series_uid not in series: raise ValueError('Requested CT series UID not found')
@@ -61,18 +61,26 @@ def read_ct(path, confirm_hu=False, series_uid='', slices=''):
         elif len(series) == 1:
             entries = next(iter(series.values()))
         else:
-            raise ValueError('Select one CT series folder or specify series UID. Found: ' + ', '.join(series))
+            raise ValueError('目录中有多个或没有 CT 序列，请点击“检查序列”后选择一个序列')
         _, _, normal = orientation_vectors(entries[0][1].ImageOrientationPatient)
         entries = sorted(entries, key=lambda item: float(np.asarray(item[1].ImagePositionPatient) @ normal))
+        if allow_inconsistent_frame_uids:
+            checked_ct_headers(entries, allow_inconsistent_frame_uids=True)
+        original_frames = [str(ds.FrameOfReferenceUID) for _, ds in entries]
         chosen = selection(len(entries))
         checked_shape((len(chosen), int(entries[0][1].Rows), int(entries[0][1].Columns)))
         # Discover reads headers only; decode pixel data only for selected planes.
-        volume = load_ct([entries[z] for z in chosen])
+        volume = load_ct([entries[z] for z in chosen], allow_inconsistent_frame_uids=allow_inconsistent_frame_uids)
         if path.is_file(): details['partial_input'] = True
         hu = volume.hu
         geom = geometry(volume.positions[0], volume.orientation, volume.spacing)
         details.update(series_uid=volume.series_uid, frame_uid=volume.frame_uid,
-                       sop_uids=list(volume.sop_uids), format='DICOM CT (rescale to HU)')
+                       source_name=str(getattr(entries[0][1], 'SeriesDescription', path.name)),
+                       sop_uids=list(volume.sop_uids), format='DICOM CT (rescale to HU)',
+                       source_frame_uid_count=len(set(original_frames)), frame_uids=list(volume.frame_uids),
+                       frame_uid_exception_applied=bool(allow_inconsistent_frame_uids and len(set(original_frames)) > 1),
+                       frame_uid_policy='Explicit image-only compatibility; original UIDs retained; no registration or resampling'
+                           if allow_inconsistent_frame_uids else 'Strict shared FrameOfReferenceUID')
     elif path.name.lower().endswith(('.nii', '.nii.gz')):
         if not confirm_hu: raise ValueError('Confirm this NIfTI contains CT HU with millimetre geometry')
         import nibabel as nib
