@@ -1,0 +1,941 @@
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2018.2 (win64) Build 2258646 Thu Jun 14 20:03:12 MDT 2018
+| Date         : Sat Oct 17 21:37:57 2026
+| Host         : gwr running 64-bit major release  (build 9200)
+| Command      : report_drc -file D:/PLD/data/denoise/ct_tile_build_ldctv1_100_04/drc.rpt
+| Design       : design_1_wrapper
+| Device       : xc7z020clg400-1
+| Speed File   : -1
+| Design State : Routed
+------------------------------------------------------------------------------------------
+
+Report DRC
+
+Table of Contents
+-----------------
+1. REPORT SUMMARY
+2. REPORT DETAILS
+
+1. REPORT SUMMARY
+-----------------
+            Netlist: netlist
+          Floorplan: impl_1
+      Design limits: <entire design considered>
+           Ruledeck: default
+             Max violations: <unlimited>
+             Violations found: 180
++-----------+----------+------------------------+------------+
+| Rule      | Severity | Description            | Violations |
++-----------+----------+------------------------+------------+
+| DPIP-1    | Warning  | Input pipelining       | 128        |
+| DPOP-1    | Warning  | PREG Output pipelining | 37         |
+| DPOP-2    | Warning  | MREG Output pipelining | 10         |
+| RTSTAT-10 | Warning  | No routable loads      | 1          |
+| REQP-165  | Advisory | writefirst             | 2          |
+| REQP-181  | Advisory | writefirst             | 2          |
++-----------+----------+------------------------+------------+
+
+2. REPORT DETAILS
+-----------------
+DPIP-1#1 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[0].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#2 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[0].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#3 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[2].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#4 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[2].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#5 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[4].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#6 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[4].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#7 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[6].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#8 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[0].mac[6].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#9 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[0].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#10 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[0].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#11 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[2].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#12 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[2].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#13 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[4].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#14 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[4].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#15 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[6].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#16 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[1].mac[6].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#17 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[0].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#18 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[0].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#19 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[2].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#20 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[2].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#21 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[4].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#22 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[4].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#23 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[6].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#24 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[2].mac[6].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#25 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[0].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#26 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[0].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#27 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[2].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#28 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[2].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#29 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[4].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#30 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[4].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#31 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[6].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#32 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[3].mac[6].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#33 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[0].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#34 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[0].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#35 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[2].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#36 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[2].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#37 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[4].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#38 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[4].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#39 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[6].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#40 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[4].mac[6].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#41 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[0].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#42 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[0].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#43 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[2].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#44 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[2].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#45 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[4].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#46 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[4].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#47 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[6].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#48 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[5].mac[6].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#49 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[0].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#50 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[0].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#51 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[2].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#52 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[2].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#53 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[4].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#54 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[4].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#55 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[6].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#56 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[6].mac[6].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#57 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[0].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#58 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[0].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[0].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#59 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[2].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#60 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[2].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[2].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#61 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[4].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#62 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[4].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[4].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#63 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[6].product_reg/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#64 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[6].product_reg input design_1_i/ct_denoise_tile_axis_0/inst/bank[7].mac[6].product_reg/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#65 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#66 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#67 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__0 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__0/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#68 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__0 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__0/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#69 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__1 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__1/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#70 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__1 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__1/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#71 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__10 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__10/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#72 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__10 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__10/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#73 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__11 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__11/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#74 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__11 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__11/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#75 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__12 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__12/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#76 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__12 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__12/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#77 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__13 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__13/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#78 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__13 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__13/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#79 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__14 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__14/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#80 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__14 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__14/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#81 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__15 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__15/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#82 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__15 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__15/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#83 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__16 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__16/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#84 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__16 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__16/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#85 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__17 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__17/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#86 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__17 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__17/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#87 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__18 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__18/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#88 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__18 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__18/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#89 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__19 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__19/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#90 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__19 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__19/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#91 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__2 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__2/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#92 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__2 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__2/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#93 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__20 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__20/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#94 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__20 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__20/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#95 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__21 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__21/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#96 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__21 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__21/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#97 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__22 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__22/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#98 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__22 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__22/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#99 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__23 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__23/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#100 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__23 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__23/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#101 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__24 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__24/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#102 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__24 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__24/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#103 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__25 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__25/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#104 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__25 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__25/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#105 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__26 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__26/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#106 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__26 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__26/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#107 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__27 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__27/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#108 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__27 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__27/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#109 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__28 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__28/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#110 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__28 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__28/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#111 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__29 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__29/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#112 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__29 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__29/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#113 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__3 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__3/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#114 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__3 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__3/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#115 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__30 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__30/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#116 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__30 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__30/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#117 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__4 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__4/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#118 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__4 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__4/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#119 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__5 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__5/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#120 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__5 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__5/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#121 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__6 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__6/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#122 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__6 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__6/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#123 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__7 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__7/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#124 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__7 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__7/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#125 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__8 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__8/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#126 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__8 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__8/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#127 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__9 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__9/A[29:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPIP-1#128 Warning
+Input pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__9 input design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__9/B[17:0] is not pipelined. Pipelining DSP48 input will improve performance.
+Related violations: <none>
+
+DPOP-1#1 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum0 output design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#2 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum0__0 output design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum0__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#3 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/numerator1 output design_1_i/ct_denoise_tile_axis_0/inst/numerator1/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#4 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#5 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__0 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__0/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#6 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__1 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__1/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#7 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__10 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__10/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#8 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__11 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__11/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#9 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__12 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__12/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#10 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__13 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__13/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#11 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__14 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__14/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#12 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__15 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__15/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#13 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__16 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__16/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#14 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__17 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__17/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#15 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__18 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__18/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#16 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__19 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__19/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#17 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__2 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__2/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#18 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__20 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__20/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#19 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__21 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__21/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#20 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__22 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__22/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#21 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__23 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__23/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#22 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__24 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__24/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#23 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__25 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__25/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#24 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__26 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__26/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#25 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__27 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__27/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#26 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__28 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__28/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#27 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__29 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__29/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#28 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__3 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__3/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#29 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__30 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__30/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#30 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__4 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__4/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#31 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__5 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__5/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#32 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__6 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__6/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#33 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__7 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__7/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#34 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__8 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__8/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#35 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__9 output design_1_i/ct_denoise_tile_axis_0/inst/p_0_out__9/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#36 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/range_pixel_product output design_1_i/ct_denoise_tile_axis_0/inst/range_pixel_product/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-1#37 Warning
+PREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/weight_reg1 output design_1_i/ct_denoise_tile_axis_0/inst/weight_reg1/P[47:0] is not pipelined (PREG=0). Pipelining the DSP48 output will improve performance and often saves power so it is suggested whenever possible to fully pipeline this function.  If this DSP48 function was inferred, it is suggested to describe an additional register stage after this function.  If the DSP48 was instantiated in the design, it is suggested to set the PREG attribute to 1.
+Related violations: <none>
+
+DPOP-2#1 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/gf_intercept_reg multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/gf_intercept_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#2 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/gf_pixel_a_reg multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/gf_pixel_a_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#3 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum0 multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#4 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum0__0 multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum0__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#5 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum_reg__0 multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum_reg__0/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#6 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum_reg__2 multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/gf_square_sum_reg__2/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#7 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/numerator1 multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/numerator1/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#8 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/range_pixel_product multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/range_pixel_product/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#9 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/square_reg_reg multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/square_reg_reg/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+DPOP-2#10 Warning
+MREG Output pipelining  
+DSP design_1_i/ct_denoise_tile_axis_0/inst/weight_reg1 multiplier stage design_1_i/ct_denoise_tile_axis_0/inst/weight_reg1/P[47:0] is not pipelined (MREG=0). Pipelining the multiplier function will improve performance and will save significant power so it is suggested whenever possible to fully pipeline this function.  If this multiplier was inferred, it is suggested to describe an additional register stage after this function.  If there is no registered adder/accumulator following the multiply function, two pipeline stages are suggested to allow both the MREG and PREG registers to be used.  If the DSP48 was instantiated in the design, it is suggested to set both the MREG and PREG attributes to 1 when performing multiply functions.
+Related violations: <none>
+
+RTSTAT-10#1 Warning
+No routable loads  
+15 net(s) have no routable loads. The problem bus(es) and/or net(s) are design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_B_CHANNEL.cmd_b_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/gr1.gr1_int.rfwft/aempty_fwft_i, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_BURSTS.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/gr1.gr1_int.rfwft/aempty_fwft_i, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_READ.USE_SPLIT_R.read_addr_inst/USE_R_CHANNEL.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/gr1.gr1_int.rfwft/aempty_fwft_i, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_BURSTS.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/gwss.wsts/ram_afull_fb, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_B_CHANNEL.cmd_b_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/gwss.wsts/ram_afull_fb, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_READ.USE_SPLIT_R.read_addr_inst/USE_R_CHANNEL.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/gwss.wsts/ram_afull_fb, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_BURSTS.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/gwss.wsts/ram_afull_i, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_B_CHANNEL.cmd_b_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/gwss.wsts/ram_afull_i, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_READ.USE_SPLIT_R.read_addr_inst/USE_R_CHANNEL.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.wr/gwss.wsts/ram_afull_i, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_B_CHANNEL.cmd_b_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/grss.rsts/ram_empty_i, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_BURSTS.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/grss.rsts/ram_empty_i, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_READ.USE_SPLIT_R.read_addr_inst/USE_R_CHANNEL.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/grss.rsts/ram_empty_i, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_B_CHANNEL.cmd_b_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/gr1.gr1_int.rfwft/user_valid, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_WRITE.write_addr_inst/USE_BURSTS.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/gr1.gr1_int.rfwft/user_valid, design_1_i/memory_axi/m00_couplers/auto_pc/inst/gen_axi4_axi3.axi3_conv_inst/USE_READ.USE_SPLIT_R.read_addr_inst/USE_R_CHANNEL.cmd_queue/inst/fifo_gen_inst/inst_fifo_gen/gconvfifo.rf/grf.rf/gntv_or_sync_fifo.gl0.rd/gr1.gr1_int.rfwft/user_valid (the first 15 of 15 listed).
+Related violations: <none>
+
+REQP-165#1 Advisory
+writefirst  
+Synchronous clocking is detected for BRAM (design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_MM2S_FULL.I_MM2S_FULL_WRAPPER/GEN_INCLUDE_MM2S_SF.I_RD_SF/I_DATA_FIFO/BLK_MEM.I_SYNC_FIFOGEN_FIFO/xpm_fifo_instance.xpm_fifo_sync_inst/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_1) in SDP mode with WRITE_FIRST write-mode. This is the preferred mode for best power characteristics, however it may exhibit address collisions if the same address appears on both read and write ports resulting in unknown or corrupted read data. It is suggested to confirm via simulation that an address collision never occurs and if so it is suggested to try and avoid this situation. If address collisions cannot be avoided, the write-mode may be set to READ_FIRST which guarantees that the read data is the prior contents of the memory at the cost of additional power in the design. See the FPGA Memory Resources User Guide for additional information.
+Related violations: <none>
+
+REQP-165#2 Advisory
+writefirst  
+Synchronous clocking is detected for BRAM (design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/GEN_ENABLE_INDET_BTT_SF.I_INDET_BTT/I_DATA_FIFO/BLK_MEM.I_SYNC_FIFOGEN_FIFO/xpm_fifo_instance.xpm_fifo_sync_inst/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_1) in SDP mode with WRITE_FIRST write-mode. This is the preferred mode for best power characteristics, however it may exhibit address collisions if the same address appears on both read and write ports resulting in unknown or corrupted read data. It is suggested to confirm via simulation that an address collision never occurs and if so it is suggested to try and avoid this situation. If address collisions cannot be avoided, the write-mode may be set to READ_FIRST which guarantees that the read data is the prior contents of the memory at the cost of additional power in the design. See the FPGA Memory Resources User Guide for additional information.
+Related violations: <none>
+
+REQP-181#1 Advisory
+writefirst  
+Synchronous clocking is detected for BRAM (design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_MM2S_FULL.I_MM2S_FULL_WRAPPER/GEN_INCLUDE_MM2S_SF.I_RD_SF/I_DATA_FIFO/BLK_MEM.I_SYNC_FIFOGEN_FIFO/xpm_fifo_instance.xpm_fifo_sync_inst/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0) in SDP mode with WRITE_FIRST write-mode. This is the preferred mode for best power characteristics, however it may exhibit address collisions if the same address appears on both read and write ports resulting in unknown or corrupted read data. It is suggested to confirm via simulation that an address collision never occurs and if so it is suggested to try and avoid this situation. If address collisions cannot be avoided, the write-mode may be set to READ_FIRST which guarantees that the read data is the prior contents of the memory at the cost of additional power in the design. See the FPGA Memory Resources User Guide for additional information.
+Related violations: <none>
+
+REQP-181#2 Advisory
+writefirst  
+Synchronous clocking is detected for BRAM (design_1_i/axi_dma_0/U0/I_PRMRY_DATAMOVER/GEN_S2MM_FULL.I_S2MM_FULL_WRAPPER/GEN_ENABLE_INDET_BTT_SF.I_INDET_BTT/I_DATA_FIFO/BLK_MEM.I_SYNC_FIFOGEN_FIFO/xpm_fifo_instance.xpm_fifo_sync_inst/xpm_fifo_base_inst/gen_sdpram.xpm_memory_base_inst/gen_wr_a.gen_word_narrow.mem_reg_0) in SDP mode with WRITE_FIRST write-mode. This is the preferred mode for best power characteristics, however it may exhibit address collisions if the same address appears on both read and write ports resulting in unknown or corrupted read data. It is suggested to confirm via simulation that an address collision never occurs and if so it is suggested to try and avoid this situation. If address collisions cannot be avoided, the write-mode may be set to READ_FIRST which guarantees that the read data is the prior contents of the memory at the cost of additional power in the design. See the FPGA Memory Resources User Guide for additional information.
+Related violations: <none>
+
+

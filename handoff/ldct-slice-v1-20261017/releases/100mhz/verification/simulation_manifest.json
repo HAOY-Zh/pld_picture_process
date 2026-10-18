@@ -1,0 +1,12 @@
+﻿{
+    "output_pixels":  51607,
+    "cnn_compact_protocol":  true,
+    "frames":  78,
+    "result":  "PASS",
+    "rtl_sha256":  {
+                       "ct_denoise_roms.vh":  "49c5459212dc4e34a902e1730ec05bd839e4396c1680592ca44a23ca5f37cdb9",
+                       "ct_unsigned_divider.v":  "789fdb6baee0e493b6405c9199482abc9a5983b83d2b85fd788f3b26796f9df1",
+                       "ct_denoise_tile_axis.v":  "e7573e5f53a76a2dd00145e8095d8d1ecb158ab76cf1d61b4f5537b82341e7d1"
+                   },
+    "stress":  true
+}

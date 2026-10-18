@@ -1,0 +1,5 @@
+Optional PC FP32 reference: three replicate-padded Conv3x3 layers 1->8->8->1, ReLU after first two.
+Normalized input HU/1024; output=(input-predicted_noise)*1024. No display clipping/resizing.
+equivalent_model.pt is the compensated hidden-channel parameterization; source_trained_best.pt is original best epoch118.
+Both store schema=1/model state_dict/channels/hu_scale. Use model.float() after loading for FP32.
+Torch is optional on PC only; board interface and integer reference require NumPy and PYNQ, no Torch.

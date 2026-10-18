@@ -1,0 +1,299 @@
+{
+  "status": "PASS",
+  "actual_FPGA_execution": false,
+  "scope": "76 fixed test slices, C067/C077, previously inspected. Frozen candidate evaluated once; no test-driven tuning.",
+  "metrics": [
+    {
+      "method": "New_optimized_integer",
+      "rmse_hu": 69.87323505543708,
+      "psnr_window_db": 29.60478156216717,
+      "ssim_window": 0.6742017816854713,
+      "body_rmse_hu": 80.37885764763101,
+      "body_ssim": 0.5749186966993114
+    },
+    {
+      "method": "New_original_float",
+      "rmse_hu": 69.587930299655,
+      "psnr_window_db": 29.62957130457803,
+      "ssim_window": 0.6751563703513448,
+      "body_rmse_hu": 80.32449587705314,
+      "body_ssim": 0.5759866453836477
+    },
+    {
+      "method": "New_original_integer",
+      "rmse_hu": 70.65305096145335,
+      "psnr_window_db": 29.509892260876775,
+      "ssim_window": 0.6706512712937592,
+      "body_rmse_hu": 81.13136136965196,
+      "body_ssim": 0.5735106523876826
+    },
+    {
+      "method": "Old_float",
+      "rmse_hu": 69.90655016385085,
+      "psnr_window_db": 29.590327799906788,
+      "ssim_window": 0.672439589379487,
+      "body_rmse_hu": 80.69004992802057,
+      "body_ssim": 0.5715615575097827
+    },
+    {
+      "method": "Old_integer",
+      "rmse_hu": 70.36512974019783,
+      "psnr_window_db": 29.54190214732759,
+      "ssim_window": 0.6699946696415949,
+      "body_rmse_hu": 81.064070126873,
+      "body_ssim": 0.5678284334559195
+    }
+  ],
+  "patient_metrics": [
+    {
+      "patient": "C067",
+      "method": "New_optimized_integer",
+      "slices": 37,
+      "rmse_hu": 66.987720852412,
+      "psnr_window_db": 29.895600631093448,
+      "ssim_window": 0.6911419422454175,
+      "body_rmse_hu": 80.27779410008411,
+      "body_ssim": 0.5761161691339858,
+      "rmse_hu_count": 37,
+      "psnr_window_db_count": 37,
+      "ssim_window_count": 37,
+      "body_rmse_hu_count": 37,
+      "body_ssim_count": 37
+    },
+    {
+      "patient": "C077",
+      "method": "New_optimized_integer",
+      "slices": 39,
+      "rmse_hu": 72.75874925846217,
+      "psnr_window_db": 29.313962493240886,
+      "ssim_window": 0.6572616211255252,
+      "body_rmse_hu": 80.4799211951779,
+      "body_ssim": 0.5737212242646369,
+      "rmse_hu_count": 39,
+      "psnr_window_db_count": 39,
+      "ssim_window_count": 39,
+      "body_rmse_hu_count": 39,
+      "body_ssim_count": 39
+    },
+    {
+      "patient": "C067",
+      "method": "New_original_float",
+      "slices": 37,
+      "rmse_hu": 66.7010729627303,
+      "psnr_window_db": 29.92054983839698,
+      "ssim_window": 0.6922656427996391,
+      "body_rmse_hu": 80.3313797298423,
+      "body_ssim": 0.5770904499980639,
+      "rmse_hu_count": 37,
+      "psnr_window_db_count": 37,
+      "ssim_window_count": 37,
+      "body_rmse_hu_count": 37,
+      "body_ssim_count": 37
+    },
+    {
+      "patient": "C077",
+      "method": "New_original_float",
+      "slices": 39,
+      "rmse_hu": 72.4747876365797,
+      "psnr_window_db": 29.338592770759078,
+      "ssim_window": 0.6580470979030506,
+      "body_rmse_hu": 80.31761202426398,
+      "body_ssim": 0.5748828407692315,
+      "rmse_hu_count": 39,
+      "psnr_window_db_count": 39,
+      "ssim_window_count": 39,
+      "body_rmse_hu_count": 39,
+      "body_ssim_count": 39
+    },
+    {
+      "patient": "C067",
+      "method": "New_original_integer",
+      "slices": 37,
+      "rmse_hu": 67.98619307842347,
+      "psnr_window_db": 29.766984364001665,
+      "ssim_window": 0.6858837258978513,
+      "body_rmse_hu": 81.30834372088434,
+      "body_ssim": 0.5727287137131983,
+      "rmse_hu_count": 37,
+      "psnr_window_db_count": 37,
+      "ssim_window_count": 37,
+      "body_rmse_hu_count": 37,
+      "body_ssim_count": 37
+    },
+    {
+      "patient": "C077",
+      "method": "New_original_integer",
+      "slices": 39,
+      "rmse_hu": 73.31990884448321,
+      "psnr_window_db": 29.25280015775189,
+      "ssim_window": 0.6554188166896672,
+      "body_rmse_hu": 80.95437901841956,
+      "body_ssim": 0.5742925910621669,
+      "rmse_hu_count": 39,
+      "psnr_window_db_count": 39,
+      "ssim_window_count": 39,
+      "body_rmse_hu_count": 39,
+      "body_ssim_count": 39
+    },
+    {
+      "patient": "C067",
+      "method": "Old_float",
+      "slices": 37,
+      "rmse_hu": 66.95905113356069,
+      "psnr_window_db": 29.88716347508538,
+      "ssim_window": 0.6904140402878653,
+      "body_rmse_hu": 80.48111533236472,
+      "body_ssim": 0.5739280597615588,
+      "rmse_hu_count": 37,
+      "psnr_window_db_count": 37,
+      "ssim_window_count": 37,
+      "body_rmse_hu_count": 37,
+      "body_ssim_count": 37
+    },
+    {
+      "patient": "C077",
+      "method": "Old_float",
+      "slices": 39,
+      "rmse_hu": 72.854049194141,
+      "psnr_window_db": 29.293492124728193,
+      "ssim_window": 0.6544651384711087,
+      "body_rmse_hu": 80.89898452367642,
+      "body_ssim": 0.5691950552580065,
+      "rmse_hu_count": 39,
+      "psnr_window_db_count": 39,
+      "ssim_window_count": 39,
+      "body_rmse_hu_count": 39,
+      "body_ssim_count": 39
+    },
+    {
+      "patient": "C067",
+      "method": "Old_integer",
+      "slices": 37,
+      "rmse_hu": 67.45025292414873,
+      "psnr_window_db": 29.830948218803996,
+      "ssim_window": 0.68770410794509,
+      "body_rmse_hu": 80.87169822120153,
+      "body_ssim": 0.5694681828953367,
+      "rmse_hu_count": 37,
+      "psnr_window_db_count": 37,
+      "ssim_window_count": 37,
+      "body_rmse_hu_count": 37,
+      "body_ssim_count": 37
+    },
+    {
+      "patient": "C077",
+      "method": "Old_integer",
+      "slices": 39,
+      "rmse_hu": 73.28000655624695,
+      "psnr_window_db": 29.252856075851184,
+      "ssim_window": 0.6522852313380999,
+      "body_rmse_hu": 81.25644203254448,
+      "body_ssim": 0.5661886840165022,
+      "rmse_hu_count": 39,
+      "psnr_window_db_count": 39,
+      "ssim_window_count": 39,
+      "body_rmse_hu_count": 39,
+      "body_ssim_count": 39
+    }
+  ],
+  "quantization_error": [
+    {
+      "model": "New_optimized",
+      "float_integer_rmse_hu": 5.7921459178176065
+    },
+    {
+      "model": "New_original",
+      "float_integer_rmse_hu": 10.422530884377682
+    },
+    {
+      "model": "Old",
+      "float_integer_rmse_hu": 6.152323917845358
+    }
+  ],
+  "integer_backend_audits": [
+    {
+      "patient": "C067",
+      "slice": 0,
+      "model": "Old",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C067",
+      "slice": 0,
+      "model": "New_original",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C067",
+      "slice": 0,
+      "model": "New_optimized",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C067",
+      "slice": 180,
+      "model": "Old",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C067",
+      "slice": 180,
+      "model": "New_original",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C067",
+      "slice": 180,
+      "model": "New_optimized",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C077",
+      "slice": 0,
+      "model": "Old",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C077",
+      "slice": 0,
+      "model": "New_original",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C077",
+      "slice": 0,
+      "model": "New_optimized",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C077",
+      "slice": 190,
+      "model": "Old",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C077",
+      "slice": 190,
+      "model": "New_original",
+      "independent_integer_max_error_hu": 0
+    },
+    {
+      "patient": "C077",
+      "slice": 190,
+      "model": "New_optimized",
+      "independent_integer_max_error_hu": 0
+    }
+  ],
+  "model_hashes": {
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_run02\\best.pt": "fc07ccb94fed013cbb87665ed4d2b498d8fa12e7bd8a1bbd42fbe481990da6cb",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_quant_20261017\\quantization.json": "047ca0684e3a2450935e9105a57d2156a698dfbe6461fac57e98a0f1552097b8",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_quant_20261017\\weights_integer.npz": "7646917acde04babf26f6424133a351bf058a2475ac2bb77af8ccdd26a6b0586",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_detail_long01\\best.pt": "0fd09c0901d395384d7d28d272935d121bb005dc2ef318f31add8a06b1ce24f5",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_detail_long_quant2048_01\\quantization.json": "92c5cda0f36fbb30ea8e339a564967ce6f512039f6c07a7d563699705a167786",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_detail_long_quant2048_01\\weights_integer.npz": "4aee5460b7fdf95e6f09124ddea907f0c11f283468cf83fc65e9cea4d0245690",
+    "D:\\PLD\\data\\denoise\\ct_quant_diagnosis_20261017_01\\range_safe_quantized\\equivalent_model.pt": "2cc0ba07080f950c87427c574472d067e411c7379a7394332290fba12f6f8d5b",
+    "D:\\PLD\\data\\denoise\\ct_quant_diagnosis_20261017_01\\range_safe_quantized\\quantization.json": "8c762103047b348734df4447f296524e99e66ebfd3ac7f98c11a5dcc4a904bfd",
+    "D:\\PLD\\data\\denoise\\ct_quant_diagnosis_20261017_01\\range_safe_quantized\\weights_integer.npz": "00d7d04f33219c381ad748ae4c869a046538ef7c176e96e2031202b15b0ae022"
+  },
+  "baseline_metrics_reproduced": true
+}

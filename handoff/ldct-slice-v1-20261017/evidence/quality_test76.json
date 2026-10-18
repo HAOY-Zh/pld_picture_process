@@ -1,0 +1,108 @@
+{
+  "scope": "Same 76 previously inspected test slices, C067/C077, patient-equal means; candidate frozen before this evaluation",
+  "raw_ldct_metrics": [
+    {
+      "method": "Raw_LDCT",
+      "rmse_hu": 192.7263185479952,
+      "psnr_window_db": 20.7437309589342,
+      "ssim_window": 0.39572295896097,
+      "body_rmse_hu": 240.4378851795322,
+      "body_ssim": 0.299079239537124
+    }
+  ],
+  "raw_ldct_patient_metrics": [
+    {
+      "patient": "C067",
+      "method": "Raw_LDCT",
+      "slices": 37,
+      "rmse_hu": 193.10987009796767,
+      "psnr_window_db": 20.593392946416184,
+      "ssim_window": 0.3847452017822246,
+      "body_rmse_hu": 250.20370350794482,
+      "body_ssim": 0.27397187777059834,
+      "rmse_hu_count": 37,
+      "psnr_window_db_count": 37,
+      "ssim_window_count": 37,
+      "body_rmse_hu_count": 37,
+      "body_ssim_count": 37
+    },
+    {
+      "patient": "C077",
+      "method": "Raw_LDCT",
+      "slices": 39,
+      "rmse_hu": 192.3427669980227,
+      "psnr_window_db": 20.894068971452214,
+      "ssim_window": 0.4067007161397154,
+      "body_rmse_hu": 230.6720668511196,
+      "body_ssim": 0.3241866013036497,
+      "rmse_hu_count": 39,
+      "psnr_window_db_count": 39,
+      "ssim_window_count": 39,
+      "body_rmse_hu_count": 39,
+      "body_ssim_count": 39
+    }
+  ],
+  "model_metrics": [
+    {
+      "method": "New_optimized_integer",
+      "rmse_hu": 69.87323505543708,
+      "psnr_window_db": 29.60478156216717,
+      "ssim_window": 0.6742017816854713,
+      "body_rmse_hu": 80.37885764763101,
+      "body_ssim": 0.5749186966993114
+    },
+    {
+      "method": "New_original_float",
+      "rmse_hu": 69.587930299655,
+      "psnr_window_db": 29.62957130457803,
+      "ssim_window": 0.6751563703513448,
+      "body_rmse_hu": 80.32449587705314,
+      "body_ssim": 0.5759866453836477
+    },
+    {
+      "method": "New_original_integer",
+      "rmse_hu": 70.65305096145335,
+      "psnr_window_db": 29.509892260876775,
+      "ssim_window": 0.6706512712937592,
+      "body_rmse_hu": 81.13136136965196,
+      "body_ssim": 0.5735106523876826
+    },
+    {
+      "method": "Old_float",
+      "rmse_hu": 69.90655016385085,
+      "psnr_window_db": 29.590327799906788,
+      "ssim_window": 0.672439589379487,
+      "body_rmse_hu": 80.69004992802057,
+      "body_ssim": 0.5715615575097827
+    },
+    {
+      "method": "Old_integer",
+      "rmse_hu": 70.36512974019783,
+      "psnr_window_db": 29.54190214732759,
+      "ssim_window": 0.6699946696415949,
+      "body_rmse_hu": 81.064070126873,
+      "body_ssim": 0.5678284334559195
+    }
+  ],
+  "quantization_error": [
+    {
+      "model": "New_optimized",
+      "float_integer_rmse_hu": 5.7921459178176065
+    },
+    {
+      "model": "New_original",
+      "float_integer_rmse_hu": 10.422530884377682
+    },
+    {
+      "model": "Old",
+      "float_integer_rmse_hu": 6.152323917845358
+    }
+  ],
+  "hu_rmse": "unclipped HU",
+  "psnr_ssim": "fixed [-1000,1000] clipping, data_range=2000; SSIM window7",
+  "display_window": [
+    -1000,
+    400
+  ],
+  "interpretation": "Compared with paired full-dose CT, not clinical ground truth; no manual lung labels or downstream accuracy claim"
+}

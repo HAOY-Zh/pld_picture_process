@@ -1,0 +1,339 @@
+{
+  "status": "PASS",
+  "actual_FPGA_execution": true,
+  "independent_output_checks": [
+    {
+      "label": "stable50",
+      "case": "C067",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\C067_actual.npy",
+      "sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48"
+    },
+    {
+      "label": "stable50",
+      "case": "C077",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\C077_actual.npy",
+      "sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15"
+    },
+    {
+      "label": "stable50",
+      "case": "edge67x69",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\edge67x69_actual.npy",
+      "sha256": "209059de1b7d3b6caeb4c54350605c06170bda92373e4ddf3c9154e2ab4cdcc9"
+    },
+    {
+      "label": "stable50",
+      "case": "row1x69",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\row1x69_actual.npy",
+      "sha256": "d750eed4b743c28c2ef1b32d3a445f5dd4fe9909f7bf1f805bd194a9b640487b"
+    },
+    {
+      "label": "stable50",
+      "case": "column67x1",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\column67x1_actual.npy",
+      "sha256": "e2131a8a0a05d12f2a23dba212392136095ee7f9f3f14ba2a670bd2c5f6db8f8"
+    },
+    {
+      "label": "stable50",
+      "case": "single",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\single_actual.npy",
+      "sha256": "e0cbad9e9d012c612f1eb79c2f279b180e3ebbc7b6b90ccca3c7d171aeb58a69"
+    },
+    {
+      "label": "stable50",
+      "case": "float_ties",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\float_ties_actual.npy",
+      "sha256": "ff0702e081bec8ec692a63a774b8a316ca31a3f4835e43ec83ceca7e137df477"
+    },
+    {
+      "label": "stable50",
+      "case": "method_bypass",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\method_bypass_actual.npy",
+      "sha256": "7832145daa30f33fd2ff5fc1126583c99db22cd3ebb4e64c2e4cce985bbe408d"
+    },
+    {
+      "label": "stable50",
+      "case": "method_gaussian5",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\method_gaussian5_actual.npy",
+      "sha256": "780b770776f18550227f905e6b896ca49a1698c27cd97a1747e39b9d649c45ff"
+    },
+    {
+      "label": "stable50",
+      "case": "method_bilateral5",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\method_bilateral5_actual.npy",
+      "sha256": "98f753dcfcda5294539b5f4ed6953150308b91e7aa8218fc27d3d0ee76b08753"
+    },
+    {
+      "label": "stable50",
+      "case": "method_joint7_guide5",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\method_joint7_guide5_actual.npy",
+      "sha256": "b06dfe7a1490358616333e7aec3c5ae468b35da5afa7718817a905b9def243cb"
+    },
+    {
+      "label": "stable50",
+      "case": "method_joint7_guide3",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\method_joint7_guide3_actual.npy",
+      "sha256": "22e30c3761c56f9539f4388d1efa96f60705b32e950f6db538a1139e4a693607"
+    },
+    {
+      "label": "stable50",
+      "case": "method_guided3",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\method_guided3_actual.npy",
+      "sha256": "9a48a337b69b381b53b718e944747ef87fb6329882cc081714c4ce4fad6f3e12"
+    },
+    {
+      "label": "stable50",
+      "case": "method_cnn",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\method_cnn_actual.npy",
+      "sha256": "034e43dace344080b350072c35c35b9e52bc18a1642a707092580181fca098cb"
+    },
+    {
+      "label": "stable50",
+      "case": "method_bilateral7",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\method_bilateral7_actual.npy",
+      "sha256": "390bf5eae75a8f155a3ebcc3a5e51f8d0d9cec69bca002e5b664bb8ca828f4ff"
+    },
+    {
+      "label": "stable50",
+      "case": "C067_timed_phase0",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\C067_timed_actual.npy",
+      "sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48"
+    },
+    {
+      "label": "stable50",
+      "case": "C077_timed_phase0",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_00_stable50\\C077_timed_actual.npy",
+      "sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15"
+    },
+    {
+      "label": "stable50",
+      "case": "C067_timed_phase3",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_03_stable50\\C067_timed_actual.npy",
+      "sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48"
+    },
+    {
+      "label": "stable50",
+      "case": "C077_timed_phase3",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_03_stable50\\C077_timed_actual.npy",
+      "sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15"
+    },
+    {
+      "label": "fast100",
+      "case": "C067",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\C067_actual.npy",
+      "sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48"
+    },
+    {
+      "label": "fast100",
+      "case": "C077",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\C077_actual.npy",
+      "sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15"
+    },
+    {
+      "label": "fast100",
+      "case": "edge67x69",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\edge67x69_actual.npy",
+      "sha256": "209059de1b7d3b6caeb4c54350605c06170bda92373e4ddf3c9154e2ab4cdcc9"
+    },
+    {
+      "label": "fast100",
+      "case": "row1x69",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\row1x69_actual.npy",
+      "sha256": "d750eed4b743c28c2ef1b32d3a445f5dd4fe9909f7bf1f805bd194a9b640487b"
+    },
+    {
+      "label": "fast100",
+      "case": "column67x1",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\column67x1_actual.npy",
+      "sha256": "e2131a8a0a05d12f2a23dba212392136095ee7f9f3f14ba2a670bd2c5f6db8f8"
+    },
+    {
+      "label": "fast100",
+      "case": "single",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\single_actual.npy",
+      "sha256": "e0cbad9e9d012c612f1eb79c2f279b180e3ebbc7b6b90ccca3c7d171aeb58a69"
+    },
+    {
+      "label": "fast100",
+      "case": "float_ties",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\float_ties_actual.npy",
+      "sha256": "ff0702e081bec8ec692a63a774b8a316ca31a3f4835e43ec83ceca7e137df477"
+    },
+    {
+      "label": "fast100",
+      "case": "method_bypass",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\method_bypass_actual.npy",
+      "sha256": "7832145daa30f33fd2ff5fc1126583c99db22cd3ebb4e64c2e4cce985bbe408d"
+    },
+    {
+      "label": "fast100",
+      "case": "method_gaussian5",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\method_gaussian5_actual.npy",
+      "sha256": "780b770776f18550227f905e6b896ca49a1698c27cd97a1747e39b9d649c45ff"
+    },
+    {
+      "label": "fast100",
+      "case": "method_bilateral5",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\method_bilateral5_actual.npy",
+      "sha256": "98f753dcfcda5294539b5f4ed6953150308b91e7aa8218fc27d3d0ee76b08753"
+    },
+    {
+      "label": "fast100",
+      "case": "method_joint7_guide5",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\method_joint7_guide5_actual.npy",
+      "sha256": "b06dfe7a1490358616333e7aec3c5ae468b35da5afa7718817a905b9def243cb"
+    },
+    {
+      "label": "fast100",
+      "case": "method_joint7_guide3",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\method_joint7_guide3_actual.npy",
+      "sha256": "22e30c3761c56f9539f4388d1efa96f60705b32e950f6db538a1139e4a693607"
+    },
+    {
+      "label": "fast100",
+      "case": "method_guided3",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\method_guided3_actual.npy",
+      "sha256": "9a48a337b69b381b53b718e944747ef87fb6329882cc081714c4ce4fad6f3e12"
+    },
+    {
+      "label": "fast100",
+      "case": "method_cnn",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\method_cnn_actual.npy",
+      "sha256": "034e43dace344080b350072c35c35b9e52bc18a1642a707092580181fca098cb"
+    },
+    {
+      "label": "fast100",
+      "case": "method_bilateral7",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\method_bilateral7_actual.npy",
+      "sha256": "390bf5eae75a8f155a3ebcc3a5e51f8d0d9cec69bca002e5b664bb8ca828f4ff"
+    },
+    {
+      "label": "fast100",
+      "case": "C067_timed_phase1",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\C067_timed_actual.npy",
+      "sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48"
+    },
+    {
+      "label": "fast100",
+      "case": "C077_timed_phase1",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_01_fast100\\C077_timed_actual.npy",
+      "sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15"
+    },
+    {
+      "label": "fast100",
+      "case": "C067_timed_phase2",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_02_fast100\\C067_timed_actual.npy",
+      "sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48"
+    },
+    {
+      "label": "fast100",
+      "case": "C077_timed_phase2",
+      "max_integer_error_hu": 0,
+      "output": "data\\denoise\\ldct_v1_clock_compare001\\phase_02_fast100\\C077_timed_actual.npy",
+      "sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15"
+    }
+  ],
+  "pooled_timing_statistics": [
+    {
+      "label": "stable50",
+      "measured_frames": 40,
+      "mean_ms": 515.6194890249935,
+      "median_ms": 514.8117964999983,
+      "p95_ms": 523.8354938498787,
+      "clock_mhz": 50.0
+    },
+    {
+      "label": "fast100",
+      "measured_frames": 40,
+      "mean_ms": 373.9364682749965,
+      "median_ms": 374.0439874998174,
+      "p95_ms": 377.3079867999286,
+      "clock_mhz": 100.0
+    }
+  ],
+  "summary_per_patient": [
+    {
+      "label": "stable50",
+      "patient": "C067",
+      "count": 20,
+      "mean_ms": 516.9636071000014,
+      "median_ms": 515.6653469998673,
+      "p95_ms": 524.3199597500961,
+      "actual_pl_mhz": 50.0
+    },
+    {
+      "label": "stable50",
+      "patient": "C077",
+      "count": 20,
+      "mean_ms": 514.2753709499857,
+      "median_ms": 513.6097225001777,
+      "p95_ms": 522.1393830500119,
+      "actual_pl_mhz": 50.0
+    },
+    {
+      "label": "fast100",
+      "patient": "C067",
+      "count": 20,
+      "mean_ms": 370.2890828999898,
+      "median_ms": 369.16449849991295,
+      "p95_ms": 375.95200619982734,
+      "actual_pl_mhz": 100.0
+    },
+    {
+      "label": "fast100",
+      "patient": "C077",
+      "count": 20,
+      "mean_ms": 377.5838536500032,
+      "median_ms": 375.84652549981,
+      "p95_ms": 379.86529729992077,
+      "actual_pl_mhz": 100.0
+    }
+  ],
+  "every_frame_frequency_verified": true,
+  "identical_integer_weights": true,
+  "resources_clean_after_every_phase": true,
+  "board_environment": {
+    "pynq": "3.1.1",
+    "python": "3.10.4",
+    "numpy": "1.21.5",
+    "cpu_mhz": 650.0
+  },
+  "timing_scope": "pack+cache+DMA+PL+poll+stitch; excludes load/clock setup/files/reference validation/display",
+  "raw_result_sha256": "8fed20f0922297e70ff48643fff28b4a8ffa0347918c09523f2a300aa6346751"
+}

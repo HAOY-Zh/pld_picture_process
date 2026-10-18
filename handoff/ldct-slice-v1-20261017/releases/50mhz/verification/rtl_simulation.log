@@ -1,0 +1,99 @@
+#-----------------------------------------------------------
+# xsim v2018.2 (64-bit)
+# SW Build 2258646 on Thu Jun 14 20:03:12 MDT 2018
+# IP Build 2256618 on Thu Jun 14 22:10:49 MDT 2018
+# Start of session at: Sat Oct 17 20:46:31 2026
+# Process ID: 6864
+# Current directory: D:/PLD/data/denoise/ct_tile_sim_qsafe01
+# Command line: xsim.exe -mode tcl -source {xsim.dir/tile_sim/xsim_script.tcl}
+# Log file: D:/PLD/data/denoise/ct_tile_sim_qsafe01/xsim.log
+# Journal file: D:/PLD/data/denoise/ct_tile_sim_qsafe01\xsim.jou
+#-----------------------------------------------------------
+source xsim.dir/tile_sim/xsim_script.tcl
+# xsim {tile_sim} -autoloadwcfg -runall
+Vivado Simulator 2018.2
+Time resolution is 1 ps
+run -all
+TILE_FRAME_PASS frame=0 mode=0 pixels=35 cycles=301
+TILE_FRAME_PASS frame=1 mode=1 pixels=35 cycles=3907
+TILE_FRAME_PASS frame=2 mode=2 pixels=35 cycles=7236
+TILE_FRAME_PASS frame=3 mode=3 pixels=35 cycles=15045
+TILE_FRAME_PASS frame=4 mode=4 pixels=35 cycles=12803
+TILE_FRAME_PASS frame=5 mode=5 pixels=35 cycles=7901
+TILE_FRAME_PASS frame=6 mode=6 pixels=35 cycles=1988
+TILE_FRAME_PASS frame=7 mode=7 pixels=35 cycles=11439
+TILE_FRAME_PASS frame=8 mode=1 pixels=1 cycles=112
+TILE_FRAME_PASS frame=9 mode=3 pixels=1 cycles=430
+TILE_FRAME_PASS frame=10 mode=5 pixels=1 cycles=226
+TILE_FRAME_PASS frame=11 mode=6 pixels=1 cycles=57
+TILE_FRAME_PASS frame=12 mode=7 pixels=1 cycles=334
+TILE_FRAME_PASS frame=13 mode=1 pixels=7 cycles=784
+TILE_FRAME_PASS frame=14 mode=3 pixels=7 cycles=3010
+TILE_FRAME_PASS frame=15 mode=5 pixels=7 cycles=1582
+TILE_FRAME_PASS frame=16 mode=6 pixels=7 cycles=396
+TILE_FRAME_PASS frame=17 mode=7 pixels=7 cycles=2288
+TILE_FRAME_PASS frame=18 mode=1 pixels=7 cycles=784
+TILE_FRAME_PASS frame=19 mode=3 pixels=7 cycles=3010
+TILE_FRAME_PASS frame=20 mode=5 pixels=7 cycles=1582
+TILE_FRAME_PASS frame=21 mode=6 pixels=7 cycles=396
+TILE_FRAME_PASS frame=22 mode=7 pixels=7 cycles=2288
+TILE_FRAME_PASS frame=23 mode=0 pixels=81 cycles=708
+TILE_FRAME_PASS frame=24 mode=1 pixels=81 cycles=9052
+TILE_FRAME_PASS frame=25 mode=2 pixels=81 cycles=16744
+TILE_FRAME_PASS frame=26 mode=3 pixels=81 cycles=34805
+TILE_FRAME_PASS frame=27 mode=4 pixels=81 cycles=29618
+TILE_FRAME_PASS frame=28 mode=5 pixels=81 cycles=18286
+TILE_FRAME_PASS frame=29 mode=6 pixels=81 cycles=4595
+TILE_FRAME_PASS frame=30 mode=7 pixels=81 cycles=26468
+TILE_FRAME_PASS frame=31 mode=0 pixels=4096 cycles=35770
+TILE_FRAME_PASS frame=32 mode=1 pixels=4096 cycles=457658
+TILE_FRAME_PASS frame=33 mode=2 pixels=4096 cycles=846781
+TILE_FRAME_PASS frame=34 mode=3 pixels=4096 cycles=1760195
+TILE_FRAME_PASS frame=35 mode=4 pixels=4096 cycles=1498041
+TILE_FRAME_PASS frame=36 mode=5 pixels=4096 cycles=924605
+TILE_FRAME_PASS frame=37 mode=6 pixels=4096 cycles=232386
+TILE_FRAME_PASS frame=38 mode=7 pixels=4096 cycles=1338300
+TILE_FRAME_PASS frame=39 mode=6 pixels=4096 cycles=232377
+TILE_FRAME_PASS frame=40 mode=6 pixels=4096 cycles=232380
+TILE_FRAME_PASS frame=41 mode=6 pixels=99 cycles=5612
+TILE_FRAME_PASS frame=42 mode=6 pixels=72 cycles=4578
+TILE_FRAME_PASS frame=43 mode=6 pixels=99 cycles=5619
+TILE_FRAME_PASS frame=44 mode=6 pixels=72 cycles=4582
+TILE_FRAME_PASS frame=45 mode=6 pixels=99 cycles=5619
+TILE_FRAME_PASS frame=46 mode=6 pixels=45 cycles=3548
+TILE_FRAME_PASS frame=47 mode=6 pixels=99 cycles=5612
+TILE_FRAME_PASS frame=48 mode=6 pixels=66 cycles=4350
+TILE_FRAME_PASS frame=49 mode=6 pixels=99 cycles=5619
+TILE_FRAME_PASS frame=50 mode=6 pixels=48 cycles=3594
+TILE_FRAME_PASS frame=51 mode=6 pixels=99 cycles=5619
+TILE_FRAME_PASS frame=52 mode=6 pixels=48 cycles=3594
+TILE_FRAME_PASS frame=53 mode=6 pixels=99 cycles=5619
+TILE_FRAME_PASS frame=54 mode=6 pixels=30 cycles=2845
+TILE_FRAME_PASS frame=55 mode=6 pixels=99 cycles=5612
+TILE_FRAME_PASS frame=56 mode=6 pixels=66 cycles=4350
+TILE_FRAME_PASS frame=57 mode=6 pixels=99 cycles=5619
+TILE_FRAME_PASS frame=58 mode=6 pixels=48 cycles=3594
+TILE_FRAME_PASS frame=59 mode=6 pixels=99 cycles=5619
+TILE_FRAME_PASS frame=60 mode=6 pixels=48 cycles=3594
+TILE_FRAME_PASS frame=61 mode=6 pixels=99 cycles=5619
+TILE_FRAME_PASS frame=62 mode=6 pixels=30 cycles=2845
+TILE_FRAME_PASS frame=63 mode=6 pixels=99 cycles=5612
+TILE_FRAME_PASS frame=64 mode=6 pixels=33 cycles=3088
+TILE_FRAME_PASS frame=65 mode=6 pixels=99 cycles=5612
+TILE_FRAME_PASS frame=66 mode=6 pixels=24 cycles=2617
+TILE_FRAME_PASS frame=67 mode=6 pixels=99 cycles=5619
+TILE_FRAME_PASS frame=68 mode=6 pixels=24 cycles=2610
+TILE_FRAME_PASS frame=69 mode=6 pixels=4096 cycles=232380
+TILE_FRAME_PASS frame=70 mode=6 pixels=3364 cycles=204063
+TILE_FRAME_PASS frame=71 mode=6 pixels=1 cycles=57
+TILE_FRAME_PASS frame=72 mode=6 pixels=64 cycles=3631
+TILE_FRAME_PASS frame=73 mode=6 pixels=64 cycles=3639
+TILE_FRAME_PASS frame=74 mode=6 pixels=9 cycles=514
+TILE_FRAME_PASS frame=75 mode=0 pixels=4 cycles=35
+TILE_FRAME_PASS frame=76 mode=9 pixels=1 cycles=12
+TILE_FRAME_PASS frame=77 mode=0 pixels=1 cycles=16
+CT_TILE_PASS frames=78 pixels=51607 cycles=8349617
+$finish called at time : 83496170 ns : File "D:/PLD/fpga/tb_ct_denoise_tile_axis.sv" Line 82
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:02:10 . Memory (MB): peak = 212.418 ; gain = 0.000
+exit
+INFO: [Common 17-206] Exiting xsim at Sat Oct 17 20:48:46 2026...
