@@ -1,0 +1,26 @@
+[
+  {
+    "attempt": 1,
+    "wns_ns": -2.721,
+    "qualified": false,
+    "scope": "100MHz target; failed builds not deployable"
+  },
+  {
+    "attempt": 2,
+    "wns_ns": -1.854,
+    "qualified": false,
+    "scope": "100MHz target; failed builds not deployable"
+  },
+  {
+    "attempt": 3,
+    "wns_ns": -0.982,
+    "qualified": false,
+    "scope": "100MHz target; failed builds not deployable"
+  },
+  {
+    "attempt": 4,
+    "wns_ns": 0.276,
+    "qualified": true,
+    "scope": "100MHz target; failed builds not deployable"
+  }
+]

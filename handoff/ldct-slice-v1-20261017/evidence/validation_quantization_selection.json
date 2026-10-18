@@ -1,0 +1,176 @@
+{
+  "status": "PASS",
+  "selected_candidate": "equal_channel_cap1.5_+0",
+  "selected_quantized_dir": "D:\\PLD\\data\\denoise\\ct_quant_diagnosis_20261017_01\\selected_quantized",
+  "validation_metrics": [
+    {
+      "method": "New_float",
+      "rmse_hu": 66.7155842434191,
+      "psnr_window_db": 30.153909994683932,
+      "ssim_window": 0.7074568792654852,
+      "body_rmse_hu": 78.82058368629484,
+      "body_ssim": 0.5906508746665984,
+      "float_integer_rmse_hu": 0.0,
+      "layer1_saturations": 0.0,
+      "layer2_saturations": 0.0,
+      "layer3_saturations": 0.0,
+      "output_saturations": 0.0
+    },
+    {
+      "method": "New_integer",
+      "rmse_hu": 67.69231427093038,
+      "psnr_window_db": 30.032687863237847,
+      "ssim_window": 0.7026432842994662,
+      "body_rmse_hu": 79.66652344536868,
+      "body_ssim": 0.5872254107592008,
+      "float_integer_rmse_hu": 10.067622731669204,
+      "layer1_saturations": 0.0,
+      "layer2_saturations": 0.4140625,
+      "layer3_saturations": 0.0,
+      "output_saturations": 0.0
+    },
+    {
+      "method": "Old_float",
+      "rmse_hu": 66.77187988911405,
+      "psnr_window_db": 30.143226198062504,
+      "ssim_window": 0.7048940413906903,
+      "body_rmse_hu": 79.08174955398516,
+      "body_ssim": 0.5864567649646806,
+      "float_integer_rmse_hu": 0.0,
+      "layer1_saturations": 0.0,
+      "layer2_saturations": 0.0,
+      "layer3_saturations": 0.0,
+      "output_saturations": 0.0
+    },
+    {
+      "method": "Old_integer",
+      "rmse_hu": 67.17779591088177,
+      "psnr_window_db": 30.101619556043797,
+      "ssim_window": 0.7026449279941587,
+      "body_rmse_hu": 79.42000329249902,
+      "body_ssim": 0.5822728391675003,
+      "float_integer_rmse_hu": 5.950777028991757,
+      "layer1_saturations": 0.0,
+      "layer2_saturations": 0.0,
+      "layer3_saturations": 0.0,
+      "output_saturations": 0.0
+    },
+    {
+      "method": "clip_L2_plus1",
+      "rmse_hu": 66.91004439063398,
+      "psnr_window_db": 30.133623225751073,
+      "ssim_window": 0.7063738801922519,
+      "body_rmse_hu": 78.82124129696432,
+      "body_ssim": 0.5895707260471745,
+      "float_integer_rmse_hu": 5.917276743425754,
+      "layer1_saturations": 0.0,
+      "layer2_saturations": 0.5546875,
+      "layer3_saturations": 0.0,
+      "output_saturations": 0.0
+    },
+    {
+      "method": "equal_channel_cap1.5_+0",
+      "rmse_hu": 66.90009228700447,
+      "psnr_window_db": 30.133280926781886,
+      "ssim_window": 0.7063654211114181,
+      "body_rmse_hu": 78.81011725985641,
+      "body_ssim": 0.589603948137805,
+      "float_integer_rmse_hu": 5.722878902853621,
+      "layer1_saturations": 0.0,
+      "layer2_saturations": 0.5546875,
+      "layer3_saturations": 0.0,
+      "output_saturations": 0.0
+    },
+    {
+      "method": "equal_channel_cap1.5_-1",
+      "rmse_hu": 66.9010930660568,
+      "psnr_window_db": 30.133231743887016,
+      "ssim_window": 0.7063649167511339,
+      "body_rmse_hu": 78.80976559900743,
+      "body_ssim": 0.589604580221667,
+      "float_integer_rmse_hu": 5.721449708947244,
+      "layer1_saturations": 0.0,
+      "layer2_saturations": 0.0,
+      "layer3_saturations": 0.0,
+      "output_saturations": 0.0
+    }
+  ],
+  "source_hashes_before": {
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_run02\\best.pt": "fc07ccb94fed013cbb87665ed4d2b498d8fa12e7bd8a1bbd42fbe481990da6cb",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_quant_20261017\\quantization.json": "047ca0684e3a2450935e9105a57d2156a698dfbe6461fac57e98a0f1552097b8",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_quant_20261017\\weights_integer.npz": "7646917acde04babf26f6424133a351bf058a2475ac2bb77af8ccdd26a6b0586",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_detail_long01\\best.pt": "0fd09c0901d395384d7d28d272935d121bb005dc2ef318f31add8a06b1ce24f5",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_detail_long_quant2048_01\\quantization.json": "92c5cda0f36fbb30ea8e339a564967ce6f512039f6c07a7d563699705a167786",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_detail_long_quant2048_01\\weights_integer.npz": "4aee5460b7fdf95e6f09124ddea907f0c11f283468cf83fc65e9cea4d0245690",
+    "D:\\PLD\\data\\denoise\\tinycnn_cache_12train\\dataset.json": "524001d880327082760d1973c6ab02ae91498d9b930fd5d5143f07ba6823cef2"
+  },
+  "source_hashes_after": {
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_run02\\best.pt": "fc07ccb94fed013cbb87665ed4d2b498d8fa12e7bd8a1bbd42fbe481990da6cb",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_quant_20261017\\quantization.json": "047ca0684e3a2450935e9105a57d2156a698dfbe6461fac57e98a0f1552097b8",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_quant_20261017\\weights_integer.npz": "7646917acde04babf26f6424133a351bf058a2475ac2bb77af8ccdd26a6b0586",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_detail_long01\\best.pt": "0fd09c0901d395384d7d28d272935d121bb005dc2ef318f31add8a06b1ce24f5",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_detail_long_quant2048_01\\quantization.json": "92c5cda0f36fbb30ea8e339a564967ce6f512039f6c07a7d563699705a167786",
+    "D:\\PLD\\data\\denoise\\tinycnn_12train_detail_long_quant2048_01\\weights_integer.npz": "4aee5460b7fdf95e6f09124ddea907f0c11f283468cf83fc65e9cea4d0245690",
+    "D:\\PLD\\data\\denoise\\tinycnn_cache_12train\\dataset.json": "524001d880327082760d1973c6ab02ae91498d9b930fd5d5143f07ba6823cef2"
+  },
+  "preserved_baselines": true,
+  "validation_slices": 128,
+  "elapsed_seconds": 137.4543085,
+  "limitations": "Validation-selected software candidate only. Test evaluation, matching RTL simulation, timing/build and board output/latency remain unverified.",
+  "range_safe_quantized_dir": "D:\\PLD\\data\\denoise\\ct_quant_diagnosis_20261017_01\\range_safe_quantized",
+  "range_safe_candidate": "equal_channel_cap1.5_-1",
+  "export_roundtrip_audit": {
+    "selected_quantized": {
+      "checkpoint_roundtrip_integer_parameters_exact": true,
+      "serialized_fp32_float_equivalence_max_error_hu": 9.210959888150683e-06,
+      "weight_clipping_counts": [
+        0,
+        0,
+        0
+      ],
+      "right_shifts": [
+        6,
+        4,
+        11
+      ],
+      "weights_sha256": "2e40d47162fe06dd42dfbfec506ee321b7972e79f038589d7eab4ec653b03b65",
+      "checkpoint_sha256": "2cc0ba07080f950c87427c574472d067e411c7379a7394332290fba12f6f8d5b"
+    },
+    "range_safe_quantized": {
+      "checkpoint_roundtrip_integer_parameters_exact": true,
+      "serialized_fp32_float_equivalence_max_error_hu": 9.210959888150683e-06,
+      "weight_clipping_counts": [
+        0,
+        0,
+        0
+      ],
+      "right_shifts": [
+        6,
+        5,
+        10
+      ],
+      "weights_sha256": "00d7d04f33219c381ad748ae4c869a046538ef7c176e96e2031202b15b0ae022",
+      "checkpoint_sha256": "2cc0ba07080f950c87427c574472d067e411c7379a7394332290fba12f6f8d5b"
+    }
+  },
+  "validation_saturation_totals": {
+    "equal_channel_cap1.5_+0": {
+      "layer1_saturations": 0,
+      "layer2_saturations": 71,
+      "layer3_saturations": 0,
+      "output_saturations": 0
+    },
+    "equal_channel_cap1.5_-1": {
+      "layer1_saturations": 0,
+      "layer2_saturations": 0,
+      "layer3_saturations": 0,
+      "output_saturations": 0
+    },
+    "New_integer": {
+      "layer1_saturations": 0,
+      "layer2_saturations": 53,
+      "layer3_saturations": 0,
+      "output_saturations": 0
+    }
+  }
+}

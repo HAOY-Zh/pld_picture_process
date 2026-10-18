@@ -1,0 +1,76 @@
+{
+  "layers": [
+    {
+      "input_fraction": 10,
+      "weight_fraction": 7,
+      "output_fraction": 11,
+      "right_shift": 6,
+      "relu": true,
+      "worst_case_accumulator": 12062578
+    },
+    {
+      "input_fraction": 11,
+      "weight_fraction": 6,
+      "output_fraction": 12,
+      "right_shift": 5,
+      "relu": true,
+      "worst_case_accumulator": 26151324
+    },
+    {
+      "input_fraction": 12,
+      "weight_fraction": 8,
+      "output_fraction": 10,
+      "right_shift": 10,
+      "relu": false,
+      "worst_case_accumulator": 54614320
+    }
+  ],
+  "channels": 8,
+  "input": "signed int16 HU = normalized Q10",
+  "output": "signed int16 HU = input HU - rounded predicted noise HU, saturated",
+  "padding": "replicate separately at each layer",
+  "rounding": "nearest; half away from zero",
+  "weights": "int8 power-of-two scales; bias int32 accumulator units",
+  "activations": "int16; explicit experimental layer fractions",
+  "status": "Software candidate only; no RTL simulation/build/board validation",
+  "checkpoint_sha256": "2cc0ba07080f950c87427c574472d067e411c7379a7394332290fba12f6f8d5b",
+  "source_checkpoint_sha256": "0fd09c0901d395384d7d28d272935d121bb005dc2ef318f31add8a06b1ce24f5",
+  "dataset_sha256": "524001d880327082760d1973c6ab02ae91498d9b930fd5d5143f07ba6823cef2",
+  "weights_sha256": "00d7d04f33219c381ad748ae4c869a046538ef7c176e96e2031202b15b0ae022",
+  "calibration_patients": [
+    "C002",
+    "C004",
+    "C012",
+    "C016",
+    "C021",
+    "C027",
+    "C081",
+    "C095",
+    "C099",
+    "C107",
+    "C166",
+    "C179"
+  ],
+  "calibration_patches": 2048,
+  "observed_activation_maxima": [
+    7.6686015129089355,
+    3.540393114089966
+  ],
+  "calibration_note": "Conservative transformed bounds inherited from frozen training-only calibration; fractions selected on validation only",
+  "offline_hidden_scales": [
+    [
+      1.0
+    ],
+    [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.6906866811863932,
+      1.0,
+      1.0,
+      1.0
+    ]
+  ],
+  "selected_candidate": "equal_channel_cap1.5_-1"
+}

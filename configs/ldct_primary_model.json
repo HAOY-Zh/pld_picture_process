@@ -1,0 +1,13 @@
+{
+  "interface_version": "ldct_slice_v1",
+  "model_id": "2cc0ba07080f950c87427c574472d067e411c7379a7394332290fba12f6f8d5b",
+  "source_checkpoint_sha256": "0fd09c0901d395384d7d28d272935d121bb005dc2ef318f31add8a06b1ce24f5",
+  "integer_weights_sha256": "00d7d04f33219c381ad748ae4c869a046538ef7c176e96e2031202b15b0ae022",
+  "primary_model": "new_epoch118_equalized_channel5_qsafe",
+  "model_dir": "handoff/ldct-slice-v1-20261017/releases/100mhz/model",
+  "preferred_release": "handoff/ldct-slice-v1-20261017/releases/100mhz",
+  "preferred_clock_mhz": 100.0,
+  "stable_50mhz": "handoff/ldct-slice-v1-20261017/releases/50mhz",
+  "status": "50MHz and 100MHz timing/simulation/borrowed-interface/actual-FPGA qualification PASS",
+  "upgrade_100mhz": "handoff/ldct-slice-v1-20261017/releases/100mhz"
+}
