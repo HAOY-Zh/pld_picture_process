@@ -13,7 +13,7 @@ function seriesChoiceChanged(){
   $('frameUidCompatible').checked=false;$('loadExpert').disabled=false;
   $('frameUidChoice').hidden=!row?.requires_compatibility;
   $('seriesPanel').dataset.invalid=String(!row?.valid);
-  $('seriesAdvice').textContent=row?`${row.slices} 层 · ${row.rows} × ${row.columns}${row.spacing_zyx_mm?' · 间距 '+row.spacing_zyx_mm.map(v=>v.toFixed(3)).join(' / ')+' mm':''}。${row.note}`:'目录包含多组 CT，请选择需要分析的一组。';
+  $('seriesAdvice').textContent=row?`${row.slices} 层 · ${row.rows} × ${row.columns}${row.spacing_zyx_mm?' · 间距 '+row.spacing_zyx_mm.map(v=>v.toFixed(3)).join(' / ')+' mm':''}。${row.note}${row.slices===1?'。当前只有一层；整组分析和三维请选包含连续切片的文件夹。':''}`:'目录包含多组 CT，请选择需要分析的一组。';
   seriesControls();
 }
 function showSeriesInspection(value){
@@ -56,6 +56,39 @@ $('folderFiles').onchange=async()=>{
   finally{seriesImportBusy=false;$('folderFiles').value='';seriesControls();}
 };
 const seriesOriginalLoad=$('load').onclick;
-$('load').onclick=()=>{const row=seriesSelected();if(seriesImportBusy||seriesInspection&&(!row?.valid||row.requires_compatibility&&!$('frameUidCompatible').checked))return;return seriesOriginalLoad();};
+$('load').onclick=async()=>{
+  if(seriesImportBusy||ACTIVE.includes(state?.phase))return;
+  const path=$('path').value.trim();
+  if(!path){message('请选择 CT 文件夹，或填写 CT 路径。',true);return;}
+  // NIfTI/NPZ retain their explicit HU/mm loader. Every DICOM path, including
+  // a pasted folder loaded without the separate Inspect button, is preflighted.
+  if(/\.(npz|nii|nii\.gz)["']?$/i.test(path))return seriesOriginalLoad();
+  seriesImportBusy=true;seriesControls();
+  try{
+    if(!seriesInspection||seriesInspection.path!==path){
+      const requestedUid=$('uid').value.trim();
+      $('seriesStatus').textContent='正在检查切片数量、序列和空间位置…';
+      const inspection=await api('/api/series/inspect',{path});
+      if($('path').value.trim()!==path){message('检查期间路径已变化，请重新点击加载影像。');return;}
+      showSeriesInspection(inspection);
+      if(requestedUid&&inspection.series.some(row=>row.series_uid===requestedUid)){
+        $('seriesChoice').value=requestedUid;seriesChoiceChanged();
+      }
+    }
+    const row=seriesSelected();
+    if(!row?.valid){
+      const advice=row?.note||'目录中有多组 CT，请先选择需要加载的一组。';
+      $('seriesStatus').textContent=advice;message(advice,!!row);return;
+    }
+    if(row.requires_compatibility&&!$('frameUidCompatible').checked){
+      const advice=`已检查 ${row.slices} 层，几何一致。请确认下方“兼容匿名化数据的坐标系标识差异”，再点击加载影像。`;
+      $('seriesStatus').textContent=advice;message(advice);return;
+    }
+    $('seriesStatus').textContent=`已检查 ${row.slices} 层，正在加载影像…`;
+    return await seriesOriginalLoad();
+  }catch(e){$('seriesStatus').textContent='序列检查未完成：'+e.message;message(e.message,true);}
+  finally{seriesImportBusy=false;seriesControls();}
+};
 window.addEventListener('ct-state-change',seriesControls);
+$('seriesStatus').textContent='整组导入请选择 DICOM 文件夹；加载时自动检查序列，读取层号留空表示全部。';
 seriesControls();
