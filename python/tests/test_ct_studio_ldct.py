@@ -2,6 +2,7 @@
 import copy
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 import sys
 import tempfile
@@ -276,12 +277,33 @@ class PackageTests(unittest.TestCase):
             for variant,name in ct_studio_runtime.VARIANTS.items():
                 host=root/'base'/name[0]
                 before=hashlib.sha256((host/name[1]/'platform_manifest.json').read_bytes()).hexdigest()
+                generated=host/name[1]/'__pycache__'
+                generated.mkdir(exist_ok=True)
+                (generated/'developer.cpython-311.pyc').write_bytes(b'not a deployable source')
                 target=package(host,variant,RELEASE,root/variant)
                 manifest=validate_package(target/'ct_studio')
                 self.assertFalse(manifest['integration']['board_verified'])
                 self.assertEqual(manifest['ldct']['clock_mhz'],100.)
                 self.assertEqual(set(manifest['basic_clocks_mhz'].values()),{100. if variant=='fast' else 50.})
                 self.assertEqual(hashlib.sha256((host/name[1]/'platform_manifest.json').read_bytes()).hexdigest(),before)
+                deployment=target/'ct_studio'
+                self.assertFalse((deployment/'__pycache__').exists())
+                self.assertTrue(all('__pycache__' not in name and not name.endswith('.pyc')
+                                    for name in manifest['files_sha256']))
+                for module in ('__init__.py','filters.py','cnn_fixed.py','pl_reference.py'):
+                    self.assertEqual((deployment/'ctdenoise'/module).read_bytes(),
+                                     (RELEASE/'python/ctdenoise'/module).read_bytes())
+                # A fresh isolated interpreter must import only the generated
+                # board package; inherited sys.path/modules previously hid this.
+                code=('import sys; from pathlib import Path; '
+                      'root=Path(sys.argv[1]); sys.path.insert(0,str(root)); '
+                      'import ct_studio_service,ctdenoise.filters; '
+                      'assert Path(ctdenoise.filters.__file__).parent==root/"ctdenoise"; '
+                      'assert "pynq" not in sys.modules; '
+                      'ct_studio_service.validate_package(root)')
+                completed=subprocess.run([sys.executable,'-I','-B','-c',code,str(deployment)],
+                                         cwd=root,capture_output=True,text=True,timeout=30)
+                self.assertEqual(completed.returncode,0,completed.stderr)
                 with self.assertRaises(ValueError): package(host,variant,RELEASE,target)
 
     def test_returned_array_auditor_rejects_missing_cases_wrong_clocks_and_pixels(self):

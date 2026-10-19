@@ -26,8 +26,13 @@ def package(host,variant,ldct,out):
     out.mkdir(parents=True)
     for p in host.iterdir():
         if p.is_file(): shutil.copy2(p,out/p.name)
-    board=out/'ct_studio'; shutil.copytree(original,board)
-    shutil.copytree(ldct,board/'ldct')
+    ignore=shutil.ignore_patterns('__pycache__','*.pyc')
+    board=out/'ct_studio'; shutil.copytree(original,board,ignore=ignore)
+    shutil.copytree(ldct,board/'ldct',ignore=ignore)
+    # The tile driver imports ctdenoise at deployment root. Do not let the
+    # developer checkout's python/ directory hide a missing board dependency.
+    shutil.copytree(ldct/'python/ctdenoise',board/'ctdenoise',
+                    ignore=ignore)
     for name in ('ct_studio_service.py','ct_platform_fast_service.py','ldct_processor.py','ct_denoise_tile_pl_test.py'):
         shutil.copy2(ROOT/'pynq'/name,board/name)
     shutil.copy2(ROOT/'python/ldct_contract.py',board/'ldct_contract.py')
@@ -43,7 +48,8 @@ def package(host,variant,ldct,out):
             platform_source_commit='f2ab932500da6d954fdd2a6fb693a881a8aafd44',
             ldct_source_commit='8ccf9201c8665d36c19e31d005af5e15480e6ba9'))
     manifest['files_sha256']={p.relative_to(board).as_posix():sha(p) for p in sorted(board.rglob('*'))
-                            if p.is_file() and p!=board/'platform_manifest.json'}
+                            if p.is_file() and p!=board/'platform_manifest.json'
+                            and '__pycache__' not in p.parts and p.suffix!='.pyc'}
     write(board/'platform_manifest.json',manifest)
     public=json.loads((out/'host_platform.json').read_text())
     public.update(platform_manifest_sha256=sha(board/'platform_manifest.json'),ldct=descriptor,basic_clocks_mhz=clocks)
