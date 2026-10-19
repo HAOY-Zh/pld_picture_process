@@ -90,13 +90,32 @@ def spawn_web(config,port):
     return process,folder
 
 
+def wait_board(client, seconds):
+    """Poll readiness only; never retry an FPGA command or a reported fault."""
+    deadline = time.monotonic() + seconds
+    announced = False
+    while True:
+        try:
+            return client.health()
+        except error.HTTPError:
+            raise
+        except (error.URLError, TimeoutError, ConnectionError, OSError):
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise
+            if not announced:
+                print('开发板正在启动或尚未连通，自动等待开机服务就绪（最多%d秒）…' % seconds, flush=True)
+                announced = True
+            time.sleep(min(3, remaining))
+
+
 def launch(args):
     config=Path(args.config).resolve();url=f'http://127.0.0.1:{args.port}/'
     client,manifest=configuration(config)
     existing=web_info(url,manifest)
     print('正在检查 PYNQ 连接、运行包和真实启动自检…',flush=True)
     try:
-        client.health()
+        wait_board(client,0 if args.check_only else getattr(args,'wait_seconds',0))
     except Exception as exc:
         # An accepted owner doing an existing job is not a startup failure.
         # Only read its identity; never submit another operation or reload it.
@@ -115,7 +134,7 @@ def launch(args):
             if not args.no_browser:webbrowser.open(url)
             return 0
         print('开发板尚未通过就绪检查：'+str(exc),flush=True)
-        print('先给开发板上电、连接网线，并在Jupyter启动一次集成服务。'
+        print('先给开发板上电、连接网线，等待开机服务完成自检；排查方法见运行说明。'
               '若有正在计算的任务，请等待；不会自动复位、重载或改用电脑计算。',flush=True)
         if existing is not None and not args.check_only and not args.no_browser:
             webbrowser.open(url)
@@ -151,8 +170,10 @@ def main():
     parser.add_argument('--port',type=int,default=8095)
     parser.add_argument('--check-only',action='store_true',help='只读检查，不启动或打开网页')
     parser.add_argument('--no-browser',action='store_true',help='检查或启动服务，但不打开浏览器')
+    parser.add_argument('--wait-seconds',type=int,default=300,help='等待板端开机就绪的最长秒数，默认300')
     args=parser.parse_args()
     if not 1<=args.port<=65535:parser.error('端口须为1至65535')
+    if not 0<=args.wait_seconds<=900:parser.error('等待时间须为0至900秒')
     try:return launch(args)
     except Exception as exc:
         print('启动未完成：'+str(exc),flush=True)

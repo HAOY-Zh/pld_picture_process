@@ -4,26 +4,32 @@
 
 本次修复的是运行包：补齐冻结的 `ctdenoise` 依赖，并排除电脑生成的 `__pycache__/*.pyc`。模型、RTL、bit/HWH和量化权重均未改写。新增独立解释器导入检查，避免依赖源码目录才能启动。
 
-本机本轮实板网页入口为 `http://127.0.0.1:8095/`，配置是 `data/ct_studio_ldct_fast_03/host_config.json`，结果保存在 `data/ct_workspace_board_20261019/results/`。当前板端目录为 `/home/xilinx/ct_test/ct_studio_ldct_fast_20261019_01/`，由本次专用服务进程持有；服务运行时不需要再次执行下方启动命令。原8093/8094电脑会话和结果保留。
+本机本轮实板网页入口为 `http://127.0.0.1:8095/`，配置是 `data/ct_studio_ldct_fast_03/host_config.json`，已有结果保存在 `data/ct_workspace_board_20261019/results/`。启动器新建网页服务时使用 `data/ct_workspace_demo/results/`，复用已有服务时继续使用该服务原输出目录。当前板端运行包目录为 `/home/xilinx/ct_test/ct_studio_ldct_fast_20261019_01/`。原8093/8094电脑会话和结果保留。
 
 旧六独立基础bit版在窄窗 WL=0/WW=5 自检中有202/262144个像素不一致，参数读回正确、实际50 MHz、DMA完成且无错误/越界；该包不能标为完整验收通过的回退版。原bit及失败证据保留，根因尚待旧窗口实现的专项排查。不要通过删掉窄窗测试恢复“通过”标签。
 
 ## 竞赛现场直接启动
 
-当前电脑双击项目根目录的 **`start_ct_studio_demo.cmd`**。入口固定使用已验收的 `fast_03` 配置，检查真实板端自检后启动或复用8095网页并打开浏览器；不需要每次激活Conda、安装依赖或重新构建。网页已运行时保留当前病例和结果。缺环境、板端未就绪或版本不匹配会给出提示，不自动停止已有任务或改用电脑计算。
+当前电脑双击项目根目录的 **`start_ct_studio_demo.cmd`**。入口固定使用已验收的 `fast_03` 配置，等待板子联网并检查真实自检后启动或复用8095网页并打开浏览器；不需要每次激活Conda、安装依赖或重新构建。网页已运行时保留当前病例和结果。默认最多等待开机300秒，等待期间只读取状态；版本不匹配、鉴权错误或明确硬件故障立即提示，不停止已有任务或改用电脑计算。
 
-开发板每次重新上电后，先打开 `http://192.168.2.99:9090/`，新建一个Python3 Notebook，运行下面这一格并保持内核运行。当前板端服务已经运行时跳过这一步，不重复启动：
+**开机自启状态（2026-10-19）：** `ct-studio.service` 已在连接板子时安装、通过板端 `systemd-analyze verify` 并启用；当时未停止原服务。开发板随后不可连接，尚未完成重启后的真实自动启动验收。下一次连接时先验证下面的步骤，不能把“已启用”视为“已通过冷启动”。当前目标操作为：给板子上电并接好网线 → 电脑双击入口 → 等待自检通过 → 载入CT。无需在Jupyter输入启动代码。
 
-```python
-import os, sys
-folder = '/home/xilinx/ct_test/ct_studio_ldct_fast_20261019_01'
-os.chdir(folder)
-sys.path.insert(0, folder)
-from ct_studio_service import start
-platform_service = start(folder=folder)
+服务使用板上PYNQ Python和原运行包，在PYNQ的 `bootpy.service` 完成后启动，校验固定清单及全部运行文件，再执行原有真实FPGA自检。模型、RTL、bit/HWH和权重均未改写。通过后才报告就绪；失败时保留硬件持有者和日志，不循环重载FPGA。服务本身不执行整例CT任务，需要网页或其他客户端提交输入。
+
+下次接板的验收步骤：
+
+1. 保持电脑网页服务运行，板子正常重新上电，直接双击CMD，核对自动连接与原病例、结果保留。
+2. 管理员排查时可在板端终端执行以下只读命令；日常展示不需要打开终端。
+
+```bash
+systemctl is-enabled ct-studio.service
+systemctl status ct-studio.service --no-pager
+journalctl -u ct-studio.service -b --no-pager -n 60
 ```
 
-看到 `CT STUDIO READY: basic + segmentation + LDCT actual startup checks PASS.` 后，再双击电脑启动入口。启动器使用本机忽略的私有令牌，不打印凭据，也不自动重启开发板。首次服务启动会执行真实自检，需提前完成。
+3. 应为 `enabled`、`active (running)`，日志出现 `CT STUDIO READY: basic + segmentation + LDCT actual startup checks PASS.`；独立记录在板端 `/var/lib/ct-studio/<boot-id>/startup.json`。随后用一层CT实际执行去噪、基础处理和分割，检查实际回执。未通过前保留“待验收”状态。
+
+不要在自启服务运行时再通过Notebook启动第二份服务。若需要退回手动管理，先在空闲且健康时由管理员执行 `systemctl disable --now ct-studio.service`，确认已停止后再接管；故障状态不能强制杀进程或删锁。该命令只停用自启，不删除原运行包和结果。启动器使用本机忽略的私有令牌，不打印凭据，也不自动重启开发板。
 
 演示顺序：选择完整CT文件夹 → 读取层号留空（全部） → 按预检提示确认兼容导入 → 选择实际FPGA、先预览一层再增强全部 → 点击“使用增强影像分析” → 展示窗宽窗位/阈值/形态学 → “智能分割与三维”执行全部已载入切片 → 展示MPR、肺表面和真实性能回执。
 
@@ -34,6 +40,14 @@ platform_service = start(folder=folder)
 ```powershell
 .\.venv-web\Scripts\python.exe -B -X utf8 python/start_ct_studio_demo.py --check-only
 ```
+
+## 电脑与板端的职责
+
+板上的SD卡保存Linux/PYNQ、bit/HWH、量化权重、运行代码及服务配置；板载ARM处理器运行Python服务并控制FPGA。开机自启使这部分独立于Jupyter和电脑运行，断开电脑不会使已启动服务退出，但未提交输入时服务只等待请求。
+
+当前统一平台仍采用电脑与FPGA协作。电脑读取DICOM/HU和几何、管理整例数据与结果、执行分割预后处理及生成MPR/三维表面，并向浏览器提供网页；板端FPGA执行实际LDCT、已接入的基础算子和分割网络计算。当前 `127.0.0.1:8095` 位于电脑，不能只关闭电脑服务后直接用板端IP打开同一平台。
+
+若要求电脑只开浏览器、无需运行Python，需要将网页后端、数据管理和相应预后处理迁移到板载ARM，提供局域网访问及数据上传，同时评估整组CT的内存与依赖。若要求不连接任何电脑也自动批量处理，还要增加板上SD/USB输入目录和任务调度。这些属于后续独立部署工作，本次自启配置尚未实现。
 
 ## 操作者流程
 
@@ -107,7 +121,9 @@ C002 的 280 层各有不同的 FrameOfReferenceUID。严格模式继续拒绝�
 | 共享基础 bit | HWH声明100 MHz，2026-10-19实际12组启动输出独立复核通过 |
 | 肺分割 | 原冻结100 MHz路径，逐次核验时钟 |
 
-## 板卡可用后的启动与验收
+## 新板或新包的手动部署与验收
+
+本节用于迁移或独立包验收，不是当前已配置自启板卡的每次开机步骤。当前板卡先按上方自启验收流程检查，不重复启动Notebook所有者。
 
 电脑硬件模式预后处理需要 `python/requirements-web-fpga.txt` 中固定的 Torch 2.8.0。板端仍使用其 PYNQ 环境，不复制电脑虚拟环境。
 

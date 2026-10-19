@@ -99,6 +99,19 @@
     "isolated_package_import_variants": 2,
     "passed": true
   },
+  "autostart": {
+    "status": "INSTALLED_ENABLED_COLD_BOOT_PENDING",
+    "unit": "ct-studio.service",
+    "board_systemd_unit_verify_passed": true,
+    "enabled_for_next_boot": true,
+    "current_owner_not_stopped": true,
+    "runner_sha256": "ceb796486e0391d6735980ceb3070cc17aae32f273c5e8c1e97e525c9661ec82",
+    "cold_boot_verified": false,
+    "reason": "Board unavailable before reboot acceptance; no reboot was executed",
+    "pc_readiness_wait_seconds": 300,
+    "offline_boot_and_launcher_tests_passed": 19,
+    "local_evidence_directory": "data/ct_studio_autostart_20261019"
+  },
   "local_evidence_directory": "data/board_acceptance_fast_20261019_01",
   "private_or_patient_arrays_uploaded": false,
   "evidence_sha256": {
