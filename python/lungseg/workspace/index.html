@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="ui-token" content="__UI_TOKEN__"><title>CT Studio · 医学影像处理工作台</title>
-<link rel="stylesheet" href="/workspace.css"><link rel="stylesheet" href="/ldct.css"><script src="/workspace.js" defer></script><script src="/ldct.js" defer></script><script src="/series.js" defer></script></head>
+<link rel="stylesheet" href="/workspace.css"><link rel="stylesheet" href="/ldct.css"><link rel="stylesheet" href="/roi.css"><script src="/workspace.js" defer></script><script src="/ldct.js" defer></script><script src="/series.js" defer></script><script src="/roi.js" defer></script></head>
 <body>
 <aside class="sidebar">
   <a class="brand" href="/" aria-label="CT Studio 首页"><span class="brand-mark">CT</span><span>CT Studio<small>医学影像处理工作台</small></span></a>
@@ -10,7 +10,8 @@
     <button class="nav-item" data-tab="ldct" aria-selected="false"><span class="nav-icon">◉</span>LDCT 增强<span class="nav-number">01</span></button>
     <button class="nav-item active" data-tab="basic" aria-selected="true"><span class="nav-icon">◫</span>基础处理<span class="nav-number">02</span></button>
     <button class="nav-item" data-tab="segmentation" aria-selected="false"><span class="nav-icon">◈</span>智能分割与三维<span class="nav-number">03</span></button>
-    <button class="nav-item" data-tab="performance" aria-selected="false"><span class="nav-icon">▥</span>性能记录<span class="nav-number">04</span></button>
+    <button class="nav-item" data-tab="roi" aria-selected="false"><span class="nav-icon">▣</span>ROI 定量分析<span class="nav-number">04</span></button>
+    <button class="nav-item" data-tab="performance" aria-selected="false"><span class="nav-icon">▥</span>性能记录<span class="nav-number">05</span></button>
   </nav>
   <div class="source-card"><div class="eyebrow">当前输入</div><strong id="caseLabel">尚未加载 CT</strong><p id="sourceInfo">加载一次，在各工作区共享。</p><span class="chip" id="expertBadge">未加载标注</span></div>
   <div class="sidebar-bottom"><span class="status-dot" id="boardDot"></span><span id="boardLabel">FPGA 未连接</span><button id="connect" class="text-button">连接</button><button id="connectFast" class="button secondary wide" hidden>连接新版基础加速服务</button><p id="executionNote">智能分割由实际 FPGA 执行。<br>基础处理与分割共用统一 PL 服务。</p></div>

@@ -51,7 +51,7 @@ function ldctRefresh(){
   segmentationBadge.className='chip '+(state.board_connected?'teal':'amber');
   document.querySelector('#imagePair .image-title strong').textContent=selected==='original'?'原始 CT · 固定显示参考':'LDCT 增强 CT · 当前分析输入';
   document.querySelector('.analysis-source-bar').dataset.enhanced=String(selected!=='original');
-  $('analysisSourceNote').textContent=selected==='original'?'当前基础处理、分割与 MPR 使用原始 CT；增强后可切换。':'当前基础处理、分割与 MPR 使用这份增强 HU；切回原图可恢复原来的分析结果。';
+  $('analysisSourceNote').textContent=selected==='original'?'当前基础处理、分割、ROI 与 MPR 使用原始 CT；增强后可切换。':'当前基础处理、分割、ROI 与 MPR 使用这份增强 HU；切回原图可恢复原来的分析结果。';
   const fpga=info.fpga_configured&&state.board_connected;
   $('ldctBackend').querySelector('[value="FPGA_LDCT"]').disabled=!fpga;
   $('ldctBackend').disabled=busy;$('ldctMethod').disabled=busy;

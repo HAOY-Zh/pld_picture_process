@@ -14,7 +14,7 @@ function message(text,error=false){$('message').textContent=text;$('message').pa
 async function api(path,data){const opt={headers:{'X-UI-Token':TOKEN}};if(data!==undefined){opt.method='POST';opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(data);}const r=await fetch(path,opt),v=await r.json();if(!r.ok)throw Error(v.error||r.statusText);return v;}
 async function command(path,body){try{apply(await api(path,body));}catch(e){message(e.message,true);}}
 function showTab(name){for(const button of document.querySelectorAll('[data-tab]')){const active=button.dataset.tab===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));}for(const panel of document.querySelectorAll('.tab-content'))panel.hidden=panel.id!=='tab-'+name;
-const titles={basic:['基础处理','从一张 CT，开始处理'],ldct:['LDCT 增强','先改善影像，再继续分析'],segmentation:['智能分割与三维','从切片到三维，查看肺区结构'],performance:['性能记录','每次计算，都有据可查']};$('crumb').textContent=titles[name][0];$('title').textContent=titles[name][1];requestAnimationFrame(drawAll);
+const titles={basic:['基础处理','从一张 CT，开始处理'],ldct:['LDCT 增强','先改善影像，再继续分析'],segmentation:['智能分割与三维','从切片到三维，查看肺区结构'],roi:['ROI 定量分析','框选一处，查看局部与定量'],performance:['性能记录','每次计算，都有据可查']};$('crumb').textContent=titles[name][0];$('title').textContent=titles[name][1];requestAnimationFrame(drawAll);window.dispatchEvent(new Event('ct-tab-change'));
 $('segmentationFrame').contentWindow?.postMessage({type:'ct-workspace-visible',visible:name==='segmentation'},location.origin);}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 $('load').onclick=()=>command('/api/load',{path:$('path').value,load_slices:$('loadSlices').value,confirm_hu:$('confirm').checked,series_uid:$('uid').value.trim(),load_expert:$('loadExpert').checked,expert_path:$('expertPath').value,allow_inconsistent_frame_uids:$('frameUidCompatible')?.checked===true});
@@ -46,7 +46,7 @@ $('connectFast').hidden=!s.fast_platform_available||s.fast_platform_active;$('co
 for(const k of ['sliceSlider','sliceIndex','syncSlice'])$(k).disabled=!s.shape;
 $('boardDot').className='status-dot'+(s.board_connected?' on':'');$('boardLabel').textContent=s.desktop_only?'电脑浏览模式':s.board_connected?(s.fast_platform_active?'FPGA 加速服务已连接':'FPGA 已连接'):'FPGA 未连接';$('connect').textContent=s.board_connected?'重新核对':'连接';
 $('taskDot').className='status-dot'+(s.phase==='error'?' error':busy?' busy':s.shape?' on':'');$('progress').hidden=!busy;$('progress').max=Math.max(1,s.total);$('progress').value=s.completed;
-message((s.ldct?.running&&s.phase==='processing'?'正在增强影像':phaseNames[s.phase]||s.phase)+(busy&&s.total?` · ${s.completed}/${s.total}`:'')+(s.error?' · '+s.error:''),s.phase==='error');
+message((s.roi?.job?.running?'正在分析 ROI':s.ldct?.running&&s.phase==='processing'?'正在增强影像':phaseNames[s.phase]||s.phase)+(busy&&s.total?` · ${s.completed}/${s.total}`:'')+(s.error?' · '+s.error:''),s.phase==='error');
 $('caseLabel').textContent=s.source?.source_name||s.source?.source?.split(/[\\/]/).filter(Boolean).at(-1)||(s.shape?'已加载 CT':'尚未加载 CT');
 $('sourceInfo').textContent=s.shape?`${s.shape.join(' × ')} · ${s.geometry.spacing_zyx_mm.map(v=>Number(v).toFixed(2)).join(' / ')} mm`:'加载一次，在各工作区共享。';
 $('expertBadge').textContent=s.expert_present?'已加载专家标注':'无专家标注';$('expertBadge').className='chip'+(s.expert_present?' teal':'');

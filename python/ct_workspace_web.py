@@ -22,6 +22,7 @@ from ct_basic_processing import OPERATIONS, morphology, parameters, process
 from ct_platform_client import PlatformClient
 from ct_studio_client import StudioClient
 from ldct_workspace import LDCTWorkspaceMixin
+from roi_workspace import ROIWorkspaceMixin
 from ct_series_import import FolderImports, inspect_series, MAX_FILE
 from lung_live_web import BoardClient, Controller, MODEL_SHA, handler_for, write_new
 
@@ -58,7 +59,7 @@ def benchmarks():
     return dict(rows=rows, note='历史同板 ARM INT8 / FPGA INT8；不代表当前服务版本、整例或网页端到端性能。')
 
 
-class WorkspaceController(LDCTWorkspaceMixin, Controller):
+class WorkspaceController(ROIWorkspaceMixin, LDCTWorkspaceMixin, Controller):
     def __init__(self, client, model, output):
         super().__init__(client, model, output)
         self.basic_result = self.basic_image = None
@@ -85,6 +86,7 @@ class WorkspaceController(LDCTWorkspaceMixin, Controller):
 
     def submit(self, action, values):
         if action == 'ldct_cancel': return self.cancel_ldct()
+        if action == 'roi_cancel': return self.cancel_roi(values)
         submitted_at = time.perf_counter()
         with self.lock:
             if self.client is None and action in ('connect', 'connect_fast', 'run'):
@@ -292,8 +294,12 @@ workspacePendingSlice=m;workspaceApplySlice();}
 });</script>'''
     old_html = old_html.replace('</body>', bridge+'</body>')
     base = handler_for(controller, token, old_html.encode('utf-8'), plotly)
-    html = (ASSETS/'index.html').read_text(encoding='utf-8').replace('__UI_TOKEN__', token).encode('utf-8')
+    html = (ASSETS/'index.html').read_text(encoding='utf-8').replace('__UI_TOKEN__', token)
+    html = html.replace('    <section id="tab-performance"',
+        (ASSETS/'roi.html').read_text(encoding='utf-8')+'\n    <section id="tab-performance"').encode('utf-8')
     assets = {'/workspace.css': ('style.css', 'text/css; charset=utf-8'),
+              '/roi.js': ('roi.js', 'text/javascript; charset=utf-8'),
+              '/roi.css': ('roi.css', 'text/css; charset=utf-8'),
               '/ldct.js': ('ldct.js', 'text/javascript; charset=utf-8'),
               '/ldct.css': ('ldct.css', 'text/css; charset=utf-8'),
               '/series.js': ('series.js', 'text/javascript; charset=utf-8'),
@@ -303,7 +309,7 @@ workspacePendingSlice=m;workspaceApplySlice();}
         def do_GET(self):
             parts = parse.urlsplit(self.path)
             if parts.path in ('/', '/segmentation', '/api/benchmarks', '/api/basic/image', '/api/ldct/image',
-                              '/api/export') or parts.path in assets:
+                              '/api/export', '/api/roi/image', '/api/roi/export') or parts.path in assets:
                 if not self.allowed(parts.path.startswith('/api/')): return
                 try:
                     if parts.path == '/': return self.send(200, html, 'text/html; charset=utf-8')
@@ -317,6 +323,10 @@ workspacePendingSlice=m;workspaceApplySlice();}
                         return self.send(200, dict(schema='ct_workspace_session_v1', state=snapshot,
                             note='当前会话状态及计算来源；基础PL/DMA与后台耗时分别记录；浏览器导出另附点击至显示计时；分割只显示实际回执'))
                     q = parse.parse_qs(parts.query, keep_blank_values=True)
+                    if parts.path == '/api/roi/image':
+                        return self.send(200,controller.roi_payload(q['case'][0],q['source'][0],q['result'][0],int(q['index'][0])))
+                    if parts.path == '/api/roi/export':
+                        return self.send(200,controller.roi_export(q['case'][0],q['source'][0],q['result'][0]))
                     if parts.path == '/api/ldct/image':
                         return self.send(200,controller.ldct_payload(q['series'][0],q['group'][0],int(q['index'][0])))
                     return self.send(200, controller.basic_payload(q['case'][0], q['result'][0]))
@@ -357,7 +367,7 @@ workspacePendingSlice=m;workspaceApplySlice();}
                     return self.send(200, controller.folder_imports.finish(values.get('import_id')))
                 except (ValueError, KeyError, OSError) as exc:
                     return self.send(400, dict(error=str(exc)))
-            if self.path not in ('/api/basic/run','/api/connect-fast','/api/ldct/run','/api/ldct/cancel','/api/analysis-source'): return super().do_POST()
+            if self.path not in ('/api/basic/run','/api/connect-fast','/api/ldct/run','/api/ldct/cancel','/api/analysis-source','/api/roi/run','/api/roi/cancel'): return super().do_POST()
             if not self.allowed(True): return
             try:
                 length = int(self.headers.get('Content-Length', '0'))
@@ -366,6 +376,8 @@ workspacePendingSlice=m;workspaceApplySlice();}
                     raise ValueError('需要小型JSON请求')
                 values = json.loads(self.rfile.read(length))
                 if not isinstance(values, dict): raise ValueError('需要JSON对象')
+                if self.path in ('/api/roi/run','/api/roi/cancel'):
+                    return self.send(202,controller.submit('roi' if self.path.endswith('/run') else 'roi_cancel',values))
                 if self.path in ('/api/ldct/run','/api/ldct/cancel','/api/analysis-source'):
                     action={'/api/ldct/run':'ldct','/api/ldct/cancel':'ldct_cancel','/api/analysis-source':'analysis_source'}[self.path]
                     return self.send(202,controller.submit(action,values))

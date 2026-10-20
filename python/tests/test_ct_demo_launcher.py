@@ -114,4 +114,39 @@ class LauncherTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'共享基础'):demo.configuration(root/'config.json')
 
 
+class DesktopLauncherTests(unittest.TestCase):
+    def setUp(self):
+        from roi_workspace import reference_identity
+        self.args=SimpleNamespace(port=8096,check_only=False,no_browser=True)
+        self.info=(Mock(),{},dict(desktop_only=True,roi={'identity':reference_identity()},case_id='keep-case'))
+
+    def test_existing_pc_session_reused_without_board_credentials_or_commands(self):
+        with patch.object(demo,'read_web_info',return_value=self.info),patch.object(demo,'configuration') as config,\
+             patch.object(demo,'spawn_web') as spawn,patch.object(demo,'connect_web') as connect:
+            self.assertEqual(demo.launch_desktop(self.args),0)
+        config.assert_not_called();spawn.assert_not_called();connect.assert_not_called()
+        self.assertEqual(self.info[2]['case_id'],'keep-case')
+
+    def test_cold_pc_start_uses_desktop_flag_and_never_connects_board(self):
+        process=Mock();process.poll.return_value=None
+        with patch.object(demo,'read_web_info',side_effect=[None,None,self.info]),\
+             patch.object(demo,'spawn_web',return_value=(process,Path('TEST-logs'))) as spawn,\
+             patch.object(demo,'connect_web') as connect,patch.object(demo.time,'sleep'):
+            self.assertEqual(demo.launch_desktop(self.args),0)
+        spawn.assert_called_once_with(None,8096,desktop=True);connect.assert_not_called()
+        process.kill.assert_not_called()
+
+    def test_other_port_owner_preserved(self):
+        self.info[2]['desktop_only']=False
+        with patch.object(demo,'read_web_info',return_value=self.info),patch.object(demo,'spawn_web') as spawn:
+            with self.assertRaises(ValueError):demo.launch_desktop(self.args)
+        spawn.assert_not_called()
+
+    def test_pc_check_only_never_starts_a_server(self):
+        self.args.check_only=True
+        with patch.object(demo,'read_web_info',return_value=None),patch.object(demo,'spawn_web') as spawn:
+            self.assertEqual(demo.launch_desktop(self.args),0)
+        spawn.assert_not_called()
+
+
 if __name__=='__main__':unittest.main()

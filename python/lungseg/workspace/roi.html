@@ -1,0 +1,46 @@
+<section id="tab-roi" class="tab-content" hidden>
+  <div class="section-heading"><div><span class="eyebrow">REGION OF INTEREST</span><h2>ROI 定量分析</h2><p>框选感兴趣区域，在当前原图或增强 HU 上筛选、放大并测量。</p></div><span class="chip amber">电脑参考 · FPGA 待验证</span></div>
+  <div class="roi-source-note" id="roiSourceNote">载入一次 CT，即可在此分析；不要求先做肺分割。</div>
+  <div class="roi-layout">
+    <section class="controls card roi-controls">
+      <div class="card-heading"><span class="step">1</span><h3>框选与条件</h3></div>
+      <p class="helper">在完整切片上拖动框选，右侧同步放大。滚动切片不会触发计算。</p>
+      <div class="roi-bounds">
+        <label>左侧 X<input id="roiX" type="number" min="0" step="1" value="0"></label><label>上侧 Y<input id="roiY" type="number" min="0" step="1" value="0"></label>
+        <label>宽度 / 像素<input id="roiWidth" type="number" min="0" step="1" value="0"></label><label>高度 / 像素<input id="roiHeight" type="number" min="0" step="1" value="0"></label>
+      </div>
+      <button id="roiFull" class="text-button">选择整张切片</button>
+      <label class="checkbox roi-toggle"><input id="roiUseHu" type="checkbox">按 HU 范围筛选</label>
+      <div class="roi-bounds"><label>HU 下限<input id="roiLow" type="number" min="-32768" max="32767" step="1" value="-1000" disabled></label><label>HU 上限<input id="roiHigh" type="number" min="-32768" max="32767" step="1" value="1000" disabled></label></div>
+      <label class="checkbox roi-toggle"><input id="roiUseLung" type="checkbox">只统计预测肺区域内的部分</label>
+      <select id="roiMaskStage" aria-label="预测肺掩膜阶段" disabled><option value="body">当前来源 · 人体约束后预测掩膜</option><option value="cleaned">当前来源 · 三维清理后预测掩膜</option></select>
+      <p id="roiMaskNote" class="helper">可关闭此项直接框选；不使用专家标注代替预测。</p>
+      <div class="roi-divider"></div><div class="card-heading"><span class="step">2</span><h3>分析范围</h3></div>
+      <select id="roiMode" aria-label="ROI 分析范围"><option value="slice">当前切片 · 面积与 HU</option><option value="range">连续层段 · 逐层统计与体积</option></select>
+      <div id="roiRangeFields" class="roi-bounds" hidden><label>起始层<input id="roiZ0" type="number" min="0" step="1" value="0"></label><label>结束层（含）<input id="roiZ1" type="number" min="0" step="1" value="0"></label></div>
+      <p class="helper">层段使用同一矩形逐层筛选，体积仅代表所选条件区域。</p>
+      <button id="roiRun" class="button primary wide" disabled>分析当前切片</button>
+      <button id="roiCancel" class="text-button" hidden>完成当前层后停止</button>
+      <p id="roiProgress" class="helper" role="status">等待载入影像。</p>
+    </section>
+    <div class="roi-content">
+      <div class="roi-toolbar">
+        <label>当前层<input id="roiSlice" type="number" min="0" value="0" disabled></label>
+        <label>显示窗<select id="roiWindow"><option value="lung">肺窗</option><option value="soft">软组织窗</option><option value="bone">骨窗</option></select></label>
+        <label class="checkbox"><input id="roiOverlay" type="checkbox" checked>显示筛选区域</label>
+        <button id="roiToSeg" class="text-button" disabled>在 MPR 中查看此层 →</button>
+      </div>
+      <div class="roi-viewers">
+        <article><header><strong>完整切片 · 拖动框选</strong><span id="roiSliceLabel">等待影像</span></header><div class="roi-canvas-wrap"><canvas id="roiCanvas" width="512" height="512" aria-label="ROI 完整切片，支持拖动矩形框选"></canvas></div></article>
+        <article><header><strong>局部放大</strong><span id="roiViewBadge">等待框选</span></header><div class="roi-canvas-wrap"><canvas id="roiZoom" width="512" height="512" aria-label="ROI 局部放大与筛选掩膜"></canvas></div></article>
+      </div>
+      <p class="helper roi-display-note">调窗与放大只影响显示；分析始终使用原生 HU。青色为本次筛选区域，金色为矩形边界。</p>
+      <section class="card roi-result-card">
+        <div class="roi-result-heading"><div><h3>定量结果</h3><p id="roiResultNote" class="helper">设置矩形和条件后点击分析，结果独立保存。</p></div><button id="roiExport" class="button secondary" disabled>导出 ROI 记录 ↗</button></div>
+        <div class="roi-metrics"><div><small>当前层 · 筛选像素</small><strong id="roiCount">—</strong></div><div><small>当前层 · 面积 mm²</small><strong id="roiArea">—</strong></div><div><small>已计算区域 · HU 均值</small><strong id="roiMean">—</strong></div><div><small>已计算区域 · 体积 mL</small><strong id="roiVolume">—</strong></div></div>
+        <p id="roiStatsNote" class="helper">单层只显示面积；连续层段显示实际已计算区域体积，不代表精确病灶体积。</p>
+      </section>
+      <section class="card roi-result-card"><h3>当前影像来源的分析记录</h3><p class="helper">每次分析新增一份结果；切换原图／增强图后恢复对应记录。</p><div class="table-scroll"><table><thead><tr><th>切片范围</th><th>条件</th><th>完成层数</th><th>筛选像素</th><th>电脑参考耗时</th><th>查看</th></tr></thead><tbody id="roiHistory"><tr><td colspan="6">暂无分析记录</td></tr></tbody></table></div></section>
+    </div>
+  </div>
+</section>

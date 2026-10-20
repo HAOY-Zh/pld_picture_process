@@ -35,7 +35,7 @@ def configuration(path):
     return StudioClient(config['board_url'],token,manifest),manifest
 
 
-def web_info(url,manifest):
+def read_web_info(url):
     """Return None only when no listener exists; never close another server."""
     opener=request.build_opener(request.ProxyHandler({}),NoRedirect())
     try:
@@ -47,8 +47,15 @@ def web_info(url,manifest):
     match=re.search(r'<meta name="ui-token" content="([^"]+)"',html)
     if not match:raise ValueError('该端口已有其他程序，请使用另一端口；不会关闭已有程序。')
     headers={'X-UI-Token':match[1]}
-    with opener.open(request.Request(url+'/api/state',headers=headers),timeout=5) as response:
+    with opener.open(request.Request(url.rstrip('/')+'/api/state',headers=headers),timeout=5) as response:
         state=json.load(response)
+    return opener,headers,state
+
+
+def web_info(url,manifest):
+    info=read_web_info(url)
+    if info is None:return None
+    opener,headers,state=info
     if (state.get('desktop_only') is not False or not state.get('fast_platform_active')
             or state.get('ldct',{}).get('identity')!=manifest['ldct']
             or not state['ldct'].get('fpga_configured')):
@@ -73,7 +80,7 @@ def connect_web(url,info,manifest):
     raise TimeoutError('网页连接检查尚未完成；服务保留，请查看网页。')
 
 
-def spawn_web(config,port):
+def spawn_web(config,port,desktop=False):
     folder=ROOT/'data/ct_studio_demo_launcher'/uuid.uuid4().hex
     folder.mkdir(parents=True)
     task_env=os.environ.copy()
@@ -82,9 +89,10 @@ def spawn_web(config,port):
     flags=0
     if os.name=='nt':flags=subprocess.CREATE_NEW_PROCESS_GROUP|subprocess.CREATE_NO_WINDOW
     with (folder/'web.stdout.log').open('xb') as out,(folder/'web.stderr.log').open('xb') as err:
+        mode=['--desktop'] if desktop else ['--config',str(config)]
         process=subprocess.Popen([sys.executable,'-B','-X','utf8',str(ROOT/'python/ct_workspace_web.py'),
-            '--config',str(config),'--port',str(port),
-            '--output',str(ROOT/'data/ct_workspace_demo/results')],
+            *mode,'--port',str(port),
+            '--output',str(ROOT/('data/ct_workspace_pc/results' if desktop else 'data/ct_workspace_demo/results'))],
             cwd=ROOT,env=task_env,stdin=subprocess.DEVNULL,stdout=out,stderr=err,creationflags=flags)
     (folder/'web.pid').write_text(str(process.pid),encoding='ascii')
     return process,folder
@@ -107,6 +115,37 @@ def wait_board(client, seconds):
                 print('开发板正在启动或尚未连通，自动等待开机服务就绪（最多%d秒）…' % seconds, flush=True)
                 announced = True
             time.sleep(min(3, remaining))
+
+
+def launch_desktop(args):
+    from roi_workspace import reference_identity
+    identity=reference_identity()
+    url=f'http://127.0.0.1:{args.port}/'
+    def inspect():
+        info=read_web_info(url)
+        if info is not None:
+            state=info[2]
+            if state.get('desktop_only') is not True or state.get('roi',{}).get('identity')!=identity:
+                raise ValueError('该端口已有其他版本或实板网页，已保留原会话；请选择另一端口。')
+        return info
+    existing=inspect()
+    if args.check_only:
+        print('CHECK PASS：电脑环境及ROI参考通过；未访问开发板、未启动网页。',flush=True)
+        return 0
+    if existing is None:
+        process,logs=spawn_web(None,args.port,desktop=True)
+        deadline=time.monotonic()+60
+        while time.monotonic()<deadline:
+            if process.poll() is not None:raise RuntimeError('电脑网页未启动，查看：'+str(logs/'web.stderr.log'))
+            existing=inspect()
+            if existing is not None:break
+            time.sleep(.4)
+        if existing is None:raise TimeoutError('电脑网页启动尚未完成，日志：'+str(logs))
+    else:
+        print('复用现有电脑网页，保留当前病例、原图/增强图和结果。',flush=True)
+    print('CT Studio 电脑端：'+url+'；ROI/基础参考/LDCT电脑参考可用，FPGA分割待接板。',flush=True)
+    if not args.no_browser:webbrowser.open(url)
+    return 0
 
 
 def launch(args):
@@ -167,14 +206,16 @@ def launch(args):
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--config',type=Path,default=ROOT/'data/ct_studio_ldct_fast_03/host_config.json')
-    parser.add_argument('--port',type=int,default=8095)
+    parser.add_argument('--desktop',action='store_true',help='电脑参考模式，不连接开发板；默认端口8096')
+    parser.add_argument('--port',type=int,help='实板默认8095，电脑模式默认8096')
     parser.add_argument('--check-only',action='store_true',help='只读检查，不启动或打开网页')
     parser.add_argument('--no-browser',action='store_true',help='检查或启动服务，但不打开浏览器')
     parser.add_argument('--wait-seconds',type=int,default=300,help='等待板端开机就绪的最长秒数，默认300')
     args=parser.parse_args()
+    if args.port is None:args.port=8096 if args.desktop else 8095
     if not 1<=args.port<=65535:parser.error('端口须为1至65535')
     if not 0<=args.wait_seconds<=900:parser.error('等待时间须为0至900秒')
-    try:return launch(args)
+    try:return launch_desktop(args) if args.desktop else launch(args)
     except Exception as exc:
         print('启动未完成：'+str(exc),flush=True)
         print('不会停止原进程或覆盖模型/结果。请查看 docs/CT_Studio_LDCT集成运行.md。',flush=True)
