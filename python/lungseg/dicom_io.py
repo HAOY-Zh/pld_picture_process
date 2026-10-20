@@ -21,6 +21,7 @@ class CTVolume:
     sop_uids: tuple
     series_uid: str
     frame_uid: str
+    frame_uids: tuple = ()
 
 
 def discover(root):
@@ -68,7 +69,8 @@ def orientation_vectors(orientation):
     return col_direction, row_direction, np.cross(col_direction, row_direction)
 
 
-def load_ct(entries):
+def checked_ct_headers(entries, *, allow_inconsistent_frame_uids=False):
+    """Validate a physical stack without decoding pixels or changing any UID."""
     if not entries:
         raise ValueError('No CT slices selected')
     first = entries[0][1]
@@ -79,13 +81,21 @@ def load_ct(entries):
         raise ValueError('Invalid PixelSpacing')
     series_uid, frame_uid = str(first.SeriesInstanceUID), str(first.FrameOfReferenceUID)
     shape = (int(first.Rows), int(first.Columns))
+    for tag in ('PatientID', 'StudyInstanceUID'):
+        identities = {str(getattr(ds, tag, '')).strip() for _, ds in entries}
+        if len(identities) != 1 or (allow_inconsistent_frame_uids and '' in identities):
+            raise ValueError('患者或检查标识不一致/缺失，不能合并为 CT 序列：' + tag)
     ordered = []
     seen = set()
     for path, ds in entries:
         if int(getattr(ds, 'NumberOfFrames', 1)) != 1:
             raise ValueError('Enhanced/multiframe CT is not supported in this first version')
-        if str(ds.SeriesInstanceUID) != series_uid or str(ds.FrameOfReferenceUID) != frame_uid:
-            raise ValueError('Mixed CT series or frames of reference')
+        if str(ds.SeriesInstanceUID) != series_uid:
+            raise ValueError('检测到多个 CT 序列，请先选择一个序列')
+        if not str(ds.FrameOfReferenceUID).strip():
+            raise ValueError('CT 缺少坐标系标识')
+        if not allow_inconsistent_frame_uids and str(ds.FrameOfReferenceUID) != frame_uid:
+            raise ValueError('同序列的坐标系标识不一致；请先检查序列，再按需选择匿名化数据兼容导入')
         if (int(ds.Rows), int(ds.Columns)) != shape:
             raise ValueError('CT slice sizes differ')
         if not np.allclose(ds.ImageOrientationPatient, orientation, atol=1e-5, rtol=0):
@@ -99,7 +109,7 @@ def load_ct(entries):
         position = np.asarray(ds.ImagePositionPatient, dtype=np.float64)
         if position.shape != (3,) or not np.isfinite(position).all():
             raise ValueError('Invalid ImagePositionPatient')
-        ordered.append((float(position @ normal), path, position, uid))
+        ordered.append((float(position @ normal), path, position, uid, str(ds.FrameOfReferenceUID)))
     ordered.sort(key=lambda item: item[0])
     positions = np.stack([item[2] for item in ordered])
     if len(ordered) > 1:
@@ -114,10 +124,19 @@ def load_ct(entries):
         dz = float(getattr(first, 'SliceThickness', 0))
         if not np.isfinite(dz) or dz <= 0:
             raise ValueError('Single-slice input needs a positive SliceThickness')
+    frame_uids = tuple(item[4] for item in ordered)
+    return dict(ordered=ordered, positions=positions, orientation=orientation,
+                spacing=np.array([dz, *spacing2]), shape=shape, series_uid=series_uid,
+                frame_uid=frame_uid if len(set(frame_uids)) == 1 else '', frame_uids=frame_uids)
+
+
+def load_ct(entries, *, allow_inconsistent_frame_uids=False):
+    info = checked_ct_headers(entries, allow_inconsistent_frame_uids=allow_inconsistent_frame_uids)
+    ordered, shape = info['ordered'], info['shape']
     hu = np.empty((len(ordered), *shape), dtype=np.float32)
-    for index, (_, path, _, uid) in enumerate(ordered):
+    for index, (_, path, _, uid, original_frame) in enumerate(ordered):
         ds = pydicom.dcmread(path)
-        if str(ds.SOPInstanceUID) != uid:
+        if str(ds.SOPInstanceUID) != uid or str(ds.FrameOfReferenceUID) != original_frame:
             raise ValueError('CT changed during reading')
         slope, intercept = float(ds.RescaleSlope), float(ds.RescaleIntercept)
         if not np.isfinite([slope, intercept]).all() or slope == 0:
@@ -128,8 +147,8 @@ def load_ct(entries):
         if pixels.shape != shape:
             raise ValueError('Unexpected decoded CT shape')
         hu[index] = pixels.astype(np.float32) * slope + intercept
-    return CTVolume(hu, positions, orientation, np.array([dz, *spacing2]),
-                    tuple(item[3] for item in ordered), series_uid, frame_uid)
+    return CTVolume(hu, info['positions'], info['orientation'], info['spacing'],
+                    tuple(item[3] for item in ordered), info['series_uid'], info['frame_uid'], info['frame_uids'])
 
 
 def patient_to_pixel(points, origin, orientation, pixel_spacing, plane_tolerance=.1):

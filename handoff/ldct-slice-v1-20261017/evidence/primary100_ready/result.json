@@ -1,0 +1,21 @@
+{
+  "total_ms": 371.4653410002029,
+  "timing_scope": "pack+cache+DMA+PL+poll+stitch",
+  "actual_pl_mhz_before": 100.0,
+  "actual_pl_mhz_after": 100.0,
+  "tiles": 81,
+  "method": "cnn",
+  "model_id": "2cc0ba07080f950c87427c574472d067e411c7379a7394332290fba12f6f8d5b",
+  "interface_version": "ldct_slice_v1",
+  "status": "PASS",
+  "actual_FPGA_execution": true,
+  "bit_sha256": "f0f39b4eda7f577b253e30427ed116373ae61df838f3a788fbaf0a7cd7d0a7e6",
+  "cpu_mhz": 650.0,
+  "state": {
+    "busy": false,
+    "faulted": false,
+    "dma_may_access": false,
+    "error": null
+  },
+  "max_reference_error_hu": 0
+}

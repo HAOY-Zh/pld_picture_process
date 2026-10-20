@@ -201,7 +201,8 @@ class Controller:
             elif action == 'load':
                 hu, geom, details = read_ct(values['path'].strip().strip('"'),
                     confirm_hu=values.get('confirm_hu') is True, series_uid=values.get('series_uid', ''),
-                    slices=values.get('load_slices', ''))
+                    slices=values.get('load_slices', ''),
+                    allow_inconsistent_frame_uids=values.get('allow_inconsistent_frame_uids') is True)
                 expert, expert_info = read_reference(values.get('expert_path', '').strip().strip('"'),
                     hu.shape, geom, details, enabled=values.get('load_expert', True) is True)
                 details.update(annotations_loaded=expert is not None, expert_reference=expert_info)
@@ -256,6 +257,7 @@ class Controller:
             scores = ({name: overlap_metrics(mask, self.expert[z]) for name, mask in
                 [('raw', raw), ('body', body)]} if self.expert is not None else {})
             receipt.update(slice_index=int(z), body_plan=plan, case_id=self.status['case_id'],
+                           analysis_source=copy.deepcopy(self.details.get('analysis_source',{'source_id':'original'})),
                            job_id=job_id, source_hu_sha256=self.details['hu_sha256'],
                            source_slice_index=self.details['source_slice_indices'][z])
             if scores:

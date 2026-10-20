@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-19",
+  "status": "PASS_FAST_REAL_BOARD_AND_FULL_VOLUME",
+  "integration_base_commit": "0307a8ad7e5cb2cceece79ee4e18e0e5ce62db02",
+  "deployment": {
+    "package_sha256": "4e0ac44b36e46c32f12ea10b05dd29ecb5280bb72cf953599a173d3d72e01317",
+    "archive_sha256": "2ff27d4e425644ba6be12cade0142559a77070506f7a87043a07bfe9d2e624d0",
+    "archive_bytes": 6560607,
+    "ldct_clock_mhz": 100.0,
+    "variant": "fast",
+    "basic_clock_mhz": [
+      100.0
+    ],
+    "preserved_classic_failure": "data/board_acceptance_20261019_03/returned"
+  },
+  "fixes": [
+    "Include frozen ctdenoise dependencies at board package root",
+    "Exclude PC-generated Python bytecode from copy and manifest"
+  ],
+  "actual_board": {
+    "python": "3.10.4",
+    "pynq": "3.1.1",
+    "cpu_mhz": 650.0,
+    "basic_mhz": 100.0,
+    "ldct_mhz": 100.0,
+    "segmentation_mhz": 100.0
+  },
+  "startup": {
+    "basic_cases": 12,
+    "basic_pixels": 3145728,
+    "ldct_cases": 15,
+    "segmentation_nodes_per_check": 21,
+    "segmentation_commands_per_check": 51,
+    "all_returned_outputs_independently_bit_exact": true
+  },
+  "real_http": {
+    "measured_ldct_frames": 20,
+    "warmups_excluded": 2,
+    "mean_module_ms": 379.5216703499932,
+    "p95_module_ms": 400.02900034978666,
+    "mean_http_roundtrip_ms": 532.9025499999943,
+    "module_scope": "pack+cache+DMA+PL+poll+stitch; excludes HTTP and bit switch",
+    "enhanced_hu_basic_cases": 12,
+    "enhanced_hu_segmentation_cases": 2,
+    "after_switch_bound_segmentation_reference_checks": 2,
+    "original_window_after_segmentation_checks": 2
+  },
+  "full_web_volume": {
+    "shape": [
+      280,
+      512,
+      512
+    ],
+    "actual_ldct_planes": 280,
+    "independently_bit_exact_ldct_planes": 280,
+    "actual_segmentation_planes": 280,
+    "independently_checked_actual_head_and_input_hashes": 280,
+    "segmentation_total_host_ms_mean": 684.407368517867,
+    "segmentation_loop_elapsed_ms": 234057.03399999993,
+    "actual_layer_boundary_cancel": true,
+    "partial_outputs_retained": true,
+    "no_partial_volume_registered_as_complete": true,
+    "original_and_enhanced_case_result_mask_restoration": true,
+    "mpr_three_planes_pixel_exact": true,
+    "surface_vertices": 601416,
+    "surface_faces": 1202504,
+    "surface_scope": "input_volume",
+    "expert_mask_present": false,
+    "dice_reported": false,
+    "note": "Frozen neural heads run on FPGA; PC performs frozen pre/postprocessing, MPR and surface construction"
+  },
+  "classic": {
+    "status": "FAILED_WINDOW_NARROW_SELFTEST_NOT_ACCEPTED_AS_FALLBACK",
+    "wl": 0,
+    "ww": 5,
+    "mismatched_pixels": 202,
+    "total_pixels": 262144,
+    "mismatch_input_hu": [
+      -1,
+      0,
+      1
+    ],
+    "actual_clock_mhz": 50.0,
+    "gpio_parameters_read_back_correct": true,
+    "dma_idle": true,
+    "dma_error": false,
+    "dma_guard_passed": true,
+    "root_cause": "Unresolved old window datapath issue; arithmetic/timing cause not yet proven",
+    "original_bit_and_failure_arrays_retained": true
+  },
+  "preserved": {
+    "ldct_model_id": "2cc0ba07080f950c87427c574472d067e411c7379a7394332290fba12f6f8d5b",
+    "original_models": true,
+    "original_results": true,
+    "rtl_bit_hwh_weights_unchanged": true
+  },
+  "software_regressions": {
+    "affected_integration_tests": 15,
+    "isolated_package_import_variants": 2,
+    "passed": true
+  },
+  "autostart": {
+    "status": "INSTALLED_ENABLED_COLD_BOOT_PENDING",
+    "unit": "ct-studio.service",
+    "board_systemd_unit_verify_passed": true,
+    "enabled_for_next_boot": true,
+    "current_owner_not_stopped": true,
+    "runner_sha256": "ceb796486e0391d6735980ceb3070cc17aae32f273c5e8c1e97e525c9661ec82",
+    "cold_boot_verified": false,
+    "reason": "Board unavailable before reboot acceptance; no reboot was executed",
+    "pc_readiness_wait_seconds": 300,
+    "offline_boot_and_launcher_tests_passed": 19,
+    "local_evidence_directory": "data/ct_studio_autostart_20261019"
+  },
+  "local_evidence_directory": "data/board_acceptance_fast_20261019_01",
+  "private_or_patient_arrays_uploaded": false,
+  "evidence_sha256": {
+    "deployment.json": "1357fd00ee8fa4617fbbbe14e2fb222ef0b18daec93f8b272bd84ac20668d166",
+    "live/result.json": "413d9fe197b70a111ed55a830f9bd1b5f870615ffffeeed77d2022200db92517",
+    "web_volume/final.json": "16edad0df410d70eb1395a475b40b95c0bc57ad815aebc151801e2fa056cb834",
+    "web_volume/enhanced_complete_export.json": "9e02219f3ca7b7f35131099055011602d52cc81cf90f2b24059dbfe48637d791",
+    "web_volume/surface_summary.json": "64e85d46767244bf3f255a07e0e3c7aa361fa588931e75e24899f2691cf08d77",
+    "returned/acceptance_state.json": "ef958e431f0ae608229b5b2d0079959bf961ceb753c0a6b1343cbcd8e4f11450",
+    "returned/ldct_independent_verification.json": "42937e1b96a510e7b652d4833227fe13194aa1c23c634782664f819230c939fe",
+    "returned/platform_startup_c6442a7bb25b48b28c14bbbe66d6ae37.json": "3dd491105985828c761fc7e41966715031e60d6d4bd36ee1c29c11fcc0735da3",
+    "returned/platform_startup_c6442a7bb25b48b28c14bbbe66d6ae37_verification.json": "740e5b65e7e26b71f0ffe9b7e864e560bce510bf3d0e38c22fb38eb1aad53ae9",
+    "returned/studio_ldct_startup_c995ca36c825404bbe78afdb9d572017.json": "62dfcbc0284fec395c092fa68a4f17cc694641c15b2f2818621b18820394a85f",
+    "returned/platform_startup_c6442a7bb25b48b28c14bbbe66d6ae37.npz": "c24a4e065276281e8c8236c679260376dc8e88d464cf2e893217399ae7d2b366",
+    "returned/studio_ldct_startup_c995ca36c825404bbe78afdb9d572017.npz": "1b5fe16523de4619b0bd2e2f5d3fdab30c44f6738940978be2e223f5df49595a"
+  }
+}

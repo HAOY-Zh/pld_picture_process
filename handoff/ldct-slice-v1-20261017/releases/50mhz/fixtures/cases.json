@@ -1,0 +1,152 @@
+[
+  {
+    "name": "C067",
+    "method": "cnn",
+    "input": "fixtures/C067_input.npy",
+    "expected": "fixtures/C067_expected.npy",
+    "shape": [
+      512,
+      512
+    ]
+  },
+  {
+    "name": "C077",
+    "method": "cnn",
+    "input": "fixtures/C077_input.npy",
+    "expected": "fixtures/C077_expected.npy",
+    "shape": [
+      512,
+      512
+    ]
+  },
+  {
+    "name": "edge67x69",
+    "method": "cnn",
+    "input": "fixtures/edge67x69_input.npy",
+    "expected": "fixtures/edge67x69_expected.npy",
+    "shape": [
+      67,
+      69
+    ]
+  },
+  {
+    "name": "row1x69",
+    "method": "cnn",
+    "input": "fixtures/row1x69_input.npy",
+    "expected": "fixtures/row1x69_expected.npy",
+    "shape": [
+      1,
+      69
+    ]
+  },
+  {
+    "name": "column67x1",
+    "method": "cnn",
+    "input": "fixtures/column67x1_input.npy",
+    "expected": "fixtures/column67x1_expected.npy",
+    "shape": [
+      67,
+      1
+    ]
+  },
+  {
+    "name": "single",
+    "method": "cnn",
+    "input": "fixtures/single_input.npy",
+    "expected": "fixtures/single_expected.npy",
+    "shape": [
+      1,
+      1
+    ]
+  },
+  {
+    "name": "float_ties",
+    "method": "cnn",
+    "input": "fixtures/float_ties_input.npy",
+    "expected": "fixtures/float_ties_expected.npy",
+    "shape": [
+      1,
+      8
+    ]
+  },
+  {
+    "name": "method_bypass",
+    "method": "bypass",
+    "input": "fixtures/method_bypass_input.npy",
+    "expected": "fixtures/method_bypass_expected.npy",
+    "shape": [
+      19,
+      23
+    ]
+  },
+  {
+    "name": "method_gaussian5",
+    "method": "gaussian5",
+    "input": "fixtures/method_gaussian5_input.npy",
+    "expected": "fixtures/method_gaussian5_expected.npy",
+    "shape": [
+      19,
+      23
+    ]
+  },
+  {
+    "name": "method_bilateral5",
+    "method": "bilateral5",
+    "input": "fixtures/method_bilateral5_input.npy",
+    "expected": "fixtures/method_bilateral5_expected.npy",
+    "shape": [
+      19,
+      23
+    ]
+  },
+  {
+    "name": "method_joint7_guide5",
+    "method": "joint7_guide5",
+    "input": "fixtures/method_joint7_guide5_input.npy",
+    "expected": "fixtures/method_joint7_guide5_expected.npy",
+    "shape": [
+      19,
+      23
+    ]
+  },
+  {
+    "name": "method_joint7_guide3",
+    "method": "joint7_guide3",
+    "input": "fixtures/method_joint7_guide3_input.npy",
+    "expected": "fixtures/method_joint7_guide3_expected.npy",
+    "shape": [
+      19,
+      23
+    ]
+  },
+  {
+    "name": "method_guided3",
+    "method": "guided3",
+    "input": "fixtures/method_guided3_input.npy",
+    "expected": "fixtures/method_guided3_expected.npy",
+    "shape": [
+      19,
+      23
+    ]
+  },
+  {
+    "name": "method_cnn",
+    "method": "cnn",
+    "input": "fixtures/method_cnn_input.npy",
+    "expected": "fixtures/method_cnn_expected.npy",
+    "shape": [
+      19,
+      23
+    ]
+  },
+  {
+    "name": "method_bilateral7",
+    "method": "bilateral7",
+    "input": "fixtures/method_bilateral7_input.npy",
+    "expected": "fixtures/method_bilateral7_expected.npy",
+    "shape": [
+      19,
+      23
+    ]
+  }
+]

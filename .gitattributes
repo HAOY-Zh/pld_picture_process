@@ -1,3 +1,6 @@
 # Preserve frozen hash-bound snapshots, including original line endings.
 hardware/ct_studio_20261018/** -text -whitespace
 runtime/ct_studio_20261018/** -text whitespace=cr-at-eol
+/start_ct_studio_demo.cmd text eol=crlf
+/start_ct_studio_pc.cmd text eol=crlf
+python/roi_vendor/ct_roi_reference.py -text -whitespace

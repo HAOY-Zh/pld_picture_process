@@ -1,0 +1,553 @@
+{
+  "status": "PASS",
+  "actual_FPGA_execution": true,
+  "scope": "2 real-board 512x512 demonstration slices, 1 warmup and 7 measured repeats per strategy; fresh tests for all three models.",
+  "timing_scope": "Frame packing, DMA/cache, PL compute, polling and assembly; excludes file I/O, reference/metric computation and display.",
+  "board_quality": [
+    {
+      "method": "New_optimized",
+      "rmse_hu": 72.9894146230199,
+      "psnr_window_db": 29.101754680505703,
+      "ssim_window": 0.6655640134678826,
+      "body_rmse_hu": 81.24360638956335,
+      "body_ssim": 0.6116311586782299
+    },
+    {
+      "method": "New_original",
+      "rmse_hu": 73.91724958692598,
+      "psnr_window_db": 28.988135629776554,
+      "ssim_window": 0.6615655225680508,
+      "body_rmse_hu": 82.08555675630231,
+      "body_ssim": 0.61081236909755
+    },
+    {
+      "method": "Old",
+      "rmse_hu": 73.44277534425618,
+      "psnr_window_db": 29.04138139742472,
+      "ssim_window": 0.6615154171225806,
+      "body_rmse_hu": 81.98375630636721,
+      "body_ssim": 0.6053137229178609
+    }
+  ],
+  "board_patient_quality": [
+    {
+      "patient": "C067",
+      "method": "New_optimized",
+      "slices": 1,
+      "rmse_hu": 75.60421903735782,
+      "psnr_window_db": 28.762748582417,
+      "ssim_window": 0.65192462417611,
+      "body_rmse_hu": 85.92983817318535,
+      "body_ssim": 0.5902950570538561,
+      "rmse_hu_count": 1,
+      "psnr_window_db_count": 1,
+      "ssim_window_count": 1,
+      "body_rmse_hu_count": 1,
+      "body_ssim_count": 1
+    },
+    {
+      "patient": "C077",
+      "method": "New_optimized",
+      "slices": 1,
+      "rmse_hu": 70.37461020868197,
+      "psnr_window_db": 29.440760778594406,
+      "ssim_window": 0.6792034027596553,
+      "body_rmse_hu": 76.55737460594138,
+      "body_ssim": 0.6329672603026036,
+      "rmse_hu_count": 1,
+      "psnr_window_db_count": 1,
+      "ssim_window_count": 1,
+      "body_rmse_hu_count": 1,
+      "body_ssim_count": 1
+    },
+    {
+      "patient": "C067",
+      "method": "New_original",
+      "slices": 1,
+      "rmse_hu": 76.87117635010203,
+      "psnr_window_db": 28.612389030676468,
+      "ssim_window": 0.6462834601636827,
+      "body_rmse_hu": 87.1365305826604,
+      "body_ssim": 0.5883189541357665,
+      "rmse_hu_count": 1,
+      "psnr_window_db_count": 1,
+      "ssim_window_count": 1,
+      "body_rmse_hu_count": 1,
+      "body_ssim_count": 1
+    },
+    {
+      "patient": "C077",
+      "method": "New_original",
+      "slices": 1,
+      "rmse_hu": 70.9633228237499,
+      "psnr_window_db": 29.36388222887664,
+      "ssim_window": 0.6768475849724189,
+      "body_rmse_hu": 77.03458292994422,
+      "body_ssim": 0.6333057840593335,
+      "rmse_hu_count": 1,
+      "psnr_window_db_count": 1,
+      "ssim_window_count": 1,
+      "body_rmse_hu_count": 1,
+      "body_ssim_count": 1
+    },
+    {
+      "patient": "C067",
+      "method": "Old",
+      "slices": 1,
+      "rmse_hu": 76.12333697427083,
+      "psnr_window_db": 28.696584174643206,
+      "ssim_window": 0.6486952038517123,
+      "body_rmse_hu": 86.74248952407446,
+      "body_ssim": 0.5848518456246704,
+      "rmse_hu_count": 1,
+      "psnr_window_db_count": 1,
+      "ssim_window_count": 1,
+      "body_rmse_hu_count": 1,
+      "body_ssim_count": 1
+    },
+    {
+      "patient": "C077",
+      "method": "Old",
+      "slices": 1,
+      "rmse_hu": 70.76221371424151,
+      "psnr_window_db": 29.38617862020623,
+      "ssim_window": 0.6743356303934487,
+      "body_rmse_hu": 77.22502308865995,
+      "body_ssim": 0.6257756002110515,
+      "rmse_hu_count": 1,
+      "psnr_window_db_count": 1,
+      "ssim_window_count": 1,
+      "body_rmse_hu_count": 1,
+      "body_ssim_count": 1
+    }
+  ],
+  "board_speed_mean_ms": {
+    "Old": 511.11730400000965,
+    "New_original": 512.6436980000051,
+    "New_optimized": 512.2411405000094
+  },
+  "board_speed_rows": [
+    {
+      "model": "Old",
+      "patient": "C067",
+      "stage": "compact58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 7,
+      "median_frame_ms": 512.9417900000135,
+      "p95_frame_ms": 537.6218039000037,
+      "fps": 1.9495389525582887,
+      "speedup_vs_legacy48": 1.4548594334650702,
+      "bit_exact": true,
+      "trials_ms": [
+        545.4835190000153,
+        519.2778019999764,
+        507.4190149999822,
+        513.7397839999949,
+        509.21738400001004,
+        512.9417900000135,
+        508.31487300001754
+      ]
+    },
+    {
+      "model": "Old",
+      "patient": "C077",
+      "stage": "compact58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 7,
+      "median_frame_ms": 509.2928180000058,
+      "p95_frame_ms": 516.294590400031,
+      "fps": 1.963506974095968,
+      "speedup_vs_legacy48": 1.4529536522934878,
+      "bit_exact": true,
+      "trials_ms": [
+        509.2928180000058,
+        509.9877709999987,
+        509.06242399997836,
+        518.9975130000448,
+        509.3939749999663,
+        509.2450880000001,
+        508.46675600001845
+      ]
+    },
+    {
+      "model": "New_original",
+      "patient": "C067",
+      "stage": "compact58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 7,
+      "median_frame_ms": 514.1634519999911,
+      "p95_frame_ms": 524.7570942000095,
+      "fps": 1.944906811462782,
+      "speedup_vs_legacy48": 1.4467114982727813,
+      "bit_exact": true,
+      "trials_ms": [
+        513.8611749999882,
+        517.1519440000338,
+        511.96294699997225,
+        514.1634519999911,
+        513.5465280000062,
+        525.1695750000067,
+        523.7946390000161
+      ]
+    },
+    {
+      "model": "New_original",
+      "patient": "C077",
+      "stage": "compact58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 7,
+      "median_frame_ms": 511.12394400001904,
+      "p95_frame_ms": 539.5609794999928,
+      "fps": 1.9564726163561665,
+      "speedup_vs_legacy48": 1.4530117708591552,
+      "bit_exact": true,
+      "trials_ms": [
+        511.1055140000076,
+        513.5900800000286,
+        510.8447679999699,
+        511.20582100003276,
+        511.12394400001904,
+        510.63718000000335,
+        550.6913649999774
+      ]
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C067",
+      "stage": "compact58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 7,
+      "median_frame_ms": 510.2712980000206,
+      "p95_frame_ms": 516.0349238999515,
+      "fps": 1.959741815617385,
+      "speedup_vs_legacy48": 1.4462236478758372,
+      "bit_exact": true,
+      "trials_ms": [
+        517.2086699999454,
+        513.2961829999658,
+        508.0445779999536,
+        509.7984299999325,
+        510.2712980000206,
+        513.170467000009,
+        509.8522209999601
+      ]
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C077",
+      "stage": "compact58",
+      "tile": 58,
+      "tiles": 81,
+      "repeats": 7,
+      "median_frame_ms": 514.2109829999981,
+      "p95_frame_ms": 521.0854026999982,
+      "fps": 1.9447270343504188,
+      "speedup_vs_legacy48": 1.4393344939503474,
+      "bit_exact": true,
+      "trials_ms": [
+        519.5730149999918,
+        520.6611250000606,
+        510.3261530000509,
+        521.2672359999715,
+        514.2109829999981,
+        508.91646100001253,
+        510.97309399995083
+      ]
+    }
+  ],
+  "independent_pixel_checks": [
+    {
+      "model": "Old",
+      "patient": "C067",
+      "stage": "legacy48",
+      "output_sha256": "24389d9a4b56c59599f88880aa9115a110c4b138b2ae8627160ee207ad763e22",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "Old",
+      "patient": "C067",
+      "stage": "fast48",
+      "output_sha256": "24389d9a4b56c59599f88880aa9115a110c4b138b2ae8627160ee207ad763e22",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "Old",
+      "patient": "C067",
+      "stage": "fast58",
+      "output_sha256": "24389d9a4b56c59599f88880aa9115a110c4b138b2ae8627160ee207ad763e22",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "Old",
+      "patient": "C067",
+      "stage": "compact58",
+      "output_sha256": "24389d9a4b56c59599f88880aa9115a110c4b138b2ae8627160ee207ad763e22",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "Old",
+      "patient": "C077",
+      "stage": "legacy48",
+      "output_sha256": "ae6c5973a69a2ad1fb83f139d166f2ed530b10b1ef7b2c58a41e9356c113a979",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "Old",
+      "patient": "C077",
+      "stage": "fast48",
+      "output_sha256": "ae6c5973a69a2ad1fb83f139d166f2ed530b10b1ef7b2c58a41e9356c113a979",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "Old",
+      "patient": "C077",
+      "stage": "fast58",
+      "output_sha256": "ae6c5973a69a2ad1fb83f139d166f2ed530b10b1ef7b2c58a41e9356c113a979",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "Old",
+      "patient": "C077",
+      "stage": "compact58",
+      "output_sha256": "ae6c5973a69a2ad1fb83f139d166f2ed530b10b1ef7b2c58a41e9356c113a979",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_original",
+      "patient": "C067",
+      "stage": "legacy48",
+      "output_sha256": "10dfc4a47aeb97069fd3f845498d41251c31268b74d2e02a0ca2815772b3e383",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_original",
+      "patient": "C067",
+      "stage": "fast48",
+      "output_sha256": "10dfc4a47aeb97069fd3f845498d41251c31268b74d2e02a0ca2815772b3e383",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_original",
+      "patient": "C067",
+      "stage": "fast58",
+      "output_sha256": "10dfc4a47aeb97069fd3f845498d41251c31268b74d2e02a0ca2815772b3e383",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_original",
+      "patient": "C067",
+      "stage": "compact58",
+      "output_sha256": "10dfc4a47aeb97069fd3f845498d41251c31268b74d2e02a0ca2815772b3e383",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_original",
+      "patient": "C077",
+      "stage": "legacy48",
+      "output_sha256": "2e0d374252fd8f650729d2672b8f1d70dd1e9aee937ca32d2ae1c32d12391da3",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_original",
+      "patient": "C077",
+      "stage": "fast48",
+      "output_sha256": "2e0d374252fd8f650729d2672b8f1d70dd1e9aee937ca32d2ae1c32d12391da3",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_original",
+      "patient": "C077",
+      "stage": "fast58",
+      "output_sha256": "2e0d374252fd8f650729d2672b8f1d70dd1e9aee937ca32d2ae1c32d12391da3",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_original",
+      "patient": "C077",
+      "stage": "compact58",
+      "output_sha256": "2e0d374252fd8f650729d2672b8f1d70dd1e9aee937ca32d2ae1c32d12391da3",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C067",
+      "stage": "legacy48",
+      "output_sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C067",
+      "stage": "fast48",
+      "output_sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C067",
+      "stage": "fast58",
+      "output_sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C067",
+      "stage": "compact58",
+      "output_sha256": "fd240f073302a45d74d9397a89c8dce42df53b76388889667d060294dd75bf48",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C077",
+      "stage": "legacy48",
+      "output_sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C077",
+      "stage": "fast48",
+      "output_sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C077",
+      "stage": "fast58",
+      "output_sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15",
+      "max_reference_error_hu": 0
+    },
+    {
+      "model": "New_optimized",
+      "patient": "C077",
+      "stage": "compact58",
+      "output_sha256": "6a157bad5ca1b0b284ea316e0b8bf1d3b6972c7413f6e777bc9d15ebd93bbf15",
+      "max_reference_error_hu": 0
+    }
+  ],
+  "model_identity": {
+    "Old": {
+      "model_checkpoint_sha256": "fc07ccb94fed013cbb87665ed4d2b498d8fa12e7bd8a1bbd42fbe481990da6cb",
+      "integer_weights_sha256": "7646917acde04babf26f6424133a351bf058a2475ac2bb77af8ccdd26a6b0586",
+      "bit_sha256": "d33786c2f16f8cf717ee4231a1d85ebb4d8c66ea95891df2c723730c137e0913",
+      "hwh_sha256": "649748bf331bcca8b56039678ec58806a45c547b45ac8dd52a22ea372e5ba1fa",
+      "shifts": [
+        6,
+        5,
+        10
+      ],
+      "input_result_dir": "D:\\PLD\\data\\denoise\\ct_qsafe_old_board_20261017"
+    },
+    "New_original": {
+      "model_checkpoint_sha256": "0fd09c0901d395384d7d28d272935d121bb005dc2ef318f31add8a06b1ce24f5",
+      "integer_weights_sha256": "4aee5460b7fdf95e6f09124ddea907f0c11f283468cf83fc65e9cea4d0245690",
+      "bit_sha256": "71948d2322a419319e1210aa6454b6e6b6514d3898d70be958edf0952d1bb4f0",
+      "hwh_sha256": "b8ee030fefa0b2341940d5911a5fc2be895d3942b7236cef053aca19c0b6cb77",
+      "shifts": [
+        6,
+        3,
+        11
+      ],
+      "input_result_dir": "D:\\PLD\\data\\denoise\\ct_qsafe_new_original_board_20261017"
+    },
+    "New_optimized": {
+      "model_checkpoint_sha256": "2cc0ba07080f950c87427c574472d067e411c7379a7394332290fba12f6f8d5b",
+      "integer_weights_sha256": "00d7d04f33219c381ad748ae4c869a046538ef7c176e96e2031202b15b0ae022",
+      "bit_sha256": "75cb7b6c4f876603a35930bf1175ac14f3c8b7f13fd737389d957e429a640103",
+      "hwh_sha256": "dd5a31eac7bd62a18dd8e4f53b3469339124ff394731904c640afa3d211a7c9d",
+      "shifts": [
+        6,
+        5,
+        10
+      ],
+      "input_result_dir": "D:\\PLD\\data\\denoise\\ct_qsafe_optimized_board_20261017"
+    }
+  },
+  "environment": {
+    "pl_clock_mhz": 50.0,
+    "cpu_clock_mhz": 650.0,
+    "pynq": "3.1.1",
+    "python": "3.10.4"
+  },
+  "software_test_scope": "76 fixed test slices, C067/C077, previously inspected. Frozen candidate evaluated once; no test-driven tuning.",
+  "software_test_metrics": [
+    {
+      "method": "New_optimized_integer",
+      "rmse_hu": 69.87323505543708,
+      "psnr_window_db": 29.60478156216717,
+      "ssim_window": 0.6742017816854713,
+      "body_rmse_hu": 80.37885764763101,
+      "body_ssim": 0.5749186966993114
+    },
+    {
+      "method": "New_original_float",
+      "rmse_hu": 69.587930299655,
+      "psnr_window_db": 29.62957130457803,
+      "ssim_window": 0.6751563703513448,
+      "body_rmse_hu": 80.32449587705314,
+      "body_ssim": 0.5759866453836477
+    },
+    {
+      "method": "New_original_integer",
+      "rmse_hu": 70.65305096145335,
+      "psnr_window_db": 29.509892260876775,
+      "ssim_window": 0.6706512712937592,
+      "body_rmse_hu": 81.13136136965196,
+      "body_ssim": 0.5735106523876826
+    },
+    {
+      "method": "Old_float",
+      "rmse_hu": 69.90655016385085,
+      "psnr_window_db": 29.590327799906788,
+      "ssim_window": 0.672439589379487,
+      "body_rmse_hu": 80.69004992802057,
+      "body_ssim": 0.5715615575097827
+    },
+    {
+      "method": "Old_integer",
+      "rmse_hu": 70.36512974019783,
+      "psnr_window_db": 29.54190214732759,
+      "ssim_window": 0.6699946696415949,
+      "body_rmse_hu": 81.064070126873,
+      "body_ssim": 0.5678284334559195
+    }
+  ],
+  "software_quantization_error": [
+    {
+      "model": "New_optimized",
+      "float_integer_rmse_hu": 5.7921459178176065
+    },
+    {
+      "model": "New_original",
+      "float_integer_rmse_hu": 10.422530884377682
+    },
+    {
+      "model": "Old",
+      "float_integer_rmse_hu": 6.152323917845358
+    }
+  ],
+  "build_verification": {
+    "status": "PASS",
+    "baseline_assets_unchanged": true,
+    "simulation_frames": 78,
+    "simulation_output_pixels": 51607,
+    "build_clock_mhz": 50,
+    "wns_ns": 2.911,
+    "whs_ns": 0.027,
+    "luts": 8895,
+    "bram_tiles": 46.5,
+    "dsp": 78,
+    "bit_sha256": "75cb7b6c4f876603a35930bf1175ac14f3c8b7f13fd737389d957e429a640103",
+    "hwh_sha256": "dd5a31eac7bd62a18dd8e4f53b3469339124ff394731904c640afa3d211a7c9d",
+    "zip_sha256": "4a5200403aee4c0b0115135186732306bfa0b5d8a91894d159d5cca2c1d8d56b",
+    "package_files_checked": 24,
+    "quantization_source_checkpoint_sha256": "0fd09c0901d395384d7d28d272935d121bb005dc2ef318f31add8a06b1ce24f5",
+    "model_checkpoint_sha256": "2cc0ba07080f950c87427c574472d067e411c7379a7394332290fba12f6f8d5b"
+  },
+  "original_assets_preserved": true
+}

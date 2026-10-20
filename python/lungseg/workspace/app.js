@@ -14,10 +14,10 @@ function message(text,error=false){$('message').textContent=text;$('message').pa
 async function api(path,data){const opt={headers:{'X-UI-Token':TOKEN}};if(data!==undefined){opt.method='POST';opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(data);}const r=await fetch(path,opt),v=await r.json();if(!r.ok)throw Error(v.error||r.statusText);return v;}
 async function command(path,body){try{apply(await api(path,body));}catch(e){message(e.message,true);}}
 function showTab(name){for(const button of document.querySelectorAll('[data-tab]')){const active=button.dataset.tab===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));}for(const panel of document.querySelectorAll('.tab-content'))panel.hidden=panel.id!=='tab-'+name;
-const titles={basic:['基础处理','从一张 CT，开始处理'],segmentation:['智能分割与三维','从切片到三维，查看肺区结构'],performance:['性能记录','每次计算，都有据可查']};$('crumb').textContent=titles[name][0];$('title').textContent=titles[name][1];requestAnimationFrame(drawAll);
+const titles={basic:['基础处理','从一张 CT，开始处理'],ldct:['LDCT 增强','先改善影像，再继续分析'],segmentation:['智能分割与三维','从切片到三维，查看肺区结构'],roi:['ROI 定量分析','框选一处，查看局部与定量'],performance:['性能记录','每次计算，都有据可查']};$('crumb').textContent=titles[name][0];$('title').textContent=titles[name][1];requestAnimationFrame(drawAll);window.dispatchEvent(new Event('ct-tab-change'));
 $('segmentationFrame').contentWindow?.postMessage({type:'ct-workspace-visible',visible:name==='segmentation'},location.origin);}
 document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
-$('load').onclick=()=>command('/api/load',{path:$('path').value,load_slices:$('loadSlices').value,confirm_hu:$('confirm').checked,series_uid:$('uid').value.trim(),load_expert:$('loadExpert').checked,expert_path:$('expertPath').value});
+$('load').onclick=()=>command('/api/load',{path:$('path').value,load_slices:$('loadSlices').value,confirm_hu:$('confirm').checked,series_uid:$('uid').value.trim(),load_expert:$('loadExpert').checked,expert_path:$('expertPath').value,allow_inconsistent_frame_uids:$('frameUidCompatible')?.checked===true});
 $('connect').onclick=()=>command('/api/connect',{});
 $('connectFast').onclick=()=>command('/api/connect-fast',{});
 function params(){const op=$('operation').value;if(isMorphology())return {...currentMask()?.parameters,operation:op};const p={operation:op},keys=op==='threshold'?['lower','upper']:['wl','ww'];for(const k of keys){const field=$(k);if(!field.checkValidity()||field.value.trim()==='')throw Error('请输入有效的 '+k+' 参数');p[k]=Number(field.value);if(!Number.isInteger(p[k]))throw Error('参数须为整数');}return p;}
@@ -33,12 +33,12 @@ function markDirty(){if(!result)return;let changed=true;try{const op=$('operatio
 for(const name of ['wl','ww'])$(name).oninput=()=>{$('preset').value='custom';markDirty();};
 for(const name of ['lower','upper'])$(name).oninput=markDirty;
 $('reset').onclick=()=>{$('operation').value='window';$('preset').value='lung';$('lower').value=-1000;$('upper').value=-400;preset('lung');operationChanged();updateBackend();};
-function setIndex(value){if(!state?.shape)return;index=Math.max(0,Math.min(state.shape[0]-1,Math.round(Number(value)||0)));$('sliceSlider').value=$('sliceIndex').value=index;updateSliceLabel();refreshMask();updateBackend();markDirty();clearTimeout(previewTimer);previewTimer=setTimeout(fetchPlane,90);}
+function setIndex(value){if(!state?.shape)return;index=Math.max(0,Math.min(state.shape[0]-1,Math.round(Number(value)||0)));$('sliceSlider').value=$('sliceIndex').value=index;updateSliceLabel();refreshMask();updateBackend();markDirty();clearTimeout(previewTimer);previewTimer=setTimeout(fetchPlane,90);window.dispatchEvent(new Event('ct-slice-change'));}
 $('sliceSlider').oninput=()=>setIndex($('sliceSlider').value);$('sliceIndex').oninput=()=>setIndex($('sliceIndex').value);
 $('syncSlice').onclick=()=>{desiredSegSlice={type:'ct-workspace-slice',case_id:state.case_id,index};showTab('segmentation');$('segmentationFrame').contentWindow?.postMessage(desiredSegSlice,location.origin);};
 $('segmentationFrame').addEventListener('load',()=>{const frame=$('segmentationFrame').contentWindow;frame.postMessage({type:'ct-workspace-visible',visible:document.querySelector('[data-tab="segmentation"]').classList.contains('active')},location.origin);if(desiredSegSlice?.case_id===state?.case_id)frame.postMessage(desiredSegSlice,location.origin);});
-function updateSliceLabel(){const source=state?.source?.source_slice_indices?.[index];$('sliceLabel').textContent=state?.shape?`轴位 ${index} / ${state.shape[0]-1}`:'轴位 · 等待影像';$('originalInfo').textContent=state?.shape?`源序列第 ${source} 层 · 原始 HU · ${state.shape[1]} × ${state.shape[2]}`:'原始 HU · 不修改输入';}
-function apply(s){if(state&&s.revision<state.revision)return;const changed=s.case_id!==lastCase;state=s;const busy=ACTIVE.includes(s.phase);$('load').disabled=$('connect').disabled=busy;$('apply').disabled=busy||!s.shape;updateBackend();
+function updateSliceLabel(){const source=state?.source?.source_slice_indices?.[index];$('sliceLabel').textContent=state?.shape?`轴位 ${index} / ${state.shape[0]-1}`:'轴位 · 等待影像';$('originalInfo').textContent=state?.shape?`源序列第 ${source} 层 · ${state.analysis_source?.label||'原始 HU'} · ${state.shape[1]} × ${state.shape[2]}`:'原始 HU · 不修改输入';}
+function apply(s){if(state&&s.revision<state.revision)return;const changed=s.case_id!==lastCase,sameSeries=!!state?.series_id&&state.series_id===s.series_id;state=s;const busy=ACTIVE.includes(s.phase);$('load').disabled=$('connect').disabled=busy;$('apply').disabled=busy||!s.shape;updateBackend();
 if(s.desktop_only){$('backend').value='PC_REFERENCE';$('backend').disabled=true;updateBackend();}
 $('connect').hidden=s.desktop_only===true;
 if(s.desktop_only)$('executionNote').textContent='电脑模式：可读取CT、浏览切片并运行基础参考。神经分割需连接真实FPGA。';
@@ -46,17 +46,18 @@ $('connectFast').hidden=!s.fast_platform_available||s.fast_platform_active;$('co
 for(const k of ['sliceSlider','sliceIndex','syncSlice'])$(k).disabled=!s.shape;
 $('boardDot').className='status-dot'+(s.board_connected?' on':'');$('boardLabel').textContent=s.desktop_only?'电脑浏览模式':s.board_connected?(s.fast_platform_active?'FPGA 加速服务已连接':'FPGA 已连接'):'FPGA 未连接';$('connect').textContent=s.board_connected?'重新核对':'连接';
 $('taskDot').className='status-dot'+(s.phase==='error'?' error':busy?' busy':s.shape?' on':'');$('progress').hidden=!busy;$('progress').max=Math.max(1,s.total);$('progress').value=s.completed;
-message((phaseNames[s.phase]||s.phase)+(busy&&s.total?` · ${s.completed}/${s.total}`:'')+(s.error?' · '+s.error:''),s.phase==='error');
+message((s.roi?.job?.running?'正在分析 ROI':s.ldct?.running&&s.phase==='processing'?'正在增强影像':phaseNames[s.phase]||s.phase)+(busy&&s.total?` · ${s.completed}/${s.total}`:'')+(s.error?' · '+s.error:''),s.phase==='error');
 $('caseLabel').textContent=s.source?.source_name||s.source?.source?.split(/[\\/]/).filter(Boolean).at(-1)||(s.shape?'已加载 CT':'尚未加载 CT');
 $('sourceInfo').textContent=s.shape?`${s.shape.join(' × ')} · ${s.geometry.spacing_zyx_mm.map(v=>Number(v).toFixed(2)).join(' / ')} mm`:'加载一次，在各工作区共享。';
 $('expertBadge').textContent=s.expert_present?'已加载专家标注':'无专家标注';$('expertBadge').className='chip'+(s.expert_present?' teal':'');
-if(changed){lastCase=s.case_id;lastResult=null;lastRevision=-1;plane=null;result=null;planeTicket++;resultTicket++;maskTicket++;maskPlane=null;lastMask=null;pendingBasic=null;desiredSegSlice=null;browserTimings.clear();index=s.shape?Math.floor(s.shape[0]/2):0;
+if(changed){lastCase=s.case_id;lastResult=null;lastRevision=-1;plane=null;result=null;planeTicket++;resultTicket++;maskTicket++;maskPlane=null;lastMask=null;pendingBasic=null;desiredSegSlice=null;if(!sameSeries)browserTimings.clear();index=s.shape?(sameSeries?Math.min(index,s.shape[0]-1):Math.floor(s.shape[0]/2)):0;if(s.shape)document.querySelector('.input-options').open=false;
 $('sliceSlider').max=$('sliceIndex').max=s.shape?s.shape[0]-1:0;$('sliceSlider').value=$('sliceIndex').value=index;$('processedEmpty').hidden=false;$('resultTitle').textContent='处理结果';$('resultBadge').textContent='等待计算';$('resultInfo').textContent='尚无处理结果';$('basicSummary').textContent='基础处理输出独立保存，不覆盖原始 CT，也不会自动送入分割模型。';drawAll();}
+if(changed&&sameSeries&&s.basic){$('operation').value=s.basic.parameters.operation;for(const k of ['wl','ww','lower','upper'])if(s.basic.parameters[k]!==undefined)$(k).value=s.basic.parameters[k];if(s.basic.parameters.wl!==undefined)$('preset').value='custom';operationChanged();}
 updateSliceLabel();if(s.shape&&(changed||!plane&&s.revision!==lastRevision))fetchPlane();lastRevision=s.revision;
 if(s.phase==='error')pendingBasic=null;
 refreshMask();updateBackend();
 if(s.basic&&s.basic.case_id===s.case_id&&s.basic.result_id!==lastResult){lastResult=s.basic.result_id;fetchResult(s.basic);}
-updateMetrics(s);}
+updateMetrics(s);window.dispatchEvent(new Event('ct-state-change'));}
 function bytes(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
 async function fetchPlane(){if(!state?.shape)return;const ticket=++planeTicket,caseId=state.case_id,z=index;try{const p=await api('/api/plane?'+new URLSearchParams({case:caseId,axis:0,index:z,stage:'body'}));if(ticket!==planeTicket||caseId!==state.case_id||z!==index)return;p.values=new Float32Array(bytes(p.hu).buffer);plane=p;$('originalEmpty').hidden=true;drawAll();}catch(e){if(ticket===planeTicket)message(e.message,true);}}
 const ms=value=>Number.isFinite(value)?value.toFixed(2)+' ms':'—';

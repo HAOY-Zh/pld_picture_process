@@ -109,6 +109,8 @@ def dicom_reference(path, shape, geom, details):
 def read_reference(path, shape, geom, details, enabled=True):
     """Auto-find one series-bound RTSTRUCT, or load an explicit geometry-bearing mask."""
     if not enabled: return None, None
+    if details.get('frame_uid_exception_applied'):
+        raise ValueError('匿名化坐标系兼容导入仅用于影像处理；请关闭专家标注加载，不能自动匹配 RTSTRUCT')
     if not isinstance(path, str): raise ValueError('专家标注路径须为文本')
     automatic = not path.strip()
     if automatic:

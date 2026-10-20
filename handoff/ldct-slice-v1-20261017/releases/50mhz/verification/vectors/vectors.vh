@@ -1,0 +1,4 @@
+localparam FRAMES=78,PIXELS=53071,OUTPUT_PIXELS=51607;
+localparam MODEL_SHIFT_0=6;
+localparam MODEL_SHIFT_1=5;
+localparam MODEL_SHIFT_2=10;

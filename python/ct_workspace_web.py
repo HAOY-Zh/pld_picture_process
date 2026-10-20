@@ -20,6 +20,10 @@ import numpy as np
 
 from ct_basic_processing import OPERATIONS, morphology, parameters, process
 from ct_platform_client import PlatformClient
+from ct_studio_client import StudioClient
+from ldct_workspace import LDCTWorkspaceMixin
+from roi_workspace import ROIWorkspaceMixin
+from ct_series_import import FolderImports, inspect_series, MAX_FILE
 from lung_live_web import BoardClient, Controller, MODEL_SHA, handler_for, write_new
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -55,7 +59,7 @@ def benchmarks():
     return dict(rows=rows, note='历史同板 ARM INT8 / FPGA INT8；不代表当前服务版本、整例或网页端到端性能。')
 
 
-class WorkspaceController(Controller):
+class WorkspaceController(ROIWorkspaceMixin, LDCTWorkspaceMixin, Controller):
     def __init__(self, client, model, output):
         super().__init__(client, model, output)
         self.basic_result = self.basic_image = None
@@ -63,6 +67,7 @@ class WorkspaceController(Controller):
         self.history = []
         self.basic_condition = threading.Condition(self.lock)
         self.basic_request_id = None
+        self.folder_imports = FolderImports(self.output.parent/'imports')
 
     def snapshot(self):
         with self.lock:
@@ -74,12 +79,14 @@ class WorkspaceController(Controller):
             value['basic_pl_configured'] = isinstance(self.client, PlatformClient)
             value['basic_pl_operations'] = list(self.client.manifest['basic']) if isinstance(self.client, PlatformClient) else []
             value['desktop_only'] = self.client is None
-            value['fast_platform_available'] = self.client is not None and FAST_CONFIG.is_file()
+            value['fast_platform_available'] = self.client is not None and not isinstance(self.client,StudioClient) and FAST_CONFIG.is_file()
             value['fast_platform_active'] = (isinstance(self.client, PlatformClient) and
                 self.client.manifest.get('basic_transport') == 'ct_basic_zlib_cache_v1')
             return value
 
     def submit(self, action, values):
+        if action == 'ldct_cancel': return self.cancel_ldct()
+        if action == 'roi_cancel': return self.cancel_roi(values)
         submitted_at = time.perf_counter()
         with self.lock:
             if self.client is None and action in ('connect', 'connect_fast', 'run'):
@@ -196,6 +203,7 @@ class WorkspaceController(Controller):
                 elapsed = receipt['stats']['dma_ms']
             result_id = uuid.uuid4().hex
             metadata = dict(schema='ct_workspace_basic_v1', case_id=case_id,
+                analysis_source=copy.deepcopy(self.details.get('analysis_source',{'source_id':'original'})),
                 result_id=result_id, index=index, source_slice_index=source_index,
                 operation=params['operation'], label=OPERATIONS[params['operation']],
                 parameters=params, backend=backend, processing_ms=elapsed,
@@ -286,15 +294,22 @@ workspacePendingSlice=m;workspaceApplySlice();}
 });</script>'''
     old_html = old_html.replace('</body>', bridge+'</body>')
     base = handler_for(controller, token, old_html.encode('utf-8'), plotly)
-    html = (ASSETS/'index.html').read_text(encoding='utf-8').replace('__UI_TOKEN__', token).encode('utf-8')
+    html = (ASSETS/'index.html').read_text(encoding='utf-8').replace('__UI_TOKEN__', token)
+    html = html.replace('    <section id="tab-performance"',
+        (ASSETS/'roi.html').read_text(encoding='utf-8')+'\n    <section id="tab-performance"').encode('utf-8')
     assets = {'/workspace.css': ('style.css', 'text/css; charset=utf-8'),
+              '/roi.js': ('roi.js', 'text/javascript; charset=utf-8'),
+              '/roi.css': ('roi.css', 'text/css; charset=utf-8'),
+              '/ldct.js': ('ldct.js', 'text/javascript; charset=utf-8'),
+              '/ldct.css': ('ldct.css', 'text/css; charset=utf-8'),
+              '/series.js': ('series.js', 'text/javascript; charset=utf-8'),
               '/workspace.js': ('app.js', 'text/javascript; charset=utf-8')}
 
     class Handler(base):
         def do_GET(self):
             parts = parse.urlsplit(self.path)
-            if parts.path in ('/', '/segmentation', '/api/benchmarks', '/api/basic/image',
-                              '/api/export') or parts.path in assets:
+            if parts.path in ('/', '/segmentation', '/api/benchmarks', '/api/basic/image', '/api/ldct/image',
+                              '/api/export', '/api/roi/image', '/api/roi/export') or parts.path in assets:
                 if not self.allowed(parts.path.startswith('/api/')): return
                 try:
                     if parts.path == '/': return self.send(200, html, 'text/html; charset=utf-8')
@@ -307,7 +322,13 @@ workspacePendingSlice=m;workspaceApplySlice();}
                         snapshot = controller.snapshot()
                         return self.send(200, dict(schema='ct_workspace_session_v1', state=snapshot,
                             note='当前会话状态及计算来源；基础PL/DMA与后台耗时分别记录；浏览器导出另附点击至显示计时；分割只显示实际回执'))
-                    q = parse.parse_qs(parts.query)
+                    q = parse.parse_qs(parts.query, keep_blank_values=True)
+                    if parts.path == '/api/roi/image':
+                        return self.send(200,controller.roi_payload(q['case'][0],q['source'][0],q['result'][0],int(q['index'][0])))
+                    if parts.path == '/api/roi/export':
+                        return self.send(200,controller.roi_export(q['case'][0],q['source'][0],q['result'][0]))
+                    if parts.path == '/api/ldct/image':
+                        return self.send(200,controller.ldct_payload(q['series'][0],q['group'][0],int(q['index'][0])))
                     return self.send(200, controller.basic_payload(q['case'][0], q['result'][0]))
                 except (ValueError, KeyError) as exc:
                     return self.send(400, dict(error=str(exc)))
@@ -316,7 +337,37 @@ workspacePendingSlice=m;workspaceApplySlice();}
             return super().do_GET()
 
         def do_POST(self):
-            if self.path not in ('/api/basic/run','/api/connect-fast'): return super().do_POST()
+            parts = parse.urlsplit(self.path)
+            if parts.path == '/api/import/file':
+                if not self.allowed(True): return
+                try:
+                    length = int(self.headers.get('Content-Length', '0'))
+                    if (self.headers.get('Transfer-Encoding') or self.headers.get('Content-Type') != 'application/dicom'
+                            or not 0 < length <= MAX_FILE):
+                        raise ValueError('单个 DICOM 文件需小于 64MB')
+                    query = parse.parse_qs(parts.query)
+                    raw = self.rfile.read(length)
+                    if len(raw) != length: raise ValueError('文件传输未完成')
+                    value = controller.folder_imports.receive(query['import'][0], int(query['index'][0]), query['name'][0], raw)
+                    return self.send(200, value)
+                except (ValueError, KeyError) as exc:
+                    return self.send(400, dict(error=str(exc)))
+            if parts.path in ('/api/series/inspect', '/api/import/start', '/api/import/finish'):
+                if not self.allowed(True): return
+                try:
+                    length = int(self.headers.get('Content-Length', '0'))
+                    if (self.headers.get('Transfer-Encoding') or self.headers.get('Content-Type') != 'application/json'
+                            or not 0 < length <= 16384): raise ValueError('需要小型 JSON 请求')
+                    values = json.loads(self.rfile.read(length))
+                    if not isinstance(values, dict): raise ValueError('需要 JSON 对象')
+                    if parts.path == '/api/series/inspect':
+                        if not isinstance(values.get('path'), str): raise ValueError('请输入 CT 文件夹路径')
+                        return self.send(200, inspect_series(values['path']))
+                    if parts.path == '/api/import/start': return self.send(200, controller.folder_imports.start(values))
+                    return self.send(200, controller.folder_imports.finish(values.get('import_id')))
+                except (ValueError, KeyError, OSError) as exc:
+                    return self.send(400, dict(error=str(exc)))
+            if self.path not in ('/api/basic/run','/api/connect-fast','/api/ldct/run','/api/ldct/cancel','/api/analysis-source','/api/roi/run','/api/roi/cancel'): return super().do_POST()
             if not self.allowed(True): return
             try:
                 length = int(self.headers.get('Content-Length', '0'))
@@ -325,6 +376,11 @@ workspacePendingSlice=m;workspaceApplySlice();}
                     raise ValueError('需要小型JSON请求')
                 values = json.loads(self.rfile.read(length))
                 if not isinstance(values, dict): raise ValueError('需要JSON对象')
+                if self.path in ('/api/roi/run','/api/roi/cancel'):
+                    return self.send(202,controller.submit('roi' if self.path.endswith('/run') else 'roi_cancel',values))
+                if self.path in ('/api/ldct/run','/api/ldct/cancel','/api/analysis-source'):
+                    action={'/api/ldct/run':'ldct','/api/ldct/cancel':'ldct_cancel','/api/analysis-source':'analysis_source'}[self.path]
+                    return self.send(202,controller.submit(action,values))
                 if self.path == '/api/connect-fast':
                     return self.send(202, controller.submit('connect_fast', values))
                 if values.get('wait_for_result') is True and not values.get('ui_request_id'):
@@ -344,6 +400,7 @@ def main():
     mode.add_argument('--config', type=Path, help='真实板端服务配置；配置错误时直接报错，不回退')
     mode.add_argument('--desktop', action='store_true', help='电脑浏览与基础参考，不加载模型或连接FPGA')
     parser.add_argument('--port', type=int, default=8090)
+    parser.add_argument('--ldct-release',type=Path,help='已验证的 LDCT 发布目录；默认采用主模型配置的100MHz版')
     parser.add_argument('--output', type=Path, default=ROOT/'data/ct_workspace_20261017/results')
     args = parser.parse_args()
     default_config = ROOT/'data/ct_platform_20261017_v2/host_config.json'
@@ -358,13 +415,21 @@ def main():
         token = (config_path.parent/config['token_file']).read_text(encoding='utf-8').strip()
         if config.get('platform_manifest'):
             manifest = json.loads((config_path.parent/config['platform_manifest']).read_text(encoding='utf-8'))
-            client = PlatformClient(config['board_url'], token, manifest)
+            client = (StudioClient if manifest.get('ldct') else PlatformClient)(config['board_url'], token, manifest)
         else:
             client = BoardClient(config['board_url'], token)
         model = json.loads(model_path.read_text(encoding='utf-8'))
         from lung_unet import torch_module
         torch_module().set_num_threads(2)
     controller = WorkspaceController(client, model, args.output)
+    primary=ROOT/'configs/ldct_primary_model.json'
+    ldct_release=args.ldct_release
+    if ldct_release is None and config_path is not None and config.get('ldct_release'):
+        ldct_release=ROOT/config['ldct_release']
+    if ldct_release is None and primary.is_file():
+        ldct_release=ROOT/json.loads(primary.read_text(encoding='utf-8'))['preferred_release']
+    if ldct_release is not None:
+        controller.configure_ldct(ldct_release)
     from plotly.offline import get_plotlyjs
     server = ThreadingHTTPServer(('127.0.0.1', args.port),
         workspace_handler(controller, secrets.token_hex(32), get_plotlyjs().encode('utf-8')))
