@@ -1,3 +1,5 @@
+> 2026-10-24：新增已验收的肺 U-Net／结节 CNN 共享引擎与完整运行资产，见 [共享引擎交付](docs/肺分割与结节共享引擎GitHub交付_20261024.md)。公开包使用合成自检，bit 与权重保持已验收版本；原网页、LDCT、ROI 保留，本次不自动改变其服务后端。
+
 > 2026-10-18: Complete host + PYNQ runtime assets are included in this branch. Start with [CT Studio full delivery instructions](docs/CT_Studio完整运行交付_20261018.md). The public archive contains synthetic self-tests and no deployment credentials.
 
 # PYNQ-Z2 医学图像处理项目

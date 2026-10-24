@@ -94,3 +94,6 @@ Thumbs.db
 
 # Reviewed synthetic runtime delivery; no patient data or credentials.
 !/runtime/ct_studio_20261018/ct_studio_runtime_20261018.zip
+
+# Reviewed shared-engine runtime with synthetic self-tests only.
+!/runtime/lung_nodule_shared_20261024/lung_nodule_shared_public_20261024.zip

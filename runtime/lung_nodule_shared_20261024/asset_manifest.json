@@ -1,0 +1,91 @@
+{
+  "archive": "lung_nodule_shared_public_20261024.zip",
+  "archive_sha256": "b88aad7947a2362686a6e78e8983ebae3ce991378e272269f8729ddcd4e34fa7",
+  "archive_bytes": 6861608,
+  "package_manifest_sha256": "56a59b1ad20e919a55e9ed7527dcb6ac38e79df2822a4cf84e0676d4b5066a47",
+  "bit_sha256": "21523a8034acf96b2b4c20615353a9a7804cc0c4f5a6f05f1c1592d020d47187",
+  "files_sha256": {
+    "lung_nodule_shared/lung_axil.py": "dcbf30d4fa443382885ab6167ee80367cda9ad653c2f6749090ea16639371108",
+    "lung_nodule_shared/lung_axil_smoke.py": "ec703be545138b2d3e036e73fd75d2b23e272a626abbc126419a917630076b3c",
+    "lung_nodule_shared/lung_continuous.py": "239ad24b971ec3678414cc7b2db59b7bcba93d383914b76b835421d5c8adf0de",
+    "lung_nodule_shared/lung_cpu.py": "1e44aa151e360774b8a4057c92c7354700934b9c7bbc38a42282c73cdf24bd3c",
+    "lung_nodule_shared/lung_cpu_kernel.h": "818513e3a7990962926581b1d344eb6a92b4369051cea51bf76719b27fd65bbc",
+    "lung_nodule_shared/lung_cpu_native.cpp": "1217feac89780e83dea6887632248126f8438b3d2d74727dfb0716fc86868385",
+    "lung_nodule_shared/lung_fast.py": "885890a5497ec2067c1db2b07e99251c171e1aa760f30678f10632360058d65d",
+    "lung_nodule_shared/lung_fast_io.cpp": "58d2726a2783ca3133277c9ef59b4cbd00a62634689ba633d2e6cabceebef340",
+    "lung_nodule_shared/lung_fast_io.h": "11446a9322ff12cae54b23747095709bfeaa9aecc0ccb2c1fca5f16794f0e124",
+    "lung_nodule_shared/lung_model_layers_test.py": "239e0107554fd6b78b038b02231e95ef153b719a0685bf47c90cfe24781b2a92",
+    "lung_nodule_shared/lung_network.bit": "21523a8034acf96b2b4c20615353a9a7804cc0c4f5a6f05f1c1592d020d47187",
+    "lung_nodule_shared/lung_network.hwh": "411dcd82418da3be51fa96c4fbdb5a3775b17a9f423e61b710885834f0adeb1f",
+    "lung_nodule_shared/lung_nodule_cnn.py": "88f0c300ee451e13b32e6c1dd7975b0943f6b7096553db5d95455b86d68a95aa",
+    "lung_nodule_shared/lung_nodule_continuity.py": "ef821a56cf8e48c8feed98d7ed63f3965511ae441acb2b683046924dcd06f121",
+    "lung_nodule_shared/lung_nodule_continuity_boundary.py": "f728c61ade79bc811589f1841af1d86e0f07d1204beda570774d57a24f654530",
+    "lung_nodule_shared/lung_nodule_sampling_cache.py": "31bd29c2665a5013d15e6305a15216f1f81790bb8e3a27a9360faea183f634c5",
+    "lung_nodule_shared/lung_nodule_shared.py": "02721eb398eab884cf38b51bab1e9be1961b6dd7991643a78f4237edab34b057",
+    "lung_nodule_shared/lung_nodule_shared_benchmark.py": "94282439869d2d22836faa56b1805c9859587a2c89e4abea5adbfe2b9ea9b739",
+    "lung_nodule_shared/lung_tensor.py": "2d7e87d150dbda2f9c6a8e73806100b5ca61eca9041e5c0b584f817b60ec18cb",
+    "lung_nodule_shared/models/nodule/model.json": "68fe19b1d450a7bbe096437d9365e6d355631cd10a1aa5e8d85bb30701ff89dd",
+    "lung_nodule_shared/models/nodule/parameters.npz": "e94a20733fe781865faa701a27f49093e7f8496d8a83a550eadd851b442460d3",
+    "lung_nodule_shared/models/nodule/reference.npz": "2d8bb977623dd810cbff7b449d564729f2a875ae0d5b84d3c64df5fd949fe635",
+    "lung_nodule_shared/models/unet_original/input.npz": "df2ab32f31c7caf946578080bae632a48aa6e0e336055a0764c9162696cc9500",
+    "lung_nodule_shared/models/unet_original/model.json": "70ad14405228ac08421c5d9a732a2825f46c1e364e4cf927488a90cdd0650dbd",
+    "lung_nodule_shared/models/unet_original/parameters.npz": "48e938da0e18563f4a31c855ba15445490fd043b794edfc3a48e363e59847f43",
+    "lung_nodule_shared/models/unet_original/reference.npz": "483513b9ee0897595718bd6d4af2239621666dfedb6b123a65416f7c52bb9755",
+    "lung_nodule_shared/models/unet_pruned/input.npz": "df2ab32f31c7caf946578080bae632a48aa6e0e336055a0764c9162696cc9500",
+    "lung_nodule_shared/models/unet_pruned/model.json": "5b5650eadc6d8833bb961884ccd09ed975bbb3ea8051e2b42fce5d350ebf3fca",
+    "lung_nodule_shared/models/unet_pruned/parameters.npz": "8d3f6600470d6adc709da26f245bc000f2bdec132217acf65df032cdae6bc19c",
+    "lung_nodule_shared/models/unet_pruned/reference.npz": "86607f03b4cd91aebe1007f3a8ada6db65b5dcc883d73156e57ba732d8945c76",
+    "lung_nodule_shared/nodule_cpu.py": "5e36f15acffe0b167ca0989a54d7842725506cf3c498c19b3a6c1e85be54842a",
+    "lung_nodule_shared/nodule_pl.py": "424dcbdf24e85b6e7c275ed320f5adb8e84c6f1efc1d1e1d8090a08377b84920",
+    "lung_nodule_shared/nodule_plan.py": "40528c99e4a7d58bc1fa81d7a544bf84e61b2d133c35404b00f1a740011de897",
+    "lung_nodule_shared/README.md": "b0d2322a5f63e0e50e5f596d803d9363fdc61b54a4a098043a96f4efa61df4ed",
+    "lung_nodule_shared/rtl/lung_axi_burst_write64.v": "e6e0de72de871d55e50bb5962719f76ea014a6c27c4576bf1777e6bba88ee373",
+    "lung_nodule_shared/rtl/lung_axi_read64.v": "a2571c4a22e0f9e59f81d7f56ccc784e91dcd649204af6e3af6ae6f8f22cfa5a",
+    "lung_nodule_shared/rtl/lung_axi_write64.v": "8617286c679c247404e885766a5104c9d4b9a6e793f4bade8eb8df9d24f41afa",
+    "lung_nodule_shared/rtl/lung_axil_control.v": "179ecdb4d2a269de2f7d3736ff95516d5da5062da5f3c4e476679bc04fe416f8",
+    "lung_nodule_shared/rtl/lung_conv8_axil.v": "e6bd93d5cca79fbae37516c6b7080fc2213e01f94dfb1f3b16984a52198cc2db",
+    "lung_nodule_shared/rtl/lung_conv8_cached_axi.v": "18f4784180852ddfd78008e78332dc4aaf74e24beb0f106475cacc2a82d8d35d",
+    "lung_nodule_shared/rtl/lung_conv8_memory_axi.v": "4a2e05744b40312b996defe2fd2029aea1f15efe933330fc7491c16a2a5509c1",
+    "lung_nodule_shared/rtl/lung_conv8_window.v": "81d94c142d93c364c0a7777e23926a25e2b7fe7219b30112d3d7556a2f3f68d2",
+    "lung_nodule_shared/rtl/lung_feature_cache.v": "98aa829ed2bca6c0c8e4ea48e9ddce6f6bfd6fb2d6ebf2bf595b5c22b705088f",
+    "lung_nodule_shared/rtl/lung_feature_window.v": "917d2435ff0da09c75a3554062084fee113a0e3ad262973f51479128f5f5ffa9",
+    "lung_nodule_shared/rtl/lung_mac_tile8.v": "7cfbd0e1d21a5278b1203bb67223fe80f3e5b8dcd9e3a4cf19289581e07e1131",
+    "lung_nodule_shared/rtl/lung_mac_tile8_reuse.v": "f1fc4eedc6d8bbe6a3ada5f30b216b93a1536c407330fe2fb55c601d5d751451",
+    "lung_nodule_shared/rtl/lung_output_writer.v": "b8cf5c3a409bbf8279ce2d0b1203335957ef0e412022c684d8ac98385a2befdf",
+    "lung_nodule_shared/rtl/lung_requant.v": "bdfb04c994e9738aa08b61335b65b8240dde631a5c36a369ffb7ae9dda81b905",
+    "lung_nodule_shared/rtl/lung_tensor_axil.v": "706a504b86080224d2f1d36c494952b150a6a82fee3473b445cdd2b4fd34296e",
+    "lung_nodule_shared/rtl/lung_tensor_burst_engine.v": "dc5b6926d205610b9030b7dc35532d9a03ee153b09f099cfd21d5797c89ea74f",
+    "lung_nodule_shared/rtl/lung_tensor_control.v": "f2460a92ce8eb1314234117a8a3a28fef6441d4444b595c1c987b1663e59006a",
+    "lung_nodule_shared/shared_manifest.json": "56a59b1ad20e919a55e9ed7527dcb6ac38e79df2822a4cf84e0676d4b5066a47",
+    "lung_nodule_shared/synthetic_validation.json": "a9748ab7cd0cfc0745ccf8bd369d7d1d43eeb5b19cadd34e6c6edd8cdd22a912"
+  },
+  "validation": {
+    "status": "synthetic_independent_cpu_references_exact",
+    "board_tested": false,
+    "nodes_checked": {
+      "unet_original": 42,
+      "unet_pruned": 42,
+      "nodule": 88
+    },
+    "fixture_seeds": {
+      "unet_original": 2026102401,
+      "unet_pruned": 2026102401,
+      "nodule": 2026102402
+    },
+    "model_identities": {
+      "unet_original": {
+        "model.json": "70ad14405228ac08421c5d9a732a2825f46c1e364e4cf927488a90cdd0650dbd",
+        "parameters.npz": "48e938da0e18563f4a31c855ba15445490fd043b794edfc3a48e363e59847f43"
+      },
+      "unet_pruned": {
+        "model.json": "5b5650eadc6d8833bb961884ccd09ed975bbb3ea8051e2b42fce5d350ebf3fca",
+        "parameters.npz": "8d3f6600470d6adc709da26f245bc000f2bdec132217acf65df032cdae6bc19c"
+      },
+      "nodule": {
+        "model.json": "68fe19b1d450a7bbe096437d9365e6d355631cd10a1aa5e8d85bb30701ff89dd",
+        "parameters.npz": "e94a20733fe781865faa701a27f49093e7f8496d8a83a550eadd851b442460d3"
+      }
+    },
+    "provenance": "All inputs generated from analytic patterns and seeded noise. No patient arrays read or copied. Bit/weights are unchanged from accepted pack. New synthetic fixtures still require physical board acceptance."
+  }
+}

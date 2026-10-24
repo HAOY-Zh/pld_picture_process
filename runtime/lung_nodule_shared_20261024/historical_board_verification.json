@@ -1,0 +1,25 @@
+{
+  "status": "independently_verified_physical_single_bit_switching",
+  "nodes_checked": 342,
+  "retained_payload_hashes_checked": 822,
+  "model_calls": 22,
+  "summary": {
+    "unet_original": {
+      "calls": 4,
+      "host_mean_ms": 431.565950500044,
+      "hardware_mean_ms": 348.4645025
+    },
+    "unet_pruned": {
+      "calls": 4,
+      "host_mean_ms": 395.3724595003223,
+      "hardware_mean_ms": 322.9958675
+    },
+    "nodule": {
+      "calls": 8,
+      "host_mean_ms": 53.41024524977911,
+      "hardware_mean_ms": 13.70304625
+    }
+  },
+  "result_sha256": "87dad9d4e4e8d276e04c66b1cc54f0eda4700b5f9ca25a4c8ce423188642a828",
+  "scope": "Fixed frozen full-size U-Net input and four frozen real nodule patches; one overlay load, no reset/reconfiguration between graphs. Times include per-command weights and guards; snapshots/file writes excluded. Not end-to-end case speed, candidate scoring, accuracy against annotation, or web integration. All three model arenas remain resident for isolation checks."
+}

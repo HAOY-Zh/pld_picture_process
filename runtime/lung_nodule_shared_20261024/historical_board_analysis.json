@@ -1,0 +1,148 @@
+{
+  "result_sha256": "87dad9d4e4e8d276e04c66b1cc54f0eda4700b5f9ca25a4c8ce423188642a828",
+  "switching": {
+    "unet_original": {
+      "baseline": {
+        "calls": 1,
+        "host_mean_ms": 437.0895929987455,
+        "host_median_ms": 437.0895929987455,
+        "host_range_ms": [
+          437.0895929987455,
+          437.0895929987455
+        ],
+        "hardware_mean_ms": 348.48072,
+        "hardware_range_ms": [
+          348.48072,
+          348.48072
+        ],
+        "wrapper_mean_ms": 0.7502640019083628
+      },
+      "interleaved": {
+        "calls": 4,
+        "host_mean_ms": 431.565950500044,
+        "host_median_ms": 431.2351075004699,
+        "host_range_ms": [
+          430.19068899957347,
+          433.6028979996627
+        ],
+        "hardware_mean_ms": 348.4645025,
+        "hardware_range_ms": [
+          348.4516,
+          348.47446
+        ],
+        "wrapper_mean_ms": 0.726935249986127
+      },
+      "host_change_percent": -1.2637323302084114,
+      "hardware_change_percent": -0.004653772524354505
+    },
+    "unet_pruned": {
+      "baseline": {
+        "calls": 1,
+        "host_mean_ms": 394.423113000812,
+        "host_median_ms": 394.423113000812,
+        "host_range_ms": [
+          394.423113000812,
+          394.423113000812
+        ],
+        "hardware_mean_ms": 322.99896,
+        "hardware_range_ms": [
+          322.99896,
+          322.99896
+        ],
+        "wrapper_mean_ms": 0.7186899983935291
+      },
+      "interleaved": {
+        "calls": 4,
+        "host_mean_ms": 395.3724595003223,
+        "host_median_ms": 395.195845499984,
+        "host_range_ms": [
+          392.34944000054384,
+          398.74870700077736
+        ],
+        "hardware_mean_ms": 322.9958675,
+        "hardware_range_ms": [
+          322.99224,
+          322.99931
+        ],
+        "wrapper_mean_ms": 0.7244814987643622
+      },
+      "host_change_percent": 0.2406924108193209,
+      "hardware_change_percent": -0.0009574334233208859
+    },
+    "nodule": {
+      "baseline": {
+        "calls": 4,
+        "host_mean_ms": 51.06673374939419,
+        "host_median_ms": 51.282550499308854,
+        "host_range_ms": [
+          44.65291700034868,
+          57.048916998610366
+        ],
+        "hardware_mean_ms": 13.7026225,
+        "hardware_range_ms": [
+          13.70115,
+          13.70362
+        ],
+        "wrapper_mean_ms": 0.6749675012542866
+      },
+      "interleaved": {
+        "calls": 8,
+        "host_mean_ms": 53.41024524977911,
+        "host_median_ms": 50.94354149969149,
+        "host_range_ms": [
+          48.36579700167931,
+          70.53352599905338
+        ],
+        "hardware_mean_ms": 13.70304625,
+        "hardware_range_ms": [
+          13.6996,
+          13.70774
+        ],
+        "wrapper_mean_ms": 0.6965656255033537
+      },
+      "host_change_percent": 4.589115708644131,
+      "hardware_change_percent": 0.0030924737217219445
+    }
+  },
+  "historical_unet_comparison": {
+    "unet_original": {
+      "frozen_files_identical": {
+        "model.json": true,
+        "parameters.npz": true,
+        "reference.npz": true,
+        "input.npz": true
+      },
+      "old_host_ms": 552.6469052000095,
+      "new_host_ms": 431.565950500044,
+      "latency_reduction_percent": 21.90927942610027,
+      "speedup": 1.2805618806573416,
+      "old_bit_sha256": "54f54656e405eb4cee0ce073d476665110ee49ef6f200ccdaf6edc814a85cafc",
+      "new_bit_sha256": "21523a8034acf96b2b4c20615353a9a7804cc0c4f5a6f05f1c1592d020d47187"
+    },
+    "unet_pruned": {
+      "frozen_files_identical": {
+        "model.json": true,
+        "parameters.npz": true,
+        "reference.npz": true,
+        "input.npz": true
+      },
+      "old_host_ms": 492.40141630000943,
+      "new_host_ms": 395.3724595003223,
+      "latency_reduction_percent": 19.70525542529502,
+      "speedup": 1.2454115213849588,
+      "old_bit_sha256": "54f54656e405eb4cee0ce073d476665110ee49ef6f200ccdaf6edc814a85cafc",
+      "new_bit_sha256": "21523a8034acf96b2b4c20615353a9a7804cc0c4f5a6f05f1c1592d020d47187"
+    }
+  },
+  "warnings": [
+    "Short correctness run, not a controlled sustained performance benchmark",
+    "Historical U-Net comparison also changes RTL bit; do not attribute gain solely to sharing",
+    "Nodule timing is a 128x128 patch network call on pre-lowered codes, not a full slice or case"
+  ],
+  "cpu_mhz": [
+    650.0
+  ],
+  "pl_mhz": [
+    100.0
+  ]
+}
