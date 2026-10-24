@@ -1,0 +1,19 @@
+{
+  "status": "clean_git_index_checkout_verified",
+  "base_branch": "codex/ct-studio-ldct-integration",
+  "base_commit": "4653284d2845b149749a2b02f805869a576e69aa",
+  "archive_sha256": "b88aad7947a2362686a6e78e8983ebae3ce991378e272269f8729ddcd4e34fa7",
+  "runtime_files_verified": 53,
+  "independent_synthetic_cpu_node_comparisons": 172,
+  "tests": {
+    "command": "python -m unittest python/tests/test_lung_nodule_shared_runtime.py python/tests/test_lung_nodule_shared_driver.py",
+    "count": 3,
+    "passed": true,
+    "driver_test_hardware": "explicitly simulated; not physical board"
+  },
+  "hardware_rtl_files_byte_hash_verified": 17,
+  "pc_runtime_import_requires_torch": false,
+  "new_synthetic_fixtures_board_tested": false,
+  "portable_tcl_reimplemented": false,
+  "historical_board_acceptance": "historical_board_verification.json; original patient arrays deliberately not redistributed"
+}
