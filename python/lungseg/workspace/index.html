@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="ui-token" content="__UI_TOKEN__"><title>CT Studio · 医学影像处理工作台</title>
-<link rel="stylesheet" href="/workspace.css"><link rel="stylesheet" href="/ldct.css"><link rel="stylesheet" href="/roi.css"><script src="/workspace.js" defer></script><script src="/ldct.js" defer></script><script src="/series.js" defer></script><script src="/roi.js" defer></script></head>
+<link rel="stylesheet" href="/workspace.css"><link rel="stylesheet" href="/ldct.css"><link rel="stylesheet" href="/roi.css"><link rel="stylesheet" href="/nodule.css"><script src="/nodule-common.js" defer></script><script src="/workspace.js" defer></script><script src="/ldct.js" defer></script><script src="/series.js" defer></script><script src="/roi.js" defer></script><script src="/nodule.js" defer></script></head>
 <body>
 <aside class="sidebar">
   <a class="brand" href="/" aria-label="CT Studio 首页"><span class="brand-mark">CT</span><span>CT Studio<small>医学影像处理工作台</small></span></a>
@@ -72,7 +72,28 @@
         </div>
       </div>
     </section>
-    <section id="tab-segmentation" class="tab-content" hidden><div class="section-heading compact"><div><span class="eyebrow">INTELLIGENT ANALYSIS</span><h2>智能分割与三维</h2></div><span class="chip teal">真实 FPGA 推理 · 共享当前 CT</span></div><div class="segmentation-shell"><iframe id="segmentationFrame" loading="lazy" title="智能分割、三维重构与多平面联动" src="/segmentation"></iframe></div></section>
+    <section id="tab-segmentation" class="tab-content" hidden>
+      <div class="section-heading compact"><div><span class="eyebrow">INTELLIGENT ANALYSIS</span><h2>肺分割、结节候选与三维</h2></div><span id="noduleBadge" class="chip">尚无候选结果</span></div>
+      <div class="nodule-layout">
+        <div class="nodule-views">
+          <div class="segmentation-shell"><iframe id="segmentationFrame" loading="lazy" title="智能分割、三维重构与多平面联动" src="/segmentation"></iframe></div>
+          <section class="card nodule-roi"><div class="nodule-zoom-wrap"><canvas id="noduleZoom" width="360" height="260" aria-label="当前候选原生HU局部放大"></canvas></div><div class="nodule-roi-info"><h3 id="noduleRoiTitle">选择候选以自动设置 ROI</h3><p id="noduleRoiInfo" class="helper">列表、三个切面、肺三维和 ROI 使用同一个候选编号。</p><div class="nodule-local-tools"><label>显示窗<select id="noduleWindow"><option value="lung">肺窗</option><option value="soft">软组织窗</option></select></label><label>观察边界<select id="nodulePadding"><option value="0">不扩展</option><option value="3" selected>扩展 3 mm</option><option value="5">扩展 5 mm</option></select></label></div><p id="noduleBounds" class="helper">金色为检测原框；虚线为观察用扩展框。</p><button id="noduleToRoi" class="button primary" disabled>带此框进入 ROI 定量分析 →</button><button id="noduleManualRoi" class="button secondary" disabled>直接框选 ROI →</button><p class="helper">有候选可自动带框；也可直接框选 ROI，无需先做结节检测。定量分析在 ROI 工作区主动执行。</p></div></section>
+          <details class="card nodule-mip">
+            <summary>局部 MIP · 候选层段最大投影</summary>
+            <div class="nodule-local-tools"><button id="noduleMipRun" class="button secondary" disabled>生成所选候选的局部 MIP</button><label>显示窗<select id="noduleMipWindow"><option value="lung">肺窗</option><option value="soft">软组织窗</option></select></label></div>
+            <div class="nodule-mip-image"><canvas id="noduleMip" width="480" height="260" aria-label="所选候选层段的局部最大密度投影"></canvas></div>
+            <p id="noduleMipNote" class="helper" role="status">选择候选后点击生成；投影用于观察层段内高密度结构。</p>
+          </details>
+        </div>
+        <aside class="card nodule-candidates">
+          <h3>肺结节可疑候选</h3><button id="noduleRun" class="button primary wide" disabled>检测当前 CT · FPGA 实验版</button><button id="noduleCancel" class="button secondary wide" hidden>完成当前小批次后停止</button><p id="noduleStatus" class="helper" role="status">加载 CT 并完成当前来源的整例肺分割后检测。原始 CNN 分数未经标定。</p>
+          <div class="nodule-list-tools"><label class="checkbox"><input id="noduleShowAll" type="checkbox" checked>显示全部三维标记</label><button id="noduleLocate" class="text-button" disabled>定位当前候选</button></div>
+          <p id="noduleCount" class="helper">尚无结果</p><div id="noduleList" class="nodule-list" role="group" aria-label="结节候选列表"></div><p id="noduleSelected" class="helper" aria-live="polite">尚未选择候选。</p>
+          <p class="helper">分数保持结果原值，不表示恶性概率。估计直径、包围框与 ROI 统计不代表精确病灶轮廓或体积。</p>
+          <details class="nodule-connect"><summary>候选结果接入与联动测试</summary><p class="helper">导入结果须匹配当前病例、原图/增强图来源、几何与分割版本。</p><button id="noduleContext" class="button secondary" disabled>下载当前接口上下文</button><label class="nodule-file">导入候选 JSON<input id="noduleFile" type="file" accept=".json,application/json" disabled></label><button id="noduleExport" class="text-button" disabled>导出当前候选 JSON</button><hr><p class="helper">以下仅生成几何联动测试数据，不运行检测，不能作为检出效果。</p><button id="noduleFixture" class="button secondary" disabled>加载联动测试候选</button><button id="noduleClear" class="text-button" disabled>清除当前候选</button></details>
+        </aside>
+      </div>
+    </section>
     <section id="tab-performance" class="tab-content" hidden><div class="section-heading"><div><span class="eyebrow">PERFORMANCE & EVIDENCE</span><h2>性能记录</h2><p>本次运行与历史基准分别展示，便于追溯。</p></div><span class="chip">测量范围明确</span></div>
       <section class="card evidence"><h3>LDCT 增强与分析来源</h3><p id="ldctPerformance">尚未执行增强。</p><p class="helper">电脑参考与实际 FPGA 分开记录；逐层运算时间不等于整机交互时间。当前影像来源及各层模型、输入、输出哈希随会话导出。</p></section>
       <div class="metrics"><article class="card metric"><span>当前已计算层数</span><strong id="metricSlices">—</strong><small>来自本次真实分割结果</small></article><article class="card metric"><span>最近单层 FPGA 推理</span><strong id="metricPL">—</strong><small>网络壁钟 · 含板端调度</small></article><article class="card metric"><span>最近通信往返</span><strong id="metricRoundtrip">—</strong><small>含板端推理 · 不与推理耗时相加</small></article><article class="card metric"><span id="metricBasicCaption">基础处理 · 点击至显示</span><strong id="metricBasic">—</strong><small id="metricBasicNote">本浏览器实际测量，含等待、取图与绘制</small></article><article class="card metric"><span id="metricBasicKernelCaption">基础 PL / DMA</span><strong id="metricBasicKernel">—</strong><small id="metricBasicKernelNote">仅运算阶段，不代表网页响应时间</small></article></div>

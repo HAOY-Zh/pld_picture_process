@@ -32,7 +32,12 @@ def configuration(path):
             or manifest.get('ldct',{}).get('clock_mhz')!=100.):
         raise ValueError('竞赛入口要求已验收的共享基础版和100 MHz LDCT配置。')
     token=(path.parent/config['token_file']).read_text(encoding='utf-8').strip()
-    return StudioClient(config['board_url'],token,manifest),manifest
+    if manifest.get('roi'):
+        from ct_studio_roi_client import ROIStudioClient
+        client=ROIStudioClient(config['board_url'],token,manifest)
+    else:
+        client=StudioClient(config['board_url'],token,manifest)
+    return client,manifest
 
 
 def read_web_info(url):
@@ -60,6 +65,9 @@ def web_info(url,manifest):
             or state.get('ldct',{}).get('identity')!=manifest['ldct']
             or not state['ldct'].get('fpga_configured')):
         raise ValueError('此端口不是匹配的实板集成网页；请保留旧会话，另选端口。')
+    if manifest.get('roi') and (not state.get('roi',{}).get('fpga_configured')
+            or state.get('roi',{}).get('fpga_identity')!=manifest['roi']):
+        raise ValueError('此网页尚未接入匹配的ROI硬件服务；请保留旧会话，另选端口。')
     return opener,headers,state
 
 
@@ -167,6 +175,8 @@ def launch(args):
                   and detail.get('integration_board_acceptance')=='startup-selftests-passed'
                   and detail.get('ready') is True and detail.get('busy') is True
                   and detail.get('error') is None)
+            if manifest.get('roi'):
+                busy=busy and detail.get('roi')==manifest['roi'] and detail.get('roi_startup_acceptance')=='startup-selftests-passed'
         except Exception:busy=False
         if busy and existing is not None and not args.check_only:
             print('程序已经运行，开发板正在处理已有任务。已保留任务，请在原网页查看进度：'+url,flush=True)

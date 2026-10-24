@@ -4,3 +4,10 @@ runtime/ct_studio_20261018/** -text whitespace=cr-at-eol
 /start_ct_studio_demo.cmd text eol=crlf
 /start_ct_studio_pc.cmd text eol=crlf
 python/roi_vendor/ct_roi_reference.py -text -whitespace
+python/nodule_vendor/** -text -whitespace
+pynq/roi_vendor/** -text -whitespace
+hardware/lung_nodule_shared_20261024/** -text -whitespace
+hardware/roi_20261019/** -text -whitespace
+hardware/roi_statistics_20261024/** -text -whitespace
+runtime/ct_studio_integration_20261025/** -text whitespace=cr-at-eol
+/start_ct_studio_integrated.cmd text eol=crlf

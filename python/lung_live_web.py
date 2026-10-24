@@ -135,11 +135,24 @@ class Controller:
         with self.lock:
             return dict(self.status, shape=list(self.hu.shape) if self.hu is not None else None,
                 geometry=self.geom, source=self.details, known_slices=int(self.known.sum()) if self.known is not None else 0,
-                volume_ml=float(self.cleaned.sum() * np.prod(self.geom['spacing_zyx_mm']) / 1000)
-                    if self.cleaned is not None else None,
+                volume_ml=self._cleaned_volume_ml(),
                 expert_present=self.expert is not None, expert_source=self.expert_info,
                 comparison=self.comparison(),
                 warning='工程教学演示，非临床诊断。电脑只做预/后处理和显示，网络前向由 FPGA 执行。')
+
+    def _cleaned_volume_ml(self):
+        """Completed masks are replaced, never edited in place by the workflow."""
+        mask=self.cleaned
+        if mask is None:
+            self._volume_cache=None
+            return None
+        spacing=tuple(self.geom['spacing_zyx_mm'])
+        cached=getattr(self,'_volume_cache',None)
+        if (cached is None or cached[0]is not mask or cached[1]!=spacing
+                or not self.status.get('volume_ready')):
+            cached=(mask,spacing,float(mask.sum()*np.prod(spacing)/1000))
+            self._volume_cache=cached
+        return cached[2]
 
     def comparison(self):
         """Aggregate cached per-slice counts; unknown slices never count as negatives."""

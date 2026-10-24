@@ -46,7 +46,7 @@ $('connectFast').hidden=!s.fast_platform_available||s.fast_platform_active;$('co
 for(const k of ['sliceSlider','sliceIndex','syncSlice'])$(k).disabled=!s.shape;
 $('boardDot').className='status-dot'+(s.board_connected?' on':'');$('boardLabel').textContent=s.desktop_only?'电脑浏览模式':s.board_connected?(s.fast_platform_active?'FPGA 加速服务已连接':'FPGA 已连接'):'FPGA 未连接';$('connect').textContent=s.board_connected?'重新核对':'连接';
 $('taskDot').className='status-dot'+(s.phase==='error'?' error':busy?' busy':s.shape?' on':'');$('progress').hidden=!busy;$('progress').max=Math.max(1,s.total);$('progress').value=s.completed;
-message((s.roi?.job?.running?'正在分析 ROI':s.ldct?.running&&s.phase==='processing'?'正在增强影像':phaseNames[s.phase]||s.phase)+(busy&&s.total?` · ${s.completed}/${s.total}`:'')+(s.error?' · '+s.error:''),s.phase==='error');
+message((s.nodule?.job?.status==='RUNNING'?'正在 FPGA 检测结节候选':s.roi?.job?.running?'正在分析 ROI':s.ldct?.running&&s.phase==='processing'?'正在增强影像':phaseNames[s.phase]||s.phase)+(busy&&s.total?` · ${s.completed}/${s.total}`:'')+(s.error?' · '+s.error:''),s.phase==='error');
 $('caseLabel').textContent=s.source?.source_name||s.source?.source?.split(/[\\/]/).filter(Boolean).at(-1)||(s.shape?'已加载 CT':'尚未加载 CT');
 $('sourceInfo').textContent=s.shape?`${s.shape.join(' × ')} · ${s.geometry.spacing_zyx_mm.map(v=>Number(v).toFixed(2)).join(' / ')} mm`:'加载一次，在各工作区共享。';
 $('expertBadge').textContent=s.expert_present?'已加载专家标注':'无专家标注';$('expertBadge').className='chip'+(s.expert_present?' teal':'');

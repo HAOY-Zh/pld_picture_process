@@ -1,0 +1,41 @@
+{
+  "status": "PASS_REAL_CASE_SPEED_AND_EXACT_PARITY",
+  "patch_count": 5237,
+  "candidate_count": 8288,
+  "before_seconds": 696.9830365,
+  "after_seconds": 431.2926339999999,
+  "speedup": 1.6160327850625897,
+  "reduction_percent": 38.120067288036516,
+  "before_requests": 5237,
+  "after_requests": 655,
+  "all_patch_inputs_bit_exact": true,
+  "all_patch_heads_bit_exact": true,
+  "all_candidates_exact": true,
+  "auto_roi_exact": true,
+  "roi_slices": 21,
+  "model_weights_and_bits_unchanged": true,
+  "scoring_and_sampling_unchanged": true,
+  "detection_quality_accepted": false,
+  "reboot_tested": false,
+  "scope": "Single real-case physical verification; no patient identifiers, images or raw receipts included.",
+  "legacy_regression": {
+    "status": "PASS_PHYSICAL_LEGACY_FUNCTIONS_AND_SWITCHING",
+    "light_cnn_max_hu_error": 0,
+    "original_lung_head_bit_exact": true,
+    "basic_output_bit_exact": true,
+    "nodule_after_legacy_bit_exact": true,
+    "web_case_and_386_masks_preserved": true
+  },
+  "regression_tests": {
+    "core_passed": 132,
+    "desktop_isolated_passed": 2
+  },
+  "public_delivery": {
+    "new_fixture_board_tested": false,
+    "fresh_install_and_contract_validation_passed": true,
+    "patient_data_included": false,
+    "credentials_included": false,
+    "clean_index_checkout_tests_passed": 70,
+    "clean_index_desktop_tests_passed": 2
+  }
+}

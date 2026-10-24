@@ -94,3 +94,7 @@ Thumbs.db
 
 # Reviewed synthetic runtime delivery; no patient data or credentials.
 !/runtime/ct_studio_20261018/ct_studio_runtime_20261018.zip
+
+# Credential-free integrated release; maintainer staging remains local.
+!/runtime/ct_studio_integration_20261025/ct_studio_integration_runtime.zip
+/runtime/ct_studio_integration_20261025/staging/

@@ -1,0 +1,9 @@
+{
+  "source_commit": "95e570f260a2dc657956a174db11084565c8a4ff",
+  "files_sha256": {
+    "lung_nodule_cnn.py": "43ec816d78c8cd80a34f7307f91b954fe50824ccbb1da29c26019213d257168e",
+    "lung_nodule_sampling_cache.py": "daac0bb4641c6577a4921a6c5a6b8675faa16f04f0f081f9c8e3fe1cde7f9449",
+    "nodule_plan.py": "6e490dbcc1cad3bd44e70dd0803c2597f24c9bacde6c72eeb2c9355e2faa6bdd"
+  },
+  "numerical_changes": false
+}

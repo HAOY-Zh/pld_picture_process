@@ -1,4 +1,6 @@
-> 2026-10-18: Complete host + PYNQ runtime assets are included in this branch. Start with [CT Studio full delivery instructions](docs/CT_Studio完整运行交付_20261018.md). The public archive contains synthetic self-tests and no deployment credentials.
+> 2026-10-25：当前集成包含轻量 CNN、肺分割、结节候选、自动 ROI、MPR/三维联动与批量调度。配套去凭据运行包及启动方式见 [集成交付](docs/CT_Studio集成交付_20261025.md)。原模型和硬件文件保留，真实病例与连接凭据不随本次提交上传。
+>
+> 2026-10-18 的历史交付记录见 [完整运行交付说明](docs/CT_Studio完整运行交付_20261018.md)。下方早期进度按当时版本保留。
 
 # PYNQ-Z2 医学图像处理项目
 

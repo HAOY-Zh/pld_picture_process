@@ -1,0 +1,51 @@
+{
+  "module_version": "roi-filter-1.0.0",
+  "abi_magic": "0x524F4931",
+  "abi_version": 1,
+  "date": "2026-10-19",
+  "tool": "Vivado 2018.2",
+  "part": "xc7z020clg400-1",
+  "requested_clock_hz": 100000000,
+  "timing": {
+    "wns_ns": 1.308,
+    "whs_ns": 0.025,
+    "tns_ns": 0.0
+  },
+  "core_synthesis_resources": {
+    "LUT": 479,
+    "FF": 270,
+    "BRAM": 0,
+    "DSP": 0
+  },
+  "overlay_implementation_resources": {
+    "LUT": 3498,
+    "FF": 5074,
+    "BRAM": 3,
+    "DSP": 0
+  },
+  "board_validated": false,
+  "real_ct_validated": false,
+  "cpu_and_adapter_tests": 15,
+  "rtl_cases": 14,
+  "rtl_pixels": 786620,
+  "assets": {
+    "hardware/ct_roi.bit": {
+      "sha256": "04bfecbf4cb9e0d994b0249c64dd7e18316a0e8895e5feb8cfea64789d05d9f5",
+      "bytes": 4045676
+    },
+    "hardware/ct_roi.hwh": {
+      "sha256": "8355210743f521d9d2fffb93e008767bdddde04d6ec4653ced81a9b06e3b5b8b",
+      "bytes": 418633
+    },
+    "fpga/ct_roi_axis.v": {
+      "sha256": "8ed50c8a2acb9d379528a607e1624966412f9a553ce4bbd3c5089ec3b5df1039",
+      "bytes": 5761
+    },
+    "results/xsim_2018_2/verification.json": {
+      "sha256": "7047299caedc0d7f670cba863210a1e526b7c2c94d6c1ffd41359f0b0ed90b6d",
+      "bytes": 4976
+    }
+  },
+  "candidate_mode": "NOT_IMPLEMENTED_WAITING_A_RULES",
+  "team_abi_confirmation": "PROPOSED_NOT_YET_CONFIRMED_BY_B"
+}

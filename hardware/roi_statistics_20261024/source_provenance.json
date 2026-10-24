@@ -1,0 +1,26 @@
+{
+  "archive": "C:\\Users\\17821\\Documents\\xwechat_files\\wxid_zwmwehzkiixh22_c7f9\\msg\\file\\2026-10\\zhenghe\\CT_Studio_最终整合_20261024_源码与验收.zip",
+  "archive_sha256": "1cea560b51ffa5672b10ea744dad83db58d1b7c2d3c2ce9e3929456c448a660d",
+  "zip_prefix": "CT_Studio_最终整合_20261024/modules/candidate_linkage/",
+  "files_sha256": {
+    "fpga/pynq_z2_roi.v": "ac824aa2d68e66e72e99e394a718f8a43c92aa823cfe6c21283a32f869174e02",
+    "fpga/pynq_z2_roi_statistics.v": "0827449cb19d666859e15b0989a3d97b13e733393047726068f747610ebb32ca",
+    "tests/tb_roi_statistics.sv": "b6a81cb5a3fed51f610efaabb4c728d1bc669584b1ee447ce581dfe1e767d85b",
+    "vectors/statistics_cases.vh": "6d02e5ee47dedb04218c1f6f958957060ff21311a5095d10a1cee21b764a0bdd",
+    "vectors/statistics_input.mem": "19fa484a0f35bfaf44fddf780e4dad2dadb270f08edcd4a0a2ce3a59dbfa8e3d",
+    "vectors/statistics_last.mem": "ade53da9b76ca5341efd6025ea6879a71c66d7fafb875e3d3dea266364386b87",
+    "vectors/statistics_manifest.json": "b9d014624a03fff6f8b81d6953f8b5b6bb38cb4b214b2d21e01507bdf97cbf11",
+    "vectors/statistics_mask.mem": "2d77eab2a617f9ffa3568b24490ac68b80045966f7dae311d6a2824e063d15aa",
+    "scripts/generate_statistics_vectors.py": "f683c2b69d999893b3c1a161cf0e7aa2dadd8cdfc20fdab456e251f4c98700e2",
+    "scripts/synth_statistics.tcl": "c444ca9e391e09afbb6819d27032f361538deb8aa3d19a7ad94fcc1183d4ca32",
+    "scripts/run_statistics.ps1": "2d1b59206e7a07086be48a5067b51132da2397566ff84bc983a28eb9f1b9a82d",
+    "python/roi_linkage_adapter.py": "736c912fea0a88679cbef5e5f76bdbdd4a98d9f540220d160503316318d3071e",
+    "python/ct_roi_reference.py": "529e530b570e257241df3dd7abbace52c4fd8d277780d383b22153aef795b94f",
+    "docs/fpga_statistics.md": "9acb28b4cb57cfcb764a755f908889020d82747e295d2f3853f56c5499d860b8",
+    "results/verification.json": "e2dee3ae98419c6d7a3ff14495b57fb0e8d35a4afa91cb7529e2f0fef2a014cd",
+    "results/fpga_statistics/timing_routed.rpt": "adf906b254b0d6d8882f272220f250ec46b1f9973a556786850bb921a44282c5",
+    "results/fpga_statistics/utilization_routed.rpt": "72bea47a94544ec98a14e458d344ae91fdca4a0fd6e75f34fd30bfceddc946ca",
+    "results/fpga_statistics/actual_statistics.csv": "ba59873d8374d1decdfc4a2f61b9fa401f9d9bd1dc0ed35bb8f43e247014303f"
+  },
+  "state": "IMPORTED_FOR_INDEPENDENT_HARDWARE_REVIEW_NOT_DEPLOYED"
+}

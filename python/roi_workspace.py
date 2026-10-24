@@ -58,8 +58,11 @@ class ROIWorkspaceMixin:
     def snapshot(self):
         with self.lock:
             value = super().snapshot()
-            value['roi'] = dict(available=True, backend='CPU_REFERENCE', fpga_available=False,
-                fpga_status='待接板验证', identity=self.roi_identity,
+            configured=bool(self.client is not None and hasattr(self.client,'roi') and self.client.manifest.get('roi'))
+            ready=configured and value.get('board_connected') is True
+            value['roi'] = dict(available=True, backend='CPU_REFERENCE', fpga_available=ready,
+                fpga_configured=configured, fpga_status='已通过统一服务启动自检' if ready else '待连接匹配的ROI服务',
+                fpga_identity=self.client.manifest['roi'] if configured else None, identity=self.roi_identity,
                 result=summary(self.roi_result) if self.roi_result else None,
                 history=[summary(row) for row in list(self.roi_records.values())[-30:]],
                 job=copy.deepcopy(self.roi_job),
@@ -92,8 +95,12 @@ class ROIWorkspaceMixin:
             if (self.hu is None or values.get('case_id') != self.status['case_id']
                     or values.get('analysis_source_id') != self.analysis_source_id):
                 raise ValueError('病例或原图/增强图来源已变化，请刷新后分析')
-            if values.get('backend', 'CPU_REFERENCE') != 'CPU_REFERENCE':
-                raise ValueError('ROI FPGA 尚未接入验证；当前仅提供明确的电脑参考')
+            backend=values.get('backend','CPU_REFERENCE')
+            if backend not in ('CPU_REFERENCE','FPGA_ROI'):
+                raise ValueError('ROI FPGA 后端无效；请选择电脑参考或已接入的FPGA ROI')
+            if backend=='FPGA_ROI' and not (self.client is not None and hasattr(self.client,'roi')
+                    and self.status.get('board_connected') and self.client.manifest.get('roi')):
+                raise ValueError('ROI FPGA 尚未连接匹配的统一服务；不会改用电脑计算')
             mode = values.get('mode', 'slice'); index = values.get('index')
             if mode not in ('slice', 'range') or type(index) is not int or not 0 <= index < len(self.hu):
                 raise ValueError('ROI 切片或处理模式无效')
@@ -106,6 +113,8 @@ class ROIWorkspaceMixin:
             if mask_stage not in ('body', 'cleaned'): raise ValueError('请选择有效的预测肺掩膜')
             hu, roi, thresholds, use_hu, _ = validate_slice(self.hu[z0],
                 values.get('roi_yx'), values.get('hu_range'), values.get('use_hu', False))
+            candidate_reference = (self.nodule_reference(values['candidate_reference'], roi, [z0,z1])
+                if values.get('candidate_reference') is not None else None)
             lung = None
             if use_lung:
                 if not self.known[z0:z1].all():
@@ -119,11 +128,12 @@ class ROIWorkspaceMixin:
             record = dict(schema='ct_workspace_roi_v1', result_id=job_id,
                 case_id=self.status['case_id'], analysis_source_id=self.analysis_source_id,
                 analysis_source=copy.deepcopy(self.source_choices[self.analysis_source_id]),
-                backend='CPU_REFERENCE', module_version=MODULE_VERSION, algorithm_id=ALGORITHM_ID,
+                backend=backend, module_version=MODULE_VERSION, algorithm_id=ALGORITHM_ID,
                 params_version=PARAMS_VERSION, reference_identity=copy.deepcopy(self.roi_identity),
                 shape=list(self.hu.shape), geometry=copy.deepcopy(self.geom),
                 source_hu_sha256=self.details['hu_sha256'], mode=mode, index=index,
                 roi_yx=list(roi), z_bounds=[z0, z1], use_hu=use_hu,
+                candidate_reference=candidate_reference,
                 hu_range=list(thresholds) if use_hu else None, use_lung_mask=use_lung, lung_mask_stage=mask_stage,
                 lung_mask=dict(stage=mask_stage, analysis_source_id=self.analysis_source_id,
                     segmentation_receipts={str(z):self.receipts.get(z) for z in range(z0,z1)}) if use_lung else None,
@@ -151,32 +161,54 @@ class ROIWorkspaceMixin:
 
     def _roi_work(self, record, output, volume, lung, source_indices):
         began = time.perf_counter(); failure = None
-        total_sum = 0; low = high = None; cpu_ms = 0.
+        total_sum = 0; total_sumsq = 0; low = high = None; processing_ms = dma_ms = roundtrip_ms = switch_ms = 0.
+        statistics_origins=set()
         spacing = physical_spacing(record['geometry'])
         try:
-            processor = CpuRoiProcessor()
+            if record['backend']=='FPGA_ROI':
+                from ct_studio_roi_client import RemoteRoiProcessor
+                processor=RemoteRoiProcessor(self.client)
+            else:processor=CpuRoiProcessor()
             for z in range(*record['z_bounds']):
                 if self.roi_cancel_event.is_set(): break
                 lung_slice = None if lung is None else lung[z]
                 result = processor.process_slice(volume[z], roi_yx=record['roi_yx'],
                     hu_range=record['hu_range'], use_hu=record['use_hu'], lung_mask=lung_slice)
                 mask = result['filtered_mask']; stats = result['hu_statistics']
-                if result['backend'] != 'CPU_REFERENCE' or int(mask.sum()) != result['valid_count']:
-                    raise ValueError('ROI 参考返回身份或计数不一致')
+                if result['backend'] != record['backend'] or int(mask.sum()) != result['valid_count']:
+                    raise ValueError('ROI 返回身份或计数不一致')
                 rounded = np.rint(volume[z]).astype(np.int16)
+                if result.get('statistics_abi'):
+                    from roi_statistics_contract import STATISTICS_ABI,COMPUTED_ON,validate_statistics
+                    if record['backend']!='FPGA_ROI' or result['statistics_abi']!=STATISTICS_ABI:
+                        raise ValueError('ROI statistics hardware ABI/backend mismatch')
+                    stats=validate_statistics(stats,result['valid_count']);slice_sumsq=stats['sumsq']
+                    statistics_origins.add(COMPUTED_ON)
+                else:
+                    values = rounded[mask != 0].astype(np.int64)
+                    slice_sumsq = int((values*values).sum())
+                    stats = dict(stats, sumsq=slice_sumsq,
+                        std_population=float(values.std()) if values.size else None,
+                        dispersion_computed_on='PC_FROM_RETURNED_MASKS')
+                    statistics_origins.add('PC_FROM_RETURNED_MASKS')
                 row = dict(index=z, source_slice_index=source_indices[z], valid_count=result['valid_count'],
                     area_mm2=result['valid_count']*float(spacing[1]*spacing[2]) if spacing is not None else None,
                     hu_statistics=stats, input_hu_i16_sha256=digest(rounded), mask_sha256=digest(mask),
                     lung_mask_sha256=digest(lung_slice.astype(np.uint8)) if lung_slice is not None else None,
-                    timing=result['timing'])
+                    timing=result['timing'],hardware_receipt=result.get('hardware_receipt'))
                 with (output / f'slice_{z:06d}.npz').open('xb') as stream:
                     np.savez_compressed(stream, filtered_mask=mask)
                 record['slice_results'].append(row); record['processed_indices'].append(z)
                 record['valid_count'] += result['valid_count']; total_sum += stats['sum']
+                total_sumsq += slice_sumsq
                 if result['valid_count']:
                     low = stats['min'] if low is None else min(low, stats['min'])
                     high = stats['max'] if high is None else max(high, stats['max'])
-                cpu_ms += result['timing']['total_seconds']*1000
+                processing_ms += result['timing']['total_seconds']*1000
+                if record['backend']=='FPGA_ROI':
+                    receipt=result['hardware_receipt']
+                    dma_ms+=result['timing']['dma_compute_seconds']*1000
+                    roundtrip_ms+=receipt['roundtrip_ms'];switch_ms+=receipt['stats']['overlay_switch_ms']
                 with self.lock:
                     self.roi_job['completed'] = len(record['slice_results'])
                     self._update(completed=len(record['slice_results']), active_slice=z)
@@ -187,16 +219,24 @@ class ROIWorkspaceMixin:
         record['status'] = 'FAILED' if failure else 'SUCCESS' if record['complete'] else 'CANCELLED'
         record['error'] = failure
         count = record['valid_count']
-        record['hu_statistics'] = dict(count=count, sum=total_sum, min=low, max=high,
-            mean=total_sum/count if count else None, computed_on='PC_FROM_RETURNED_MASKS')
+        record['hu_statistics'] = dict(count=count, sum=total_sum, sumsq=total_sumsq, min=low, max=high,
+            mean=total_sum/count if count else None,
+            std_population=(max(0,count*total_sumsq-total_sum*total_sum)**.5)/count if count else None,
+            computed_on='FPGA_STATISTICS_RST1' if statistics_origins=={'FPGA_STATISTICS_RST1'} else 'PC_FROM_RETURNED_MASKS')
         # A single plane reports area; a slab reports only actually computed voxels.
         volume_mm3 = (count*float(np.prod(spacing)) if spacing is not None
                       and record['mode'] == 'range' and record['processed_slices'] >= 2 else None)
         record.update(region_volume_mm3=volume_mm3,
             region_volume_ml=None if volume_mm3 is None else volume_mm3/1000,
             physical_geometry_verified=spacing is not None,
-            timing=dict(cpu_reference_ms=cpu_ms, host_result_ready_ms=(time.perf_counter()-began)*1000,
-                        scope='电脑参考及电脑落盘；非FPGA耗时，不含浏览器显示'))
+            timing=dict(cpu_reference_ms=processing_ms if record['backend']=='CPU_REFERENCE' else None,
+                        fpga_module_ms=processing_ms if record['backend']=='FPGA_ROI' else None,
+                        fpga_dma_compute_ms=dma_ms if record['backend']=='FPGA_ROI' else None,
+                        http_roundtrip_ms=roundtrip_ms if record['backend']=='FPGA_ROI' else None,
+                        overlay_switch_ms=switch_ms if record['backend']=='FPGA_ROI' else None,
+                        host_result_ready_ms=(time.perf_counter()-began)*1000,
+                        scope='实际FPGA筛选/计数；模块、切换、通信与电脑落盘分别计时' if record['backend']=='FPGA_ROI'
+                              else '电脑参考及电脑落盘；非FPGA耗时，不含浏览器显示'))
         try:
             with (output / 'result.json').open('x', encoding='utf-8') as stream:
                 json.dump(record, stream, ensure_ascii=False, indent=2, allow_nan=False)
@@ -204,7 +244,8 @@ class ROIWorkspaceMixin:
                 self.roi_records[record['result_id']] = record
                 self.roi_result = record
                 self.roi_job.update(running=False, status=record['status'], error=failure)
-                self._update(phase='error' if failure else 'done' if record['complete'] else 'cancelled', error=failure)
+                self._update(phase='error' if failure else 'done' if record['complete'] else 'cancelled', error=failure,
+                    **({'board_connected':False} if failure and record['backend']=='FPGA_ROI' else {}))
         except Exception as exc:
             with self.lock:
                 self.roi_job.update(running=False, status='FAILED', error=str(exc))

@@ -1,9 +1,10 @@
 <section id="tab-roi" class="tab-content" hidden>
-  <div class="section-heading"><div><span class="eyebrow">REGION OF INTEREST</span><h2>ROI 定量分析</h2><p>框选感兴趣区域，在当前原图或增强 HU 上筛选、放大并测量。</p></div><span class="chip amber">电脑参考 · FPGA 待验证</span></div>
+  <div class="section-heading"><div><span class="eyebrow">REGION OF INTEREST</span><h2>ROI 定量分析</h2><p>框选感兴趣区域，在当前原图或增强 HU 上筛选、放大并测量。</p></div><span id="roiBackendBadge" class="chip amber">电脑参考 · FPGA 待连接</span></div>
   <div class="roi-source-note" id="roiSourceNote">载入一次 CT，即可在此分析；不要求先做肺分割。</div>
   <div class="roi-layout">
     <section class="controls card roi-controls">
       <div class="card-heading"><span class="step">1</span><h3>框选与条件</h3></div>
+      <label>ROI 执行位置<select id="roiBackend"><option value="CPU_REFERENCE">电脑参考 · 用于对照</option><option value="FPGA_ROI" disabled>FPGA ROI · 实际硬件</option></select></label>
       <p class="helper">在完整切片上拖动框选，右侧同步放大。滚动切片不会触发计算。</p>
       <div class="roi-bounds">
         <label>左侧 X<input id="roiX" type="number" min="0" step="1" value="0"></label><label>上侧 Y<input id="roiY" type="number" min="0" step="1" value="0"></label>
@@ -40,7 +41,7 @@
         <div class="roi-metrics"><div><small>当前层 · 筛选像素</small><strong id="roiCount">—</strong></div><div><small>当前层 · 面积 mm²</small><strong id="roiArea">—</strong></div><div><small>已计算区域 · HU 均值</small><strong id="roiMean">—</strong></div><div><small>已计算区域 · 体积 mL</small><strong id="roiVolume">—</strong></div></div>
         <p id="roiStatsNote" class="helper">单层只显示面积；连续层段显示实际已计算区域体积，不代表精确病灶体积。</p>
       </section>
-      <section class="card roi-result-card"><h3>当前影像来源的分析记录</h3><p class="helper">每次分析新增一份结果；切换原图／增强图后恢复对应记录。</p><div class="table-scroll"><table><thead><tr><th>切片范围</th><th>条件</th><th>完成层数</th><th>筛选像素</th><th>电脑参考耗时</th><th>查看</th></tr></thead><tbody id="roiHistory"><tr><td colspan="6">暂无分析记录</td></tr></tbody></table></div></section>
+      <section class="card roi-result-card"><h3>当前影像来源的分析记录</h3><p class="helper">每次分析新增一份结果；切换原图／增强图后恢复对应记录。</p><div class="table-scroll"><table><thead><tr><th>切片范围</th><th>条件</th><th>完成层数</th><th>筛选像素</th><th>执行与耗时</th><th>查看</th></tr></thead><tbody id="roiHistory"><tr><td colspan="6">暂无分析记录</td></tr></tbody></table></div></section>
     </div>
   </div>
 </section>

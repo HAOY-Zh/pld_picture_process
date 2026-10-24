@@ -2,7 +2,8 @@
 (() => {
   let context=null, contextSeries=null, selected=null, latest=null, image=null, imageKey=null, imageTicket=0;
   let payload=null, payloadKey=null, payloadTicket=0, drag=null, historyKey=null, localError='';
-  const fields=['roiX','roiY','roiWidth','roiHeight','roiLow','roiHigh','roiUseHu','roiUseLung','roiMaskStage','roiMode','roiZ0','roiZ1'];
+  let candidateOrigin=null;
+  const fields=['roiBackend','roiX','roiY','roiWidth','roiHeight','roiLow','roiHigh','roiUseHu','roiUseLung','roiMaskStage','roiMode','roiZ0','roiZ1'];
   const windows={lung:[-600,1500],soft:[40,400],bone:[400,1800]};
   const current=()=>state?.roi?.history?.find(r=>r.result_id===selected)||null;
   const visible=()=>!$('tab-roi').hidden;
@@ -19,13 +20,14 @@
     const useHu=$('roiUseHu').checked,limits=useHu?[number('roiLow'),number('roiHigh')]:null;
     if(limits&&limits[0]>limits[1])throw Error('HU 下限不能大于上限。');
     return {roi_yx:[y,y+h,x,x+w],use_hu:useHu,hu_range:limits,use_lung_mask:$('roiUseLung').checked,
-      mask_stage:$('roiMaskStage').value,mode:range?'range':'slice',z_bounds:[z0,z1]};
+      mask_stage:$('roiMaskStage').value,mode:range?'range':'slice',z_bounds:[z0,z1],backend:$('roiBackend').value,
+      candidate_reference:candidateOrigin?.candidate_reference||null};
   }
   function matches(record){
     if(!record||record.case_id!==state?.case_id||record.analysis_source_id!==state.analysis_source_id)return false;
     try{
       const p=parameters();
-      return ['roi_yx','use_hu','hu_range','use_lung_mask','mode','z_bounds'].every(k=>JSON.stringify(p[k])===JSON.stringify(record[k]))
+      return ['roi_yx','use_hu','hu_range','use_lung_mask','mode','z_bounds','backend'].every(k=>JSON.stringify(p[k])===JSON.stringify(record[k]))
         &&(!p.use_lung_mask||p.mask_stage===record.lung_mask_stage);
     }catch{return false;}
   }
@@ -34,6 +36,10 @@
     $('roiX').value=x0;$('roiY').value=y0;$('roiWidth').value=x1-x0;$('roiHeight').value=y1-y0;
   }
   function restore(record){
+    const ref=record.candidate_reference;
+    candidateOrigin=ref&&ref.context_id===state?.nodule?.context?.context_id&&ref.result_id===state?.nodule?.result?.result_id
+      ?{candidate_reference:ref,is_test_data:ref.is_test_data}:null;
+    $('roiBackend').value=record.backend||'CPU_REFERENCE';$('roiBackend').dataset.chosen='1';
     bounds(record.roi_yx);$('roiUseHu').checked=record.use_hu;
     if(record.hu_range)[$('roiLow').value,$('roiHigh').value]=record.hu_range;
     $('roiUseLung').checked=record.use_lung_mask;$('roiMaskStage').value=record.lung_mask_stage||'body';
@@ -101,23 +107,30 @@
     $('roiMean').textContent=fixed(r?.hu_statistics?.mean);$('roiVolume').textContent=fixed(r?.region_volume_ml,4);
     $('roiExport').disabled=!r;
     $('roiResultNote').textContent=!r?'设置矩形和条件后点击分析，结果独立保存。':
-      `${matches(r)?'已保存结果。':'参数／当前层已变，以下为上次保存结果。'} ${r.analysis_source.label} · ${r.processed_slices}/${r.requested_slices} 层 · ${r.status==='SUCCESS'?'完成':r.status==='CANCELLED'?'已停止，保留已完成层':'失败，保留已有输出'}。`;
+      `${matches(r)?'已保存结果。':'参数／当前层已变，以下为上次保存结果。'} ${r.analysis_source.label} · ${r.processed_slices}/${r.requested_slices} 层 · ${r.status==='SUCCESS'?'完成':r.status==='CANCELLED'?'已停止，保留已完成层':'失败，保留已有输出'}。${r.candidate_reference?' 来源候选 '+r.candidate_reference.candidate_id+(r.candidate_reference.is_test_data?'（联动测试，非检出结果）':'')+(r.candidate_reference.user_adjusted?'；ROI 已手动调整。':'。'):''}`;
     $('roiStatsNote').textContent=!r?'单层只显示面积；连续层段显示实际已计算区域体积，不代表精确病灶体积。':
-      `已计算区域 HU ${fixed(r.hu_statistics.min)}～${fixed(r.hu_statistics.max)}；${r.physical_geometry_verified?'已核对毫米几何':'几何不足，不显示物理量'}。${!row?'当前层未计算，不能按零计数。 ':''}${r.mode==='slice'?'单层不报告体积。':'体积仅汇总实际已完成层。'} 电脑参考 ${fixed(r.timing.cpu_reference_ms)} ms；不是 FPGA 实测。`;
+      `已计算区域 HU ${fixed(r.hu_statistics.min)}～${fixed(r.hu_statistics.max)}；HU 总体标准差 ${fixed(r.hu_statistics.std_population)}（${r.hu_statistics.computed_on==='FPGA_STATISTICS_RST1'?'FPGA 统计核汇总，电脑求均值/标准差':'电脑按返回掩膜统计'}）；${r.physical_geometry_verified?'已核对毫米几何':'几何不足，不显示物理量'}。${!row?'当前层未计算，不能按零计数。 ':''}${r.mode==='slice'?'单层不报告体积。':'体积仅汇总实际已完成层。'} `+
+      (r.backend==='FPGA_ROI'?`实际 FPGA 模块 ${fixed(r.timing.fpga_module_ms)} ms；其中 DMA/计算 ${fixed(r.timing.fpga_dma_compute_ms)} ms，往返 ${fixed(r.timing.http_roundtrip_ms)} ms，bit切换 ${fixed(r.timing.overlay_switch_ms)} ms。`:`电脑参考 ${fixed(r.timing.cpu_reference_ms)} ms；不是 FPGA 实测。`);
   }
   function refreshControls(){
     const busy=ACTIVE.includes(state?.phase),has=!!state?.shape,range=$('roiMode').value==='range';
+    const fpga=state?.roi?.fpga_available===true;
+    $('roiBackend').querySelector('[value="FPGA_ROI"]').disabled=!fpga;
+    if(fpga&&!$('roiBackend').dataset.chosen){$('roiBackend').value='FPGA_ROI';$('roiBackend').dataset.chosen='1';}
+    const hardware=$('roiBackend').value==='FPGA_ROI';
+    $('roiBackendBadge').textContent=hardware?(fpga?(state.roi.fpga_identity?.statistics_abi==='roi_hu_statistics_rst1_v1'?'FPGA ROI · 筛选、计数与 HU 统计':'FPGA ROI · 实际筛选与计数'):'FPGA ROI · 待连接或故障'):'电脑参考 · 用于对照';
+    $('roiBackendBadge').className='chip '+(hardware&&fpga?'teal':'amber');
     for(const id of fields)$(id).disabled=!has||busy;
     $('roiLow').disabled=$('roiHigh').disabled=!has||busy||!$('roiUseHu').checked;
     $('roiMaskStage').disabled=!has||busy||!$('roiUseLung').checked;
     $('roiMaskStage').querySelector('[value="cleaned"]').disabled=!state?.roi?.cleaned_mask_available;
     $('roiRangeFields').hidden=!range;$('roiSlice').disabled=$('roiFull').disabled=$('roiToSeg').disabled=!has||busy;
-    $('roiRun').disabled=!has||busy;$('roiRun').textContent=range?'分析连续层段':'分析当前切片';
+    $('roiRun').disabled=!has||busy||(hardware&&!fpga);$('roiRun').textContent=range?'分析连续层段':'分析当前切片';
     $('roiCancel').hidden=!state?.roi?.job?.running;
     if(document.activeElement!==$('roiSlice'))$('roiSlice').value=index;
     $('roiSlice').max=has?state.shape[0]-1:0;
     const info=state?.roi?.job;
-    $('roiProgress').textContent=localError||(!has?'等待载入影像。':info?.running?`电脑正在分析 ${info.completed} / ${info.total} 层…`:'使用当前分析来源 HU；点击分析后才计算。');
+    $('roiProgress').textContent=localError||(!has?'等待载入影像。':info?.running?`${hardware?'FPGA':'电脑参考'}正在分析 ${info.completed} / ${info.total} 层…`:'使用当前分析来源 HU；点击分析后才计算。');
     let missing=false;
     if(has){
       try{const p=parameters(),known=new Set(state.roi.mask_known_indices);missing=Array.from({length:p.z_bounds[1]-p.z_bounds[0]},(_,n)=>p.z_bounds[0]+n).some(z=>!known.has(z));}
@@ -126,6 +139,7 @@
     if($('roiUseLung').checked&&(missing||$('roiMaskStage').value==='cleaned'&&!state?.roi?.cleaned_mask_available))$('roiRun').disabled=true;
     $('roiMaskNote').textContent=!$('roiUseLung').checked?'未启用肺区域限制，可直接分析框内区域；无需先分割。':missing?'所选范围有未分割层。可关闭肺区域限制直接分析，或先完成当前来源肺分割。':'使用当前来源的预测肺掩膜；不会使用专家标注或其他来源结果。';
     $('roiSourceNote').textContent=has?`当前分析输入：${state.analysis_source?.label||'原始 CT'}。框选和结果绑定这份 HU；切换来源后恢复各自记录。`:'载入一次 CT，即可在此分析；不要求先做肺分割。';
+    if(candidateOrigin)$('roiSourceNote').textContent+=` 自动 ROI 来自 ${candidateOrigin.candidate_reference.candidate_id}${candidateOrigin.is_test_data?'（联动测试候选，非检测结果）':''}；检测原框保留，当前框可调整。`;
     $('roiSliceLabel').textContent=has?`轴位 ${index} · 源序列第 ${state.source.source_slice_indices[index]} 层`:'等待影像';
   }
   function history(){
@@ -134,7 +148,8 @@
     for(const r of [...rows].reverse()){
       const tr=document.createElement('tr');if(r.result_id===selected)tr.className='roi-history-current';
       const [y0,y1,x0,x1]=r.roi_yx;
-      for(const value of [`${r.z_bounds[0]}～${r.z_bounds[1]-1}`,`${x1-x0}×${y1-y0}${r.use_hu?' · HU '+r.hu_range.join('～'):''}${r.use_lung_mask?' · 肺内':''}`,`${r.processed_slices}/${r.requested_slices}${r.complete?'':' · 未完成'}`,r.valid_count.toLocaleString(),r.timing.cpu_reference_ms.toFixed(2)+' ms'])textCell(tr,value);
+      const timing=r.backend==='FPGA_ROI'?'FPGA '+r.timing.fpga_module_ms.toFixed(2)+' ms':'电脑 '+r.timing.cpu_reference_ms.toFixed(2)+' ms';
+      for(const value of [`${r.z_bounds[0]}～${r.z_bounds[1]-1}`,`${x1-x0}×${y1-y0}${r.use_hu?' · HU '+r.hu_range.join('～'):''}${r.use_lung_mask?' · 肺内':''}`,`${r.processed_slices}/${r.requested_slices}${r.complete?'':' · 未完成'}`,r.valid_count.toLocaleString(),timing])textCell(tr,value);
       const td=document.createElement('td'),button=document.createElement('button');button.className='text-button';button.textContent='查看';
       button.onclick=()=>{selected=r.result_id;payload=null;payloadKey=null;payloadTicket++;restore(r);if(index<r.z_bounds[0]||index>=r.z_bounds[1])setIndex(r.z_bounds[0]);refresh();};td.append(button);tr.append(td);body.append(tr);
     }
@@ -151,17 +166,32 @@
     refreshControls();history();metrics();fetchImage();fetchMask();
   }
   const canvas=$('roiCanvas');
+  window.addEventListener('ct-nodule-roi',event=>{
+    const value=event.detail;
+    if(!value){
+      if(candidateOrigin){candidateOrigin=null;selected=null;payload=null;payloadKey=null;payloadTicket++;
+        bounds([0,0,0,0]);$('roiMode').value='slice';localError='候选已清除或失效，请重新选框。';changed();}
+      return;
+    }
+    if(value.case_id!==state?.case_id||value.analysis_source_id!==state.analysis_source_id
+      ||value.context_id!==state.nodule?.context?.context_id)return;
+    candidateOrigin=value;selected=null;payload=null;payloadKey=null;payloadTicket++;
+    bounds(value.display_bbox_zyx.slice(2));$('roiMode').value='range';
+    $('roiZ0').value=value.display_bbox_zyx[0];$('roiZ1').value=value.display_bbox_zyx[1]-1;
+    $('roiUseHu').checked=false;$('roiUseLung').checked=false;changed();history();
+  });
   canvas.addEventListener('pointerdown',event=>{if(!image||ACTIVE.includes(state?.phase)||event.button!==0)return;const p=pointer(event);if(!p)return;drag={start:p,previous:[number('roiY'),number('roiY')+number('roiHeight'),number('roiX'),number('roiX')+number('roiWidth')]};canvas.setPointerCapture(event.pointerId);dragTo(p);});
   canvas.addEventListener('pointermove',event=>{if(drag)dragTo(pointer(event,true));});
   canvas.addEventListener('pointerup',event=>{if(drag){dragTo(pointer(event,true));drag=null;canvas.releasePointerCapture(event.pointerId);}});
   canvas.addEventListener('pointercancel',()=>{if(drag){bounds(drag.previous);drag=null;changed();}});
   for(const id of fields)$(id).addEventListener('input',changed);
+  $('roiBackend').addEventListener('change',()=>{$('roiBackend').dataset.chosen='1';changed();});
   $('roiSlice').onchange=()=>{setIndex($('roiSlice').value);refresh();};
   $('roiFull').onclick=()=>{bounds([0,state.shape[1],0,state.shape[2]]);changed();};
   $('roiWindow').onchange=$('roiOverlay').onchange=draw;
   $('roiToSeg').onclick=()=>{$('syncSlice').click();};
   $('roiRun').onclick=async()=>{try{
-    const p=parameters();localError='';apply(await api('/api/roi/run',{...p,case_id:state.case_id,analysis_source_id:state.analysis_source_id,index,backend:'CPU_REFERENCE'}));
+    const p=parameters();localError='';apply(await api('/api/roi/run',{...p,case_id:state.case_id,analysis_source_id:state.analysis_source_id,index}));
   }catch(e){localError=e.message;refreshControls();message(e.message,true);}};
   $('roiCancel').onclick=async()=>{try{apply(await api('/api/roi/cancel',{case_id:state.case_id,analysis_source_id:state.analysis_source_id,result_id:state.roi.job.result_id}));}catch(e){localError=e.message;refreshControls();}};
   $('roiExport').onclick=async()=>{try{

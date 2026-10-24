@@ -79,6 +79,7 @@ class ROIWorkspaceTests(unittest.TestCase):
     def test_zero_selection_is_known_with_zero_count_and_null_mean(self):
         r=self.run_roi(roi_yx=[3,3,2,7])
         self.assertEqual(r['valid_count'],0);self.assertIsNone(r['hu_statistics']['mean'])
+        self.assertIsNone(r['hu_statistics']['std_population']);self.assertEqual(r['hu_statistics']['sumsq'],0)
         self.assertTrue(self.payload(r)['known'])
         self.assertEqual(self.payload(r)['slice_result']['area_mm2'],0.)
         self.assertFalse(self.payload(r,0)['known'])
@@ -91,6 +92,19 @@ class ROIWorkspaceTests(unittest.TestCase):
         self.assertAlmostEqual(r['region_volume_ml'],.054)
         self.assertEqual(r['processed_indices'],[0,1,2])
         self.assertEqual(r['backend'],'CPU_REFERENCE')
+
+    def test_population_std_aggregates_all_selected_voxels_with_signed_extremes(self):
+        self.c.hu[:]=np.resize(np.array([-32768,32767,-1.5,.5],np.float32),self.c.hu.shape)
+        r=self.run_roi(mode='range',z_bounds=[0,3])
+        values=np.rint(self.c.hu[:,1:4,2:7]).astype(np.int64)
+        self.assertEqual(r['hu_statistics']['sumsq'],int((values*values).sum()))
+        self.assertAlmostEqual(r['hu_statistics']['std_population'],float(values.std()),places=8)
+        self.assertEqual(r['hu_statistics']['computed_on'],'PC_FROM_RETURNED_MASKS')
+        for z,row in enumerate(r['slice_results']):
+            self.assertAlmostEqual(row['hu_statistics']['std_population'],float(values[z].std()),places=8)
+            self.assertEqual(row['hu_statistics']['dispersion_computed_on'],'PC_FROM_RETURNED_MASKS')
+        exported=self.c.roi_export(r['case_id'],r['analysis_source_id'],r['result_id'])
+        self.assertIn('std_population',json.dumps(exported))
 
     def test_bad_geometry_does_not_invent_physical_units(self):
         self.c.geom['basis_lps_zyx'][0][1]=.7

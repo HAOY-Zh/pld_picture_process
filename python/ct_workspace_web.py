@@ -23,6 +23,7 @@ from ct_platform_client import PlatformClient
 from ct_studio_client import StudioClient
 from ldct_workspace import LDCTWorkspaceMixin
 from roi_workspace import ROIWorkspaceMixin
+from nodule_workspace import NoduleWorkspaceMixin
 from ct_series_import import FolderImports, inspect_series, MAX_FILE
 from lung_live_web import BoardClient, Controller, MODEL_SHA, handler_for, write_new
 
@@ -59,7 +60,7 @@ def benchmarks():
     return dict(rows=rows, note='历史同板 ARM INT8 / FPGA INT8；不代表当前服务版本、整例或网页端到端性能。')
 
 
-class WorkspaceController(ROIWorkspaceMixin, LDCTWorkspaceMixin, Controller):
+class WorkspaceController(NoduleWorkspaceMixin, ROIWorkspaceMixin, LDCTWorkspaceMixin, Controller):
     def __init__(self, client, model, output):
         super().__init__(client, model, output)
         self.basic_result = self.basic_image = None
@@ -270,6 +271,7 @@ def workspace_handler(controller, token, plotly):
 header>.row:nth-of-type(2),header>.row:nth-of-type(3){display:none}
 header{padding:5px 10px}footer{display:none}main{padding:6px}
 #receipt{display:none}.row{margin:3px 0}#message{font-size:12px}
+@media(min-width:601px){body{height:100vh}main{flex:1;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}}
 </style>'''
     old_html = old_html.replace('</head>', embed+'</head>').replace('__UI_TOKEN__', token)
     old_html = old_html.replace("['loading','connecting','computing','reconstructing']",
@@ -292,12 +294,17 @@ planes.forEach((_,a)=>draw(a));if(sceneReady)Plotly.Plots.resize('scene');});}
 if(m?.type==='ct-workspace-slice'&&typeof m.case_id==='string'&&Number.isInteger(m.index)){
 workspacePendingSlice=m;workspaceApplySlice();}
 });</script>'''
-    old_html = old_html.replace('</body>', bridge+'</body>')
+    old_html = old_html.replace('</body>', bridge+
+        '<script src="/nodule-common.js"></script><script src="/nodule-viewer.js"></script></body>')
     base = handler_for(controller, token, old_html.encode('utf-8'), plotly)
     html = (ASSETS/'index.html').read_text(encoding='utf-8').replace('__UI_TOKEN__', token)
     html = html.replace('    <section id="tab-performance"',
         (ASSETS/'roi.html').read_text(encoding='utf-8')+'\n    <section id="tab-performance"').encode('utf-8')
     assets = {'/workspace.css': ('style.css', 'text/css; charset=utf-8'),
+              '/nodule-common.js': ('nodule-common.js', 'text/javascript; charset=utf-8'),
+              '/nodule-viewer.js': ('nodule-viewer.js', 'text/javascript; charset=utf-8'),
+              '/nodule.js': ('nodule.js', 'text/javascript; charset=utf-8'),
+              '/nodule.css': ('nodule.css', 'text/css; charset=utf-8'),
               '/roi.js': ('roi.js', 'text/javascript; charset=utf-8'),
               '/roi.css': ('roi.css', 'text/css; charset=utf-8'),
               '/ldct.js': ('ldct.js', 'text/javascript; charset=utf-8'),
@@ -309,7 +316,8 @@ workspacePendingSlice=m;workspaceApplySlice();}
         def do_GET(self):
             parts = parse.urlsplit(self.path)
             if parts.path in ('/', '/segmentation', '/api/benchmarks', '/api/basic/image', '/api/ldct/image',
-                              '/api/export', '/api/roi/image', '/api/roi/export') or parts.path in assets:
+                              '/api/export', '/api/roi/image', '/api/roi/export',
+                              '/api/nodule/context', '/api/nodule/result', '/api/nodule/mip') or parts.path in assets:
                 if not self.allowed(parts.path.startswith('/api/')): return
                 try:
                     if parts.path == '/': return self.send(200, html, 'text/html; charset=utf-8')
@@ -318,11 +326,18 @@ workspacePendingSlice=m;workspaceApplySlice();}
                         name, mime = assets[parts.path]
                         return self.send(200, (ASSETS/name).read_bytes(), mime)
                     if parts.path == '/api/benchmarks': return self.send(200, benchmarks())
+                    if parts.path == '/api/nodule/context':
+                        return self.send(200, dict(schema='ct_nodule_context_v1', context=controller.nodule_context()))
                     if parts.path == '/api/export':
                         snapshot = controller.snapshot()
                         return self.send(200, dict(schema='ct_workspace_session_v1', state=snapshot,
                             note='当前会话状态及计算来源；基础PL/DMA与后台耗时分别记录；浏览器导出另附点击至显示计时；分割只显示实际回执'))
                     q = parse.parse_qs(parts.query, keep_blank_values=True)
+                    if parts.path == '/api/nodule/result':
+                        return self.send(200,controller.nodule_payload(q['case'][0],q['source'][0],q['context'][0],q['result'][0]))
+                    if parts.path == '/api/nodule/mip':
+                        return self.send(200,controller.nodule_mip(q['case'][0],q['source'][0],q['context'][0],
+                            q['result'][0],q['candidate'][0],float(q['padding'][0])))
                     if parts.path == '/api/roi/image':
                         return self.send(200,controller.roi_payload(q['case'][0],q['source'][0],q['result'][0],int(q['index'][0])))
                     if parts.path == '/api/roi/export':
@@ -338,6 +353,24 @@ workspacePendingSlice=m;workspaceApplySlice();}
 
         def do_POST(self):
             parts = parse.urlsplit(self.path)
+            if parts.path in ('/api/nodule/import','/api/nodule/fixture','/api/nodule/clear','/api/nodule/run','/api/nodule/cancel'):
+                if not self.allowed(True): return
+                try:
+                    length = int(self.headers.get('Content-Length', '0'))
+                    if (self.headers.get('Transfer-Encoding') or self.headers.get('Content-Type') != 'application/json'
+                            or not 0 < length <= 8*1024*1024):
+                        raise ValueError('需要不超过 8MB 的候选 JSON 请求')
+                    raw = self.rfile.read(length)
+                    if len(raw) != length: raise ValueError('候选传输未完成')
+                    values = json.loads(raw)
+                    if not isinstance(values,dict): raise ValueError('需要 JSON 对象')
+                    if parts.path.endswith('/run'):
+                        if controller.nodule_provider is None:
+                            return self.send(501,dict(error='尚未配置真实整病例检测服务；不会生成模拟检测结果'))
+                        return self.send(202,controller.start_nodule(values))
+                    return self.send(200,controller.nodule_action(parts.path.rsplit('/',1)[1],values))
+                except BlockingIOError as exc: return self.send(409,dict(error=str(exc)))
+                except (ValueError,KeyError) as exc: return self.send(400,dict(error=str(exc)))
             if parts.path == '/api/import/file':
                 if not self.allowed(True): return
                 try:
@@ -402,6 +435,8 @@ def main():
     parser.add_argument('--port', type=int, default=8090)
     parser.add_argument('--ldct-release',type=Path,help='已验证的 LDCT 发布目录；默认采用主模型配置的100MHz版')
     parser.add_argument('--output', type=Path, default=ROOT/'data/ct_workspace_20261017/results')
+    parser.add_argument('--nodule-package',type=Path,help='已验收共享核的运行包；启用原始 CNN 分数实验检测')
+    parser.add_argument('--resume-session',type=Path,help='恢复本机已保存的病例、增强、分割与ROI会话状态')
     args = parser.parse_args()
     default_config = ROOT/'data/ct_platform_20261017_v2/host_config.json'
     config_path = args.config or (default_config if not args.desktop and default_config.is_file() else None)
@@ -415,7 +450,10 @@ def main():
         token = (config_path.parent/config['token_file']).read_text(encoding='utf-8').strip()
         if config.get('platform_manifest'):
             manifest = json.loads((config_path.parent/config['platform_manifest']).read_text(encoding='utf-8'))
-            client = (StudioClient if manifest.get('ldct') else PlatformClient)(config['board_url'], token, manifest)
+            if manifest.get('roi'):
+                from ct_studio_roi_client import ROIStudioClient
+                client=ROIStudioClient(config['board_url'],token,manifest)
+            else:client = (StudioClient if manifest.get('ldct') else PlatformClient)(config['board_url'], token, manifest)
         else:
             client = BoardClient(config['board_url'], token)
         model = json.loads(model_path.read_text(encoding='utf-8'))
@@ -430,6 +468,20 @@ def main():
         ldct_release=ROOT/json.loads(primary.read_text(encoding='utf-8'))['preferred_release']
     if ldct_release is not None:
         controller.configure_ldct(ldct_release)
+    nodule_package=args.nodule_package or (ROOT/config['nodule_package'] if config_path is not None and config.get('nodule_package') else None)
+    nodule_primary=ROOT/'configs/nodule_primary_runtime.json'
+    if nodule_package is None and client is not None and nodule_primary.is_file():
+        selected=json.loads(nodule_primary.read_text(encoding='utf8'))
+        nodule_package=ROOT/selected['package']
+        descriptor=json.loads((nodule_package/'shared_host_platform.json').read_text(encoding='utf8'))
+        if descriptor['service_bundle_sha256']!=selected['service_bundle_sha256']:
+            raise ValueError('结节运行包与已验收主版本不匹配')
+    nodule_package=nodule_package or ROOT/'data/ct_studio_shared_20261024_01'
+    if client is not None and (nodule_package/'shared_host_platform.json').is_file():
+        controller.configure_nodule(nodule_package)
+    if args.resume_session:
+        from ct_workspace_resume import restore_session
+        restore_session(controller,args.resume_session)
     from plotly.offline import get_plotlyjs
     server = ThreadingHTTPServer(('127.0.0.1', args.port),
         workspace_handler(controller, secrets.token_hex(32), get_plotlyjs().encode('utf-8')))

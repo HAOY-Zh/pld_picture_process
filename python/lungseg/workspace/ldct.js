@@ -53,10 +53,12 @@ function ldctRefresh(){
   document.querySelector('.analysis-source-bar').dataset.enhanced=String(selected!=='original');
   $('analysisSourceNote').textContent=selected==='original'?'当前基础处理、分割、ROI 与 MPR 使用原始 CT；增强后可切换。':'当前基础处理、分割、ROI 与 MPR 使用这份增强 HU；切回原图可恢复原来的分析结果。';
   const fpga=info.fpga_configured&&state.board_connected;
-  $('ldctBackend').querySelector('[value="FPGA_LDCT"]').disabled=!fpga;
+  const fpgaOption=$('ldctBackend').querySelector('[value="FPGA_LDCT"]');
+  fpgaOption.disabled=!fpga;
+  fpgaOption.textContent=fpga?'FPGA · 实际硬件':info.fpga_configured?'FPGA · 待连接统一服务':'FPGA · 未配置板端服务';
   $('ldctBackend').disabled=busy;$('ldctMethod').disabled=busy;
   const hardware=$('ldctBackend').value==='FPGA_LDCT';
-  $('ldctBackendBadge').textContent=hardware?'FPGA · 实际输出':'电脑整数参考';
+  $('ldctBackendBadge').textContent=hardware?(fpga?'FPGA · 实际输出':'FPGA · 待连接统一服务'):'电脑整数参考';
   $('ldctBackendNote').textContent=hardware?'仅调用匹配的统一 FPGA 服务；失败后保留错误，不自动改用电脑。':'使用同一组量化权重验证增强流程；本次时间属于电脑参考。';
   $('ldctPreview').disabled=$('ldctRunVolume').disabled=!state.shape||!info.available||busy||(hardware&&!fpga);
   $('ldctCancel').hidden=!info.running;$('ldctSlice').disabled=!state.shape;
