@@ -1,0 +1,9 @@
+# Tested host dependencies for Python 3.11, Windows x64.
+# Install torch==2.8.0 separately from https://download.pytorch.org/whl/cpu.
+numpy==2.4.6
+scipy==1.17.1
+pydicom==3.0.2
+matplotlib==3.11.2
+nibabel==5.4.2
+scikit-image==0.26.0
+plotly==6.9.0
