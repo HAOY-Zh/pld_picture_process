@@ -156,7 +156,7 @@ class NoduleWorkspaceMixin:
             context = self.nodule_context()
             packet = self.nodule_result
             value['nodule'] = dict(service_available=self.nodule_provider is not None,
-                service_status=('原始 CNN 分数实验版：使用当前所选 HU；实际 FPGA 推理，检测质量尚未验收。'
+                service_status=('INT8整层复用＋冻结跨层评分；系数与阈值固定。新版端到端实板质量待验收。'
                     if self.nodule_provider is not None else '等待整病例检测服务与冻结评分参数；可导入匹配结果进行联动'),
                 job=copy.deepcopy(self.nodule_job),context=context,
                 result={k:packet[k] for k in ('case_id','analysis_source_id','context_id','result_id',
@@ -211,11 +211,11 @@ class NoduleWorkspaceMixin:
             if self.nodule_provider is None:raise ValueError('尚未配置真实检测服务')
             if not self.status.get('board_connected'):raise ValueError('先连接统一 FPGA 服务')
             if not context['whole_case_ready']:raise ValueError('先完成当前所选 CT 的整例肺分割')
-            if values.get('scoring_mode')!='raw_cnn':raise ValueError('当前只提供明确的原始 CNN 实验模式')
+            if values.get('scoring_mode')!='frozen_cross_layer':raise ValueError('当前使用冻结跨层评分模式，请刷新网页')
             job_id='nodule_'+uuid.uuid4().hex
             folder=self.case_folder/'nodule'/job_id;folder.mkdir(parents=True,exist_ok=False)
             self.nodule_job=dict(job_id=job_id,status='RUNNING',stage='search',completed=0,total=0,error=None,
-                analysis_source_id=self.analysis_source_id,case_id=context['case_id'],scoring_mode='raw_cnn')
+                analysis_source_id=self.analysis_source_id,case_id=context['case_id'],scoring_mode='frozen_cross_layer')
             self.nodule_cancel_event.clear();self._update(phase='processing',error=None,completed=0,total=0)
             threading.Thread(target=self._nodule_work,args=(copy.deepcopy(context),folder,self.hu,self.body),daemon=True).start()
             return self.snapshot()

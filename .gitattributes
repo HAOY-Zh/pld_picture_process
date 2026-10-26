@@ -11,3 +11,7 @@ hardware/roi_20261019/** -text -whitespace
 hardware/roi_statistics_20261024/** -text -whitespace
 runtime/ct_studio_integration_20261025/** -text whitespace=cr-at-eol
 /start_ct_studio_integrated.cmd text eol=crlf
+
+runtime/ct_studio_current_20261026/** -text whitespace=cr-at-eol
+hardware/ct_studio_current_20261026/** -text -whitespace
+/start_ct_studio_current.cmd text eol=crlf

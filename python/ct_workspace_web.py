@@ -73,6 +73,7 @@ class WorkspaceController(NoduleWorkspaceMixin, ROIWorkspaceMixin, LDCTWorkspace
     def snapshot(self):
         with self.lock:
             value = super().snapshot()
+            value['segmentation_engine'] = self.client.manifest.get('shared_segmentation') if self.client is not None and hasattr(self.client, 'manifest') else None
             value['basic'] = copy.deepcopy(self.basic_result)
             value['threshold_input'] = copy.deepcopy(self.threshold_result)
             value['workspace_history'] = copy.deepcopy(self.history[-30:])
@@ -452,7 +453,8 @@ def main():
             manifest = json.loads((config_path.parent/config['platform_manifest']).read_text(encoding='utf-8'))
             if manifest.get('roi'):
                 from ct_studio_roi_client import ROIStudioClient
-                client=ROIStudioClient(config['board_url'],token,manifest)
+                from ct_shared_seg_client import SharedSegStudioClient
+                client=(SharedSegStudioClient if manifest.get('shared_segmentation') else ROIStudioClient)(config['board_url'],token,manifest)
             else:client = (StudioClient if manifest.get('ldct') else PlatformClient)(config['board_url'], token, manifest)
         else:
             client = BoardClient(config['board_url'], token)
@@ -466,7 +468,7 @@ def main():
         ldct_release=ROOT/config['ldct_release']
     if ldct_release is None and primary.is_file():
         ldct_release=ROOT/json.loads(primary.read_text(encoding='utf-8'))['preferred_release']
-    if ldct_release is not None:
+    if ldct_release is not None and (not args.desktop or ldct_release.is_dir()):
         controller.configure_ldct(ldct_release)
     nodule_package=args.nodule_package or (ROOT/config['nodule_package'] if config_path is not None and config.get('nodule_package') else None)
     nodule_primary=ROOT/'configs/nodule_primary_runtime.json'

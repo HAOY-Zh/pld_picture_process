@@ -82,7 +82,7 @@ def restore_session(c,state_file):
             records=[folder/(state['volume_job_id']+'_volume.json')]
         if records:
             meta=json.loads(records[-1].read_text(encoding='utf8'))
-            if (meta['source']['hu_sha256']!=key or meta['model_sha256']!=MODEL_SHA or meta['bit_sha256']!=BIT_SHA
+            if (meta['source']['hu_sha256']!=key or meta['model_sha256']!=MODEL_SHA or not set(meta.get('bit_sha256s') or [meta['bit_sha256']]).issubset({BIT_SHA, getattr(c.client,'segmentation_bit_sha256',BIT_SHA)})
                     or meta['input_geometry']!=geom):raise ValueError('恢复分割结果的来源/模型不一致')
             job=meta['job_id'];plan=meta['reconstruction'];lo,hi=plan['local_start'],plan['local_stop']
             with np.load(folder/(job+'_masks.npz'),allow_pickle=False) as masks:

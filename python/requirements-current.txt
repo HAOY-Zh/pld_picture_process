@@ -1,0 +1,3 @@
+# Exact numerical environment: NumPy scalar promotion affects sampling.
+-r requirements-web-fpga.txt
+numpy==1.26.4

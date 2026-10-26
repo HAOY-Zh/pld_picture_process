@@ -98,3 +98,7 @@ Thumbs.db
 # Credential-free integrated release; maintainer staging remains local.
 !/runtime/ct_studio_integration_20261025/ct_studio_integration_runtime.zip
 /runtime/ct_studio_integration_20261025/staging/
+
+# Credential-free current application snapshot.
+!/runtime/ct_studio_current_20261026/ct_studio_integration_runtime.zip
+/runtime/ct_studio_current_20261026/staging/

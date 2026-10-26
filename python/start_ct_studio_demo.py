@@ -34,7 +34,8 @@ def configuration(path):
     token=(path.parent/config['token_file']).read_text(encoding='utf-8').strip()
     if manifest.get('roi'):
         from ct_studio_roi_client import ROIStudioClient
-        client=ROIStudioClient(config['board_url'],token,manifest)
+        from ct_dual_io_client import DualSegStudioClient as SharedSegStudioClient
+        client=(SharedSegStudioClient if manifest.get('shared_segmentation') else ROIStudioClient)(config['board_url'],token,manifest)
     else:
         client=StudioClient(config['board_url'],token,manifest)
     return client,manifest
@@ -96,11 +97,15 @@ def spawn_web(config,port,desktop=False):
     task_env.update(TEMP=str(temporary),TMP=str(temporary))
     flags=0
     if os.name=='nt':flags=subprocess.CREATE_NEW_PROCESS_GROUP|subprocess.CREATE_NO_WINDOW
+    workspace_output = ROOT/('data/ct_workspace_pc/results' if desktop else 'data/ct_workspace_demo/results')
+    if not desktop:
+        setup=json.loads(Path(config).read_text(encoding='utf8'))
+        workspace_output=Path(setup.get('workspace_output',workspace_output))
     with (folder/'web.stdout.log').open('xb') as out,(folder/'web.stderr.log').open('xb') as err:
         mode=['--desktop'] if desktop else ['--config',str(config)]
         process=subprocess.Popen([sys.executable,'-B','-X','utf8',str(ROOT/'python/ct_workspace_web.py'),
             *mode,'--port',str(port),
-            '--output',str(ROOT/('data/ct_workspace_pc/results' if desktop else 'data/ct_workspace_demo/results'))],
+            '--output',str(workspace_output)],
             cwd=ROOT,env=task_env,stdin=subprocess.DEVNULL,stdout=out,stderr=err,creationflags=flags)
     (folder/'web.pid').write_text(str(process.pid),encoding='ascii')
     return process,folder

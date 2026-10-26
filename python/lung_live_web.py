@@ -6,6 +6,7 @@ Optional expert masks are used only for display/evaluation, never as predictions
 import argparse
 import base64
 import copy
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import hmac
 import ipaddress
@@ -260,12 +261,7 @@ class Controller:
                          volume_scope=None, reconstruction=None, region_volume_ml=None)
         job_id = uuid.uuid4().hex
         start = time.perf_counter()
-        for done, z in enumerate(indices, 1):
-            if self.cancel.is_set():
-                self._update(phase='cancelled'); return
-            self._update(active_slice=int(z))
-            codes = input_codes(self.hu[z], self.model)
-            head, receipt = self.client.infer(codes)  # No retries or fallback.
+        def finish_slice(done,z,head,receipt,codes):
             raw, body, plan = native_masks(head, self.hu[z], self.geom, self.model)
             scores = ({name: overlap_metrics(mask, self.expert[z]) for name, mask in
                 [('raw', raw), ('body', body)]} if self.expert is not None else {})
@@ -285,6 +281,19 @@ class Controller:
                 self.receipts[int(z)] = receipt['request_id']
                 for name, row in scores.items(): self.scores[name][int(z)] = row
                 self._update(completed=done, latest=receipt, elapsed_ms=(time.perf_counter()-start)*1000)
+
+        # One host result in flight; device commands remain strictly serial.
+        # The context manager drains outstanding host work on errors/cancel.
+        pending=None
+        with ThreadPoolExecutor(max_workers=1,thread_name_prefix='seg-result') as executor:
+            for done,z in enumerate(indices,1):
+                if self.cancel.is_set():break
+                self._update(active_slice=int(z))
+                codes=input_codes(self.hu[z],self.model)
+                head,receipt=self.client.infer(codes)  # No retries or fallback.
+                if pending is not None:pending.result()
+                pending=executor.submit(finish_slice,done,z,head,receipt,codes)
+            if pending is not None:pending.result()
         if self.cancel.is_set():
             self._update(phase='cancelled'); return
         plan = reconstruction_plan(self.known, self.details, self.geom)
@@ -311,12 +320,13 @@ class Controller:
                         self.scores['cleaned'] = {z: overlap_metrics(cleaned[z], self.expert[z]) for z in range(len(cleaned))}
             with (self.case_folder / (job_id + '_masks.npz')).open('xb') as out:
                 np.savez_compressed(out, **masks)
+            bit_ids = sorted({json.loads((self.case_folder / rid / 'receipt.json').read_text(encoding='utf8'))['bit_sha256'] for rid in self.receipts.values()})
             write_new(self.case_folder / (job_id + '_volume.json'), dict(schema='lung_live_volume_v1',
                 job_id=job_id, geometry=plan['geometry'], input_geometry=self.geom,
                 source=self.details, slice_receipts=self.receipts,
                 reconstruction=plan, volume_scope=plan['scope'], region_volume_ml=region_volume,
                 cleanup=cleanup, volume_ml=None if partial else region_volume,
-                backend='FPGA_INT8', bit_sha256=BIT_SHA, model_sha256=MODEL_SHA,
+                backend='FPGA_INT8', bit_sha256=bit_ids[0] if len(bit_ids)==1 else None, bit_sha256s=bit_ids, model_sha256=MODEL_SHA,
                 total_elapsed_ms=(time.perf_counter()-start)*1000, expert_present=self.expert is not None,
                 expert_reference=self.expert_info, expert_comparison=self.comparison(),
                 warning='Actual on-demand FPGA heads; PC pre/postprocessing and geometry. Not a clinical result.'))

@@ -86,7 +86,7 @@
           </details>
         </div>
         <aside class="card nodule-candidates">
-          <h3>肺结节可疑候选</h3><button id="noduleRun" class="button primary wide" disabled>检测当前 CT · FPGA 实验版</button><button id="noduleCancel" class="button secondary wide" hidden>完成当前小批次后停止</button><p id="noduleStatus" class="helper" role="status">加载 CT 并完成当前来源的整例肺分割后检测。原始 CNN 分数未经标定。</p>
+          <h3>肺结节可疑候选</h3><button id="noduleRun" class="button primary wide" disabled>检测当前 CT · 整层加速＋冻结评分</button><button id="noduleCancel" class="button secondary wide" hidden>完成当前整层后停止</button><p id="noduleStatus" class="helper" role="status">加载 CT 并完成当前来源的整例肺分割后检测。采用冻结跨层评分和固定阈值，不按当前病例调参。</p>
           <div class="nodule-list-tools"><label class="checkbox"><input id="noduleShowAll" type="checkbox" checked>显示全部三维标记</label><button id="noduleLocate" class="text-button" disabled>定位当前候选</button></div>
           <p id="noduleCount" class="helper">尚无结果</p><div id="noduleList" class="nodule-list" role="group" aria-label="结节候选列表"></div><p id="noduleSelected" class="helper" aria-live="polite">尚未选择候选。</p>
           <p class="helper">分数保持结果原值，不表示恶性概率。估计直径、包围框与 ROI 统计不代表精确病灶轮廓或体积。</p>

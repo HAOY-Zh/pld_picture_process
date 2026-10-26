@@ -1,0 +1,23 @@
+{
+  "status": "OFFLINE_AUDIT_PASS_WITH_KNOWN_PIPELINE_DIFFERENCES",
+  "segmentation_all351_integer_and_postprocess_exact": true,
+  "nodule_all_retained_scores_and_selected_geometry_exact": true,
+  "fresh_ldct_reference_slices": 11,
+  "numpy_version": "1.26.4",
+  "torch_version": "2.8.0+cu126",
+  "scope": "Historical local current-version actual FPGA outputs vs original integer reference, not a fresh recipient board run or GT accuracy evaluation.",
+  "source_slices": 351,
+  "new_public_runtime_on_board_tested": false,
+  "boot_repair": {
+    "old_autostart_disabled": true,
+    "new_autostart_enabled": true,
+    "cold_boot_verified": false
+  },
+  "fresh_public_install_tests": 3,
+  "protocol_layout_and_safety_tests": 8,
+  "real_web_started_on_isolated_test_port": true,
+  "public_portability_adaptations": [
+    "Installation paths replace author private paths",
+    "Desktop browse works before optional LDCT assets are installed"
+  ]
+}
