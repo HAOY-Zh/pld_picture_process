@@ -37,7 +37,7 @@ def git(*args):
     return subprocess.check_output(['git', '-C', str(ROOT), *args]).decode('utf-8').strip()
 
 
-def validate_inputs(pair, runtime, output):
+def validate_paired_installation(pair):
     required = ['host_config.json', 'host_platform.json', 'shared_host_platform.json',
                 'model.json', 'installation.json', 'platform_token.txt',
                 'ct_studio/platform_manifest.json', 'ct_studio/platform_token.txt']
@@ -59,6 +59,10 @@ def validate_inputs(pair, runtime, output):
             target = (manifest.parent/rel).resolve()
             if board not in target.parents or sha(target) != expected:
                 raise ValueError('Paired asset integrity check failed: '+name)
+
+
+def validate_inputs(pair, runtime, output):
+    validate_paired_installation(pair)
     if not (runtime/'python.exe').is_file():
         raise ValueError('Use the complete existing portable Windows Python runtime directory.')
     if output.exists() or output.with_suffix('.zip').exists():

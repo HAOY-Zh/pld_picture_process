@@ -1,0 +1,28 @@
+{
+  "status": "PASS_CLEAN_SOURCE_ZIP_AND_PORTABLE_RUNTIME",
+  "tested_source_tree": "06710271a45909cb595ae6645ff3daec38f41034",
+  "source_git_metadata_present": false,
+  "paths_include_spaces_and_chinese": true,
+  "host_python_or_git_required_for_launch": false,
+  "target_PATH_contains_only_windows_system32": true,
+  "actual_cmd_offline_diagnose_passed": true,
+  "dependency_modules_imported": 8,
+  "current_source_module_imports_verified": true,
+  "actual_web_backend_started": true,
+  "current_source_nodule_module_loaded_in_backend": true,
+  "current_source_page_served": true,
+  "ldct_roi_and_nodule_configured": true,
+  "unchanged_source_reuses_own_session": true,
+  "changed_source_starts_new_backend": true,
+  "previous_session_preserved": true,
+  "real_board_accessed": false,
+  "fpga_inference_performed": false,
+  "fixture_methods_sent": [
+    "GET"
+  ],
+  "original_private_zip_unchanged": true,
+  "original_private_zip_sha256": "7a7b6502dc542a8ac7291889e77bf0e0fb046b627a4e87bd0c992ed617de7d9b",
+  "credentials_added_to_public_source": false,
+  "verification_date": "2026-10-27",
+  "scope": "Clean source export with local identity-only fixture; no actual board or FPGA inference. Git source tree recorded before adding this receipt."
+}

@@ -98,7 +98,11 @@ def spawn_web(config,port,desktop=False):
     if os.name=='nt':flags=subprocess.CREATE_NEW_PROCESS_GROUP|subprocess.CREATE_NO_WINDOW
     with (folder/'web.stdout.log').open('xb') as out,(folder/'web.stderr.log').open('xb') as err:
         mode=['--desktop'] if desktop else ['--config',str(config)]
-        process=subprocess.Popen([sys.executable,'-B','-X','utf8',str(ROOT/'python/ct_workspace_web.py'),
+        # A portable Python ._pth can omit the script directory and otherwise
+        # import an older application's modules. Pin imports to this source tree.
+        entry=ROOT/'python/ct_workspace_web.py'
+        runner='import sys,runpy;sys.path.insert(0,sys.argv[1]);entry=sys.argv.pop(2);sys.argv.pop(1);runpy.run_path(entry,run_name="__main__")'
+        process=subprocess.Popen([sys.executable,'-B','-X','utf8','-c',runner,str(entry.parent),str(entry),
             *mode,'--port',str(port),
             '--output',str(ROOT/('data/ct_workspace_pc/results' if desktop else 'data/ct_workspace_demo/results'))],
             cwd=ROOT,env=task_env,stdin=subprocess.DEVNULL,stdout=out,stderr=err,creationflags=flags)
