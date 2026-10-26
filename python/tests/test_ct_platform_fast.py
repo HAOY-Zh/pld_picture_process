@@ -102,15 +102,17 @@ class FastProtocolTests(unittest.TestCase):
     def test_explicit_host_upgrade_checks_health_without_hardware_command(self):
         with tempfile.TemporaryDirectory() as folder:
             folder=Path(folder)
-            model=ROOT/'data/ct_platform_20261017_v2/model.json'
-            (folder/'model.json').write_bytes(model.read_bytes())
+            (folder/'model.json').write_text(json.dumps(MODEL),encoding='utf-8')
             (folder/'token.txt').write_text(TOKEN,encoding='utf-8')
             (folder/'manifest.json').write_text(json.dumps(HOST),encoding='utf-8')
             config=folder/'host_config.json'
             config.write_text(json.dumps(dict(board_url=self.server.url,token_file='token.txt',
                 model='model.json',platform_manifest='manifest.json')),encoding='utf-8')
             c=WorkspaceController(self.client,MODEL,folder/'results')
-            with patch('ct_workspace_web.FAST_CONFIG',config):
+            # Bind this synthetic model's file identity; no private installation
+            # or production weights are required for a host-only connection test.
+            with patch('ct_workspace_web.FAST_CONFIG',config), \
+                    patch('ct_workspace_web.MODEL_SHA',hashlib.sha256((folder/'model.json').read_bytes()).hexdigest()):
                 c.submit('connect_fast',{});s=wait(c)
             self.assertEqual(s['phase'],'idle');self.assertTrue(s['board_connected'])
             self.assertTrue(s['fast_platform_active']);self.assertEqual(self.hw.basic_calls,0)

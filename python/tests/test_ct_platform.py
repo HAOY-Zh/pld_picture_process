@@ -117,7 +117,10 @@ class PlatformProtocolTests(unittest.TestCase):
             controller.submit('basic',dict(case_id=s['case_id'],index=0,operation='opening',backend='FPGA_BASIC',
                 mask_result_id=s['threshold_input']['result_id'],lower=0,upper=1))
             s=wait(controller);self.assertEqual(s['phase'],'done')
-            self.assertEqual(s['basic']['backend'],'FPGA_BASIC');self.assertTrue(s['basic']['reference_bit_exact'])
+            self.assertEqual(s['basic']['backend'],'FPGA_BASIC')
+            self.assertIs(s['basic']['software_comparison_performed'],False)
+            self.assertIsNone(s['basic']['reference_ms'])
+            self.assertNotIn('reference_bit_exact',s['basic'])
             self.assertEqual(s['known_slices'],0);self.assertEqual(self.hardware.calls,0)
             self.assertEqual(self.hardware.basic_calls,2)
             self.assertGreater(s['basic']['host_result_ready_ms'],80.)
@@ -125,7 +128,7 @@ class PlatformProtocolTests(unittest.TestCase):
             self.assertEqual(s['basic']['parameters']['lower'],-1000)
             self.assertEqual(s['basic']['input_mask']['result_id'],s['threshold_input']['result_id'])
 
-    def test_mismatched_actual_mask_is_saved_and_not_replaced(self):
+    def test_actual_output_is_preserved_without_running_a_cpu_comparison(self):
         old=self.hardware.basic
         def corrupt(*a,**k):
             image,stats=old(*a,**k);image[0,0]^=255;return image,stats
@@ -137,8 +140,13 @@ class PlatformProtocolTests(unittest.TestCase):
             c.submit('load',dict(path=str(source),confirm_hu=True,load_expert=False));wait(c)
             c.submit('connect',{});s=wait(c)
             c.submit('basic',dict(case_id=s['case_id'],index=0,backend='FPGA_BASIC'))
-            s=wait(c);self.assertEqual(s['phase'],'error');self.assertIsNone(s['basic'])
-            self.assertFalse(s['board_connected']);self.assertEqual(len(list(c.case_folder.glob('*_basic_mismatch.npz'))),1)
+            s=wait(c);self.assertEqual(s['phase'],'done')
+            expected=process(self.hu,parameters({}));expected[0,0]^=255
+            np.testing.assert_array_equal(c.basic_image,expected)
+            self.assertEqual(s['basic']['output_sha256'],hashlib.sha256(expected.tobytes()).hexdigest())
+            self.assertIs(s['basic']['software_comparison_performed'],False)
+            self.assertTrue(s['board_connected'])
+            self.assertEqual(len(list(c.case_folder.glob('*_basic_mismatch.npz'))),0)
 
 
 class Buffer(np.ndarray):

@@ -174,34 +174,37 @@ class WorkspaceController(NoduleWorkspaceMixin, ROIWorkspaceMixin, LDCTWorkspace
                     mask_input, request_id, submitted_at):
         try:
             start = time.perf_counter()
-            if mask_input is None:
-                reference = process(hu, params)
-            else:
-                source, mask = mask_input
-                # The existing board wire protocol accepts HU. Reproduce only
-                # this frozen threshold on PS, and verify it is the selected mask.
-                reproduced = process(hu, dict(params, operation='threshold'))
-                if not np.array_equal(mask, reproduced):
-                    raise ValueError('已保存二值输入与原 HU/阈值来源不一致，停止处理')
-                binary = mask != 0
-                op = params['operation']
-                if op == 'erosion': binary = morphology(binary)
-                elif op == 'dilation': binary = morphology(binary, True)
-                elif op == 'opening': binary = morphology(morphology(binary), True)
-                else: binary = morphology(morphology(binary, True))
-                reference = binary.astype(np.uint8)*255
-            reference_ms = (time.perf_counter()-start)*1000
-            receipt = None; image = reference; elapsed = reference_ms
+            source = mask_input[0] if mask_input is not None else None
+            receipt = None
+            reference_ms = None
             if backend == 'FPGA_BASIC':
+                if mask_input is not None:
+                    _, mask = mask_input
+                    # Bind the selected saved input by provenance, not by
+                    # rerunning threshold/morphology on the computer.
+                    if (hashlib.sha256(np.ascontiguousarray(hu).tobytes()).hexdigest() != source['input_hu_sha256']
+                            or hashlib.sha256(np.ascontiguousarray(mask).tobytes()).hexdigest() != source['output_sha256']):
+                        raise ValueError('已保存二值输入的来源或文件哈希变化，停止处理')
                 image, receipt = self.client.basic(hu, params)
-                if not np.array_equal(image, reference):
-                    # Keep actual data on a mismatch. Never replace it with the reference.
-                    failure_id = uuid.uuid4().hex
-                    with (folder/(failure_id+'_basic_mismatch.npz')).open('xb') as stream:
-                        np.savez_compressed(stream, actual=image, reference=reference)
-                    write_new(folder/(failure_id+'_basic_receipt.json'), receipt)
-                    raise ValueError('实际PL输出与独立软件参考不同，已保存真实输出，未使用参考替代')
                 elapsed = receipt['stats']['dma_ms']
+            else:
+                # The explicitly selected computer function remains available;
+                # it is never invoked alongside an FPGA operation.
+                if mask_input is None:
+                    image = process(hu, params)
+                else:
+                    _, mask = mask_input
+                    reproduced = process(hu, dict(params, operation='threshold'))
+                    if not np.array_equal(mask, reproduced):
+                        raise ValueError('已保存二值输入与原 HU/阈值来源不一致，停止处理')
+                    binary = mask != 0
+                    op = params['operation']
+                    if op == 'erosion': binary = morphology(binary)
+                    elif op == 'dilation': binary = morphology(binary, True)
+                    elif op == 'opening': binary = morphology(morphology(binary), True)
+                    else: binary = morphology(morphology(binary, True))
+                    image = binary.astype(np.uint8)*255
+                elapsed = reference_ms = (time.perf_counter()-start)*1000
             result_id = uuid.uuid4().hex
             metadata = dict(schema='ct_workspace_basic_v1', case_id=case_id,
                 analysis_source=copy.deepcopy(self.details.get('analysis_source',{'source_id':'original'})),
@@ -211,20 +214,21 @@ class WorkspaceController(NoduleWorkspaceMixin, ROIWorkspaceMixin, LDCTWorkspace
                 ui_request_id=request_id,
                 input_mask=(dict(result_id=source['result_id'], output_sha256=source['output_sha256'],
                     parameters=source['parameters'], backend=source['backend'], index=source['index'],
-                    note='显式选定已保存阈值结果；兼容板端协议由PS复现相同掩膜，形态学在所选后端执行')
+                    note='显式选定已保存阈值结果；FPGA 任务按原 HU 和保存阈值执行，电脑不重复计算')
                     if mask_input is not None else None),
-                reference_ms=reference_ms, reference_bit_exact=True if receipt else None,
+                reference_ms=reference_ms, software_comparison_performed=False,
                 hardware_receipt=receipt,
                 shape=list(image.shape), output_sha256=hashlib.sha256(image.tobytes()).hexdigest(),
                 input_hu_sha256=hashlib.sha256(np.ascontiguousarray(hu).tobytes()).hexdigest(),
-                note=('实际DMA/PL输出；与参考逐像素一致；切换/往返另计' if receipt else '电脑参考预览，非PL实测')+
+                note=('实际DMA/PL输出；未执行电脑参考计算或逐像素对比；切换/往返另计' if receipt else '电脑参考预览，非PL实测')+
                     '；不修改原HU或分割输入')
             with (folder/(result_id+'_basic.npz')).open('xb') as stream:
                 np.savez_compressed(stream, image=image)
             metadata['host_result_ready_ms'] = (time.perf_counter()-submitted_at)*1000
             metadata['timing_scope'] = dict(
                 processing_ms='PL/DMA（含驱动轮询），或电脑参考运算；不含bit切换与通信',
-                host_result_ready_ms='电脑收到任务至图像落盘；含调度、参考校验、板端往返；不含最终JSON回执写入及浏览器取图显示')
+                host_result_ready_ms=('电脑收到任务至图像落盘；含调度、板端往返与结果保存；未执行电脑参考计算；不含最终JSON回执写入及浏览器取图显示'
+                    if receipt else '电脑收到任务至图像落盘；含调度、电脑参考运算与结果保存；不含最终JSON回执写入及浏览器取图显示'))
             write_new(folder/(result_id+'_basic.json'), metadata)
             with self.lock:
                 self.basic_image = image; self.basic_result = metadata

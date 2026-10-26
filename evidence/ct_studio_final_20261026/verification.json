@@ -1,0 +1,57 @@
+{
+  "status": "PASS_OFFLINE_REGRESSION_PENDING_TARGET_BOARD_ACCEPTANCE",
+  "baseline_commit": "8a2a855a695b6e33b87bc29e8c7f2ae6d78121a5",
+  "date": "2026-10-26",
+  "environment": "Windows x64, existing portable Python 3.11 runtime",
+  "offline_tests": {
+    "core_passed": 134,
+    "core_skipped": 0,
+    "desktop_without_torch_separate_process_passed": 2,
+    "launcher_decisions_passed": 9,
+    "total_passed": 145,
+    "core_modules": [
+      "test_basic_single_path",
+      "test_ct_platform",
+      "test_ct_platform_fast",
+      "test_ct_workspace",
+      "test_ct_studio_boot",
+      "test_integration_release",
+      "test_nodule_speed",
+      "test_nodule_online",
+      "test_ct_nodule_workspace",
+      "test_ct_roi_workspace",
+      "test_ct_studio_shared"
+    ],
+    "hardware_double_used": true,
+    "physical_fpga_inference_performed": false
+  },
+  "source_scope": {
+    "nodule_algorithm_unchanged": true,
+    "board_source_unchanged": true,
+    "fpga_source_unchanged": true,
+    "model_configuration_unchanged": true,
+    "new_model_or_hardware_optimization_included": false,
+    "ps_migration_included": false,
+    "edcnn_experiments_included": false,
+    "original_pc_functions_and_execution_options_preserved": true
+  },
+  "basic_fpga_behavior": {
+    "automatic_pc_reference_removed": true,
+    "automatic_pixel_comparison_removed": true,
+    "request_output_identity_checks_preserved": true,
+    "saved_input_provenance_checked": true,
+    "failure_does_not_fall_back_to_pc": true,
+    "scope": "Offline behavior tests; not a new physical FPGA qualification"
+  },
+  "current_board_check": {
+    "result": "REMOTE_PEER_CLOSED_CONNECTION_WITHOUT_RESPONSE",
+    "services_modified": false,
+    "new_physical_acceptance_completed": false
+  },
+  "public_delivery": {
+    "existing_credentials_included": false,
+    "patient_data_added": false,
+    "private_desktop_runtime_committed": false,
+    "existing_private_token_scan_matches_in_changed_files": 0
+  }
+}

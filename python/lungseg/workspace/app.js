@@ -29,7 +29,7 @@ $('operationNote').textContent=morph?'使用当前切片已保存的阈值二值
 $('prepareMask').onclick=()=>{$('operation').value='threshold';operationChanged();updateBackend();};
 $('operation').onchange=()=>{operationChanged();updateBackend();};
 $('backend').onchange=()=>{updateBackend();markDirty();};
-function markDirty(){if(!result)return;let changed=true;try{const op=$('operation').value,p=isMorphology()?{operation:op}:params(),keys=['window','histogram','pseudocolor'].includes(op)?['operation','wl','ww']:op==='threshold'?['operation','lower','upper']:['operation'];changed=keys.some(k=>p[k]!==result.parameters[k])||index!==result.index||$('backend').value!==result.backend||(isMorphology()&&currentMask()?.result_id!==result.input_mask?.result_id);}catch{}$('resultBadge').textContent=changed?'参数 / 切片已变 · 待应用':result.backend==='FPGA_BASIC'?'实际 PL 输出 · 参考一致':'电脑参考预览';}
+function markDirty(){if(!result)return;let changed=true;try{const op=$('operation').value,p=isMorphology()?{operation:op}:params(),keys=['window','histogram','pseudocolor'].includes(op)?['operation','wl','ww']:op==='threshold'?['operation','lower','upper']:['operation'];changed=keys.some(k=>p[k]!==result.parameters[k])||index!==result.index||$('backend').value!==result.backend||(isMorphology()&&currentMask()?.result_id!==result.input_mask?.result_id);}catch{}$('resultBadge').textContent=changed?'参数 / 切片已变 · 待应用':result.backend==='FPGA_BASIC'?'实际 PL 输出':'电脑参考预览';}
 for(const name of ['wl','ww'])$(name).oninput=()=>{$('preset').value='custom';markDirty();};
 for(const name of ['lower','upper'])$(name).oninput=markDirty;
 $('reset').onclick=()=>{$('operation').value='window';$('preset').value='lung';$('lower').value=-1000;$('upper').value=-400;preset('lung');operationChanged();updateBackend();};
