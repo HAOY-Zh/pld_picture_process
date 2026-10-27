@@ -35,8 +35,8 @@ async function ldctFetch(){
     ldctPayload=value;ldctDraw();const m=value.metadata;
     if(!m){$('ldctResultBadge').textContent='当前层尚未增强';$('ldctResultInfo').textContent='左侧为原始 CT。可先预览当前层，或增强全部已载入切片后继续分析。';return;}
     const hw=m.hardware_receipt;
-    $('ldctResultBadge').textContent=m.backend==='FPGA_LDCT'?'实际 FPGA 输出':'电脑整数参考';
-    $('ldctResultInfo').textContent=`源序列第 ${m.source_slice_index} 层 · ${m.method} · ${m.backend==='FPGA_LDCT'?'DMA/PL/拼图':'电脑整数参考'} ${m.processing_ms.toFixed(2)} ms${hw?` · 往返 ${hw.roundtrip_ms.toFixed(2)} ms · bit切换 ${hw.stats.overlay_switch_ms.toFixed(2)} ms · 实际 ${hw.stats.actual_pl_mhz_after} MHz`:''} · HU/坐标保持一致；没有配对正常剂量参考，不显示质量分数。`;
+    $('ldctResultBadge').textContent=m.backend==='FPGA_LDCT'?'实际 FPGA 输出':'历史电脑参考结果';
+    $('ldctResultInfo').textContent=`源序列第 ${m.source_slice_index} 层 · ${m.method} · ${m.backend==='FPGA_LDCT'?'DMA/PL/拼图':'历史电脑参考结果'} ${m.processing_ms.toFixed(2)} ms${hw?` · 往返 ${hw.roundtrip_ms.toFixed(2)} ms · bit切换 ${hw.stats.overlay_switch_ms.toFixed(2)} ms · 实际 ${hw.stats.actual_pl_mhz_after} MHz`:''} · HU/坐标保持一致；没有配对正常剂量参考，不显示质量分数。`;
   }catch(e){message(e.message,true);}
 }
 function ldctRefresh(){
@@ -57,10 +57,10 @@ function ldctRefresh(){
   fpgaOption.disabled=!fpga;
   fpgaOption.textContent=fpga?'FPGA · 实际硬件':info.fpga_configured?'FPGA · 待连接统一服务':'FPGA · 未配置板端服务';
   $('ldctBackend').disabled=busy;$('ldctMethod').disabled=busy;
-  const hardware=$('ldctBackend').value==='FPGA_LDCT';
-  $('ldctBackendBadge').textContent=hardware?(fpga?'FPGA · 实际输出':'FPGA · 待连接统一服务'):'电脑整数参考';
-  $('ldctBackendNote').textContent=hardware?'仅调用匹配的统一 FPGA 服务；失败后保留错误，不自动改用电脑。':'使用同一组量化权重验证增强流程；本次时间属于电脑参考。';
-  $('ldctPreview').disabled=$('ldctRunVolume').disabled=!state.shape||!info.available||busy||(hardware&&!fpga);
+  $('ldctBackend').value='FPGA_LDCT';
+  $('ldctBackendBadge').textContent=fpga?'FPGA · 实际输出':'FPGA · 待连接统一服务';
+  $('ldctBackendNote').textContent='仅调用匹配的统一 FPGA 服务；失败后保留错误，不自动改用电脑。';
+  $('ldctPreview').disabled=$('ldctRunVolume').disabled=!state.shape||!info.available||busy||!fpga;
   $('ldctCancel').hidden=!info.running;$('ldctSlice').disabled=!state.shape;
   $('ldctSlice').max=state.shape?state.shape[0]-1:0;if(document.activeElement!==$('ldctSlice'))$('ldctSlice').value=index;
   $('ldctProgress').textContent=state.shape?`增强完成 ${info.completed_slices||0} / ${info.total_slices||0} 层`:'尚未载入 CT';
@@ -69,11 +69,11 @@ function ldctRefresh(){
   $('ldctModelInfo').textContent=info.identity?`模型 ${info.identity.model_id.slice(0,16)}…；独立 FPGA 发布版 ${info.identity.clock_mhz} MHz。统一服务实板验收待完成。`:'未配置 LDCT 发布包；基础处理仍可使用。';
   const history=$('ldctHistory');history.replaceChildren();const title=document.createElement('h3');title.textContent='本次增强记录';history.append(title);
   const rows=info.results||[],total=rows.reduce((sum,r)=>sum+r.processing_ms,0);
-  $('ldctPerformance').textContent=rows.length?`当前分析输入：${source.label}。当前增强批次 ${rows.length} 层；${rows[0].backend==='FPGA_LDCT'?'实际 FPGA DMA/PL/拼图':'电脑整数参考'}平均 ${(total/rows.length).toFixed(2)} ms/层，逐层运算合计 ${total.toFixed(2)} ms。`:'尚未执行增强；当前分析输入：'+source.label+'。';
-  for(const r of [...info.results||[]].reverse()){const line=document.createElement('div');line.className='ldct-history-row';for(const text of [`第 ${r.source_slice_index} 层 · ${r.method}`,r.backend==='FPGA_LDCT'?'实际 FPGA':'电脑整数参考',r.processing_ms.toFixed(2)+' ms']){const span=document.createElement('span');span.textContent=text;line.append(span);}history.append(line);}
+  $('ldctPerformance').textContent=rows.length?`当前分析输入：${source.label}。当前增强批次 ${rows.length} 层；${rows[0].backend==='FPGA_LDCT'?'实际 FPGA DMA/PL/拼图':'历史电脑参考结果'}平均 ${(total/rows.length).toFixed(2)} ms/层，逐层运算合计 ${total.toFixed(2)} ms。`:'尚未执行增强；当前分析输入：'+source.label+'。';
+  for(const r of [...info.results||[]].reverse()){const line=document.createElement('div');line.className='ldct-history-row';for(const text of [`第 ${r.source_slice_index} 层 · ${r.method}`,r.backend==='FPGA_LDCT'?'实际 FPGA':'历史电脑参考结果',r.processing_ms.toFixed(2)+' ms']){const span=document.createElement('span');span.textContent=text;line.append(span);}history.append(line);}
   ldctFetch();
 }
-async function ldctStart(mode){try{await command('/api/ldct/run',{case_id:state.case_id,index,mode,backend:$('ldctBackend').value,method:$('ldctMethod').value});}catch(e){message(e.message,true);}}
+async function ldctStart(mode){try{await command('/api/ldct/run',{case_id:state.case_id,index,mode,backend:'FPGA_LDCT',method:$('ldctMethod').value});}catch(e){message(e.message,true);}}
 $('ldctPreview').onclick=()=>ldctStart('slice');$('ldctRunVolume').onclick=()=>ldctStart('volume');
 $('ldctCancel').onclick=()=>command('/api/ldct/cancel',{});
 $('ldctUse').onclick=async()=>{await command('/api/analysis-source',{case_id:state.case_id,source_id:$('ldctUse').dataset.source});showTab('basic');};

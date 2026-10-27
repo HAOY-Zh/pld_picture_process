@@ -1,0 +1,38 @@
+{
+  "status": "CURRENT_LOCAL_RUNTIME_HOST_CHANGES_VERIFIED",
+  "host_files_sha256": {
+    "nodule_threshold_policy.py": "2d4420e52bf4c0386a225c91ccbffa40ac96e718263246f4a87a23fbdbc3c4bb",
+    "nodule_detector.py": "3a1666f087ad01ad52490068d303ce2507fa215618ed508761cb3a5c2a82547a",
+    "nodule_frozen_scoring.py": "40b6f529896074ac746ea56cb8b546944bb984e82f9342e3aa77ae2d12db2dad",
+    "nodule_workspace.py": "b0c609461871769dbb65c648dbe922beba910fb2dd873ccd828391891c34f8fc",
+    "ct_workspace_web.py": "42c9701fca0997a282f115e7874003efb0d56a0c978bd8b992e03cc406323320",
+    "ct_basic_processing.py": "afe2678c292a9d07ed8003a499a93f7cc2b18a9e0ea48882522201b1aefe23bb",
+    "ldct_workspace.py": "fd4f9f8650d1adb21448ce20f1e1d8374632838ea0a823cb56ae798fb1d48252",
+    "lungseg/live_viewer.html": "a6d2dc83d6c56b655c29d52b97e5ebbad3cc0cabb4b2b428a35e5638c3a070b7",
+    "lungseg/workspace/index.html": "cbeca476d4100f05ed0c6e3d2b774562f74fd86679608ae4c5cc152ab36b8eeb",
+    "lungseg/workspace/app.js": "9eb05d77beeab14d58cc5243f7ca7acf0c6f40fa9c50a09499469ff6ba77dc1a",
+    "lungseg/workspace/ldct.js": "4605111cf3312b786d935de5dd6d2631e3b860e3bcb5af0ecaa0c07634099bd1",
+    "lungseg/workspace/nodule.js": "efcaebea2d8383b3f4fcc10f2010a9dd0c1ce825e9f176d31310cde84e5f87f4"
+  },
+  "board_runtime_archive_changed": false,
+  "models_and_bitstreams_changed": false,
+  "default_selection_threshold": 0.7655561641768475,
+  "original_scoring_contract_threshold": 0.6418673229668569,
+  "removed": [
+    "basic_PC_REFERENCE",
+    "LDCT_CPU_REFERENCE",
+    "histogram",
+    "pseudocolor"
+  ],
+  "roi_reference_preserved": true,
+  "full_volume_automatically_displays_cleaned": true,
+  "original_cleanup_algorithm_preserved": true,
+  "unified_bit_work_started": false,
+  "publication_checks": {
+    "unit_tests_passed": 24,
+    "fresh_install_configured_and_desktop_http_pass": true,
+    "all_three_mpr_synthetic_hu_exact": true,
+    "new_patient_inference": false,
+    "public_runtime_archive_unchanged": true
+  }
+}

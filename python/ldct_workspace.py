@@ -6,7 +6,6 @@ import hashlib
 import json
 from pathlib import Path
 import threading
-import time
 import uuid
 import numpy as np
 from ct_studio_client import StudioClient
@@ -29,7 +28,7 @@ def pack_hu(array):
 class LDCTWorkspaceMixin:
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.ldct_release = None; self.ldct_identity = None; self._ldct_arrays = None
+        self.ldct_release = None; self.ldct_identity = None
         self.series_id = None; self.original_hu = None; self.original_details = None
         self.analysis_source_id = 'original'; self.analysis_sessions = {}; self.source_choices = {}
         self.ldct_groups = {}; self.ldct_group = None; self.ldct_running = False
@@ -78,13 +77,13 @@ class LDCTWorkspaceMixin:
             if self.ldct_identity is None:
                 raise ValueError('未配置经过校验的 LDCT 模型')
             backend=values.get('backend'); method=values.get('method','cnn')
-            if backend not in ('CPU_REFERENCE','FPGA_LDCT') or not isinstance(method,str) or method not in METHODS:
+            if backend != 'FPGA_LDCT' or not isinstance(method,str) or method not in METHODS:
                 raise ValueError('请选择有效的执行位置和增强方法')
             if backend=='FPGA_LDCT':
                 if not isinstance(self.client,StudioClient) or not self.status['board_connected']:
-                    raise ValueError('统一 LDCT FPGA 服务尚未连接；可明确选择电脑参考')
+                    raise ValueError('统一 LDCT FPGA 服务尚未连接；请先连接开发板')
                 if self.client.manifest['ldct'] != self.ldct_identity:
-                    raise ValueError('电脑参考与板端 LDCT 版本不匹配')
+                    raise ValueError('上位机与板端 LDCT 版本不匹配')
             mode=values.get('mode','slice'); z=values.get('index')
             if mode not in ('slice','volume') or type(z) is not int or not 0<=z<len(self.original_hu):
                 raise ValueError('增强范围或切片索引无效')
@@ -106,11 +105,10 @@ class LDCTWorkspaceMixin:
             return self.snapshot()
 
     def _enhance(self,indices,backend,method,group_id):
+        if backend != 'FPGA_LDCT':
+            raise ValueError('LDCT 仅支持 FPGA 执行')
         try:
             root=self.output/self.series_id/'ldct'; root.mkdir(exist_ok=True)
-            if backend=='CPU_REFERENCE' and self._ldct_arrays is None:
-                from ctdenoise.cnn_fixed import load_quantized
-                self._ldct_arrays,self._ldct_spec=load_quantized(self.ldct_release/'model')
             def save_slice(done,z,original,output,elapsed,receipt):
                 if output.dtype!=np.int16 or output.shape!=original.shape:
                     raise ValueError('LDCT 输出形状/类型与原始 CT 不一致')
@@ -119,7 +117,7 @@ class LDCTWorkspaceMixin:
                     source_slice_index=self.original_details['source_slice_indices'][z],backend=backend,
                     method=method,model_id=self.ldct_identity['model_id'],input_sha256=digest(original),
                     output_sha256=digest(output),processing_ms=elapsed,hardware_receipt=receipt,
-                    timing_scope=receipt['stats']['timing_scope'] if receipt else 'PC integer reference only',
+                    timing_scope=receipt['stats']['timing_scope'],
                     quality_reference_available=False)
                 with (root/(result_id+'.npz')).open('xb') as f:
                     np.savez_compressed(f,hu=output)
@@ -134,18 +132,8 @@ class LDCTWorkspaceMixin:
                     if self.cancel.is_set():
                         self._update(phase='cancelled'); return
                     original=quantize_slice(self.original_hu[z])
-                    start=time.perf_counter(); receipt=None
-                    if backend=='FPGA_LDCT':
-                        output,receipt=self.client.denoise(original,method)
-                        elapsed=receipt['stats']['total_ms']
-                    else:
-                        if method=='cnn':
-                            from ctdenoise.cnn_fixed import infer_fixed
-                            output=infer_fixed(original,self._ldct_arrays,self._ldct_spec)[0]
-                        else:
-                            from ctdenoise.pl_reference import fixed_filter
-                            output=fixed_filter(original,METHODS[method])
-                        elapsed=(time.perf_counter()-start)*1000
+                    output,receipt=self.client.denoise(original,method)
+                    elapsed=receipt['stats']['total_ms']
                     if pending is not None:pending.result()
                     pending=writer.submit(save_slice,done,z,original,output.copy(),elapsed,receipt)
                 if pending is not None:pending.result()
@@ -165,7 +153,7 @@ class LDCTWorkspaceMixin:
         hu=np.stack([group[z]['hu'] for z in range(len(self.original_hu))]).astype(np.float32)
         source_id='enhanced:'+group_id
         case_id=uuid.uuid4().hex; folder=self.output/case_id; folder.mkdir()
-        descriptor=dict(source_id=source_id,label='LDCT 增强 CT · '+method.upper()+' · '+('电脑参考' if backend=='CPU_REFERENCE' else 'FPGA'),
+        descriptor=dict(source_id=source_id,label='LDCT 增强 CT · '+method.upper()+' · '+'FPGA',
             backend=backend,method=method,model_id=self.ldct_identity['model_id'],
             hu_sha256=digest(hu),case_id=case_id,parent_series_id=self.series_id,group_id=group_id)
         details=copy.deepcopy(self.original_details)

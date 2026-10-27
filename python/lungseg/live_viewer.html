@@ -14,7 +14,7 @@ main{padding:8px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1
 <div class="row hint"><label><input id="confirm" type="checkbox">我确认 NIfTI / NPZ 是 CT HU，空间单位为 mm（DICOM 无需勾选）</label><label>可选 DICOM Series UID <input id="uid" type="text" style="min-width:120px;width:200px"></label></div>
 <div class="row hint"><label><input id="loadExpert" type="checkbox" checked>加载专家标注</label><input id="expertPath" type="text" aria-label="专家标注路径" placeholder="可选：专家 RTSTRUCT / NIfTI / NPZ 路径；留空自动查找 CT 目录中的匹配 RTSTRUCT"><span>标注只用于显示和评价</span></div>
 <div class="row"><button id="slice">计算当前轴位层</button><button id="volume">计算整例并重建</button><button id="cancel">层间停止</button>
-<label>结果 <select id="stage"><option value="body">FPGA 肺区分割</option><option value="cleaned">三维清理后（整例完成）</option></select></label>
+<label>结果 <select id="stage"><option value="cleaned" selected>三维清理后（整例完成自动显示）</option><option value="body">逐层预览 · 三维清理前</option></select></label>
 <label>色块透明度 <input id="alpha" type="range" min="0" max="0.8" step="0.05" value="0.35" style="width:85px"></label>
 <label><input id="showPrediction" type="checkbox" checked>橙色 FPGA 预测</label><label><input id="showExpert" type="checkbox" checked>青色专家标注</label>
 <label>WL <input id="wl" type="number" value="-300"></label><label>WW <input id="ww" type="number" min="1" value="1400"></label><progress id="progress" max="1" value="0"></progress></div>
@@ -37,7 +37,13 @@ function message(t,error=false){$('message').textContent=t;$('message').classNam
 async function api(path,value){const opt={headers:{'X-UI-Token':TOKEN}};if(value!==undefined){opt.method='POST';opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(value);}const r=await fetch(path,opt);const v=await r.json();if(!r.ok)throw Error(v.error||r.statusText);return v;}
 function bits(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
 function bit(a,i){return (a[i>>3]>>(i&7))&1;}
-function validStage(){$('stage').querySelector('[value=cleaned]').textContent=state?.cleanup_policy==='structural-preview'?'结构清理预览 · 近主肺15mm保护':'三维清理后（整例完成）';if($('stage').value==='cleaned'&&!state?.full_volume_ready)$('stage').value='body';}
+function validStage(preferCleaned=false){
+const previous=$('stage').value;
+$('stage').querySelector('[value=cleaned]').textContent=state?.cleanup_policy==='structural-preview'?'结构清理预览 · 近主肺15mm保护':'三维清理后（整例完成自动显示）';
+if(preferCleaned&&state?.full_volume_ready)$('stage').value='cleaned';
+else if($('stage').value==='cleaned'&&!state?.full_volume_ready)$('stage').value='body';
+return previous!==$('stage').value;
+}
 async function command(action,body={}){try{const next=await api('/api/'+action,body);if(next.phase)apply(next);else message(next.message);}catch(e){message(e.message,true);}}
 $('load').onclick=()=>command('load',{path:$('path').value,confirm_hu:$('confirm').checked,series_uid:$('uid').value.trim(),load_slices:$('loadSlices').value,load_expert:$('loadExpert').checked,expert_path:$('expertPath').value});
 $('connect').onclick=()=>command('connect');
@@ -49,11 +55,11 @@ for(let axis=0;axis<3;axis++)for(const prefix of ['s','n'])$(prefix+axis).oninpu
 for(const name of ['alpha','wl','ww'])$(name).oninput=()=>planes.forEach((_,a)=>draw(a));
 for(const name of ['showExpert','showPrediction'])$(name).onchange=()=>{planes.forEach((_,a)=>draw(a));surfaceKey='';refreshSurface();};
 $('stage').onchange=()=>{validStage();surfaceTicket++;surfaceKey='';sceneReady=false;Plotly.purge('scene');$('scene').textContent='正在切换结果阶段';refreshPlanes();refreshSurface();};
-function apply(s){const newCase=s.case_id!==state?.case_id;state=s;const working=busy(s);
+function apply(s){const newCase=s.case_id!==state?.case_id,cleaningCompleted=s.full_volume_ready&&(newCase||!state?.full_volume_ready||s.volume_job_id!==state?.volume_job_id);state=s;const working=busy(s);
 for(const name of ['load','connect'])$(name).disabled=working;
 $('connect').hidden=s.desktop_only===true;
 for(const name of ['slice','volume','selected'])$(name).disabled=working||!s.shape||!s.board_connected;
-$('volume').textContent=s.source?.partial_input?'计算片段并局部重建':'计算整例并重建';
+$('volume').textContent=s.source?.partial_input?'计算片段并局部重建':'整例分割 · 自动三维清理';
 $('scopeBadge').textContent=s.volume_ready?(s.volume_scope==='partial'?`局部三维 · 源 ${s.reconstruction.source_first}-${s.reconstruction.source_last} 层（上下截断）`:'全部输入三维'):'三维肺区';
 $('stage').querySelector('option[value="cleaned"]').disabled=!s.full_volume_ready;
 $('showExpert').disabled=!s.expert_present;
@@ -63,7 +69,7 @@ $('progress').max=Math.max(1,s.total);$('progress').value=s.completed;
 const labels={empty:'等待输入',idle:'就绪',loading:'正在读取 CT（不运行分割）',connecting:'正在核对 FPGA 服务',computing:'正在 FPGA 推理',reconstructing:'推理完成，电脑正在清理 / 重建三维',done:'计算完成',cancelled:'已在层间停止',error:'出错，已停止；不会自动重试 / 重载 FPGA'};
 message((labels[s.phase]||s.phase)+(s.total?' · '+s.completed+'/'+s.total:'')+(s.active_slice!==undefined&&s.phase==='computing'?' · 轴位 '+s.active_slice:'')+(s.error?'\n'+s.error:''),s.phase==='error');
 if(newCase){planes=[null,null,null];$('selection').value='';surfaceKey='';surfaceTicket++;sceneReady=false;Plotly.purge('scene');$('scene').textContent='等待整例实际推理完成';if(s.shape){indices=s.shape.map(n=>Math.floor(n/2));for(let a=0;a<3;a++){for(const p of ['s','n']){$(p+a).max=s.shape[a]-1;$(p+a).value=indices[a];}}}}
-validStage();
+if(validStage(cleaningCompleted)){planes=[null,null,null];tickets=tickets.map(t=>t+1);surfaceTicket++;surfaceKey='';sceneReady=false;Plotly.purge('scene');$('scene').textContent='正在载入当前分割结果';}
 $('stats').textContent=s.shape?`CT ${s.shape.join(' × ')} · 已计算 ${s.known_slices}/${s.shape[0]} 层`+(s.volume_scope==='partial'&&s.region_volume_ml!==null?` · 片段内分割体积 ${s.region_volume_ml.toFixed(1)} mL（非全肺）`:s.volume_ml!==null?` · 清理后输入范围内肺体积 ${s.volume_ml.toFixed(1)} mL`:' · 体积尚不可用')+(s.elapsed_ms?` · 本次任务耗时 ${(s.elapsed_ms/1000).toFixed(2)} s`:'')+comparisonText(s):'尚无输入';
 if(s.source?.partial_input){const ids=s.source.source_slice_indices;$('stats').textContent+=` · 局部输入：原序列 ${ids[0]}-${ids[ids.length-1]} / ${s.source.source_total_slices} 层；仅重建已计算的连续片段，不代表完整肺脏`;}
 if(s.latest){const r=s.latest;$('receipt').textContent=`最近轴位 ${r.slice_index} · FPGA 单层 ${r.stats.host_total_ms.toFixed(1)} ms · 通信往返 ${r.roundtrip_ms.toFixed(1)} ms · ${r.stats.command_count} 条 PL 命令 · FCLK ${r.stats.clock_after.fclk0_mhz} MHz · 请求 ${r.request_id} · head SHA ${r.head_sha256.slice(0,16)}…`;}
@@ -100,7 +106,7 @@ if(local)traces.push(slicePlane3D(r.local_start-.5,'输入起始截断面（非�
 $('scene').textContent='';
 await Plotly.newPlot('scene',traces,{paper_bgcolor:'#121e2d',font:{color:'#cfdded'},margin:{l:0,r:0,b:0,t:0},scene:{aspectmode:'data',xaxis:{title:{text:'LPS X / mm'}},yaxis:{title:{text:'LPS Y / mm'}},zaxis:{title:{text:'LPS Z / mm'}}},uirevision:state.case_id},{responsive:true,displaylogo:false});
 if(ticket!==surfaceTicket)return;
-sceneReady=true;$('meshNote').textContent=(local?`局部三维：源 ${r.source_first}-${r.source_last} 层，共 ${r.slice_count} 层。红色截断面/网格封口不是解剖边界；仅人体约束，不做整肺孤岛清理。`:'全部输入已计算；三维清理后的删除同步反映到全部二维剖面。')+` ${v.length} 顶点 / ${f.length} 面。`;
+sceneReady=true;$('meshNote').textContent=(local?`局部三维：源 ${r.source_first}-${r.source_last} 层，共 ${r.slice_count} 层。红色截断面/网格封口不是解剖边界；仅人体约束，不做整肺孤岛清理。`:(stage==='cleaned'?'全部输入已计算，当前显示三维清理后结果；删除同步反映到全部二维剖面。':'当前手动查看清理前预览；整例完成默认展示三维清理后结果。'))+` ${v.length} 顶点 / ${f.length} 面。`;
 }catch(e){if(ticket===surfaceTicket){surfaceKey='';message(e.message,true);}}}
 function updatePlane3D(){if(sceneReady){const p=plane3D();Plotly.restyle('scene',{x:[p.x],y:[p.y],z:[p.z],i:[p.i],j:[p.j],k:[p.k]},[1]);}}
 new ResizeObserver(()=>{planes.forEach((_,a)=>draw(a));if(sceneReady)Plotly.Plots.resize('scene');}).observe(document.querySelector('main'));

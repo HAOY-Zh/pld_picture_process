@@ -3,6 +3,7 @@ import copy
 import base64
 import hashlib
 import json
+import gzip
 import math
 import re
 import uuid
@@ -10,6 +11,7 @@ import threading
 import time
 
 import numpy as np
+from nodule_threshold_policy import BASE_THRESHOLD,DEFAULT_THRESHOLD,LOW_FP_THRESHOLD,checked_threshold,select_candidates
 
 SCHEMA = 'ct_nodule_prediction_v1'
 REGION = 'predicted_center_and_size_not_voxel_segmentation'
@@ -156,7 +158,8 @@ class NoduleWorkspaceMixin:
             context = self.nodule_context()
             packet = self.nodule_result
             value['nodule'] = dict(service_available=self.nodule_provider is not None,
-                service_status=('INT8整层复用＋冻结跨层评分；系数与阈值固定。新版端到端实板质量待验收。'
+                default_threshold=DEFAULT_THRESHOLD,threshold_presets=[BASE_THRESHOLD,DEFAULT_THRESHOLD,LOW_FP_THRESHOLD],
+                service_status=('INT8整层复用＋冻结跨层评分；默认严格档0.7656，原档可切换。提高阈值可能漏检，分数不是恶性概率。'
                     if self.nodule_provider is not None else '等待整病例检测服务与冻结评分参数；可导入匹配结果进行联动'),
                 job=copy.deepcopy(self.nodule_job),context=context,
                 result={k:packet[k] for k in ('case_id','analysis_source_id','context_id','result_id',
@@ -212,15 +215,16 @@ class NoduleWorkspaceMixin:
             if not self.status.get('board_connected'):raise ValueError('先连接统一 FPGA 服务')
             if not context['whole_case_ready']:raise ValueError('先完成当前所选 CT 的整例肺分割')
             if values.get('scoring_mode')!='frozen_cross_layer':raise ValueError('当前使用冻结跨层评分模式，请刷新网页')
+            threshold=checked_threshold(values.get('selection_threshold',DEFAULT_THRESHOLD))
             job_id='nodule_'+uuid.uuid4().hex
             folder=self.case_folder/'nodule'/job_id;folder.mkdir(parents=True,exist_ok=False)
             self.nodule_job=dict(job_id=job_id,status='RUNNING',stage='search',completed=0,total=0,error=None,
-                analysis_source_id=self.analysis_source_id,case_id=context['case_id'],scoring_mode='frozen_cross_layer')
+                analysis_source_id=self.analysis_source_id,case_id=context['case_id'],scoring_mode='frozen_cross_layer',selection_threshold=threshold)
             self.nodule_cancel_event.clear();self._update(phase='processing',error=None,completed=0,total=0)
-            threading.Thread(target=self._nodule_work,args=(copy.deepcopy(context),folder,self.hu,self.body),daemon=True).start()
+            threading.Thread(target=self._nodule_work,args=(copy.deepcopy(context),folder,self.hu,self.body,threshold),daemon=True).start()
             return self.snapshot()
 
-    def _nodule_work(self, context, folder, hu, lung):
+    def _nodule_work(self, context, folder, hu, lung, threshold=DEFAULT_THRESHOLD):
         from nodule_detector import Cancelled
         began=time.perf_counter()
         def progress(stage,completed,total):
@@ -231,7 +235,7 @@ class NoduleWorkspaceMixin:
                 self.nodule_job.update(stage=stage,completed=completed,total=total,elapsed_ms=(time.perf_counter()-began)*1000)
                 self._update(completed=completed,total=total)
         try:
-            candidates,provenance=self.nodule_provider.run(hu,lung,context['geometry'],context,folder,progress,self.nodule_cancel_event.is_set)
+            candidates,provenance=self.nodule_provider.run(hu,lung,context['geometry'],context,folder,progress,self.nodule_cancel_event.is_set,selection_threshold=threshold)
             if self.nodule_cancel_event.is_set():raise Cancelled('已停止；未发布部分候选')
             packet={k:copy.deepcopy(context[k]) for k in ('case_id','analysis_source_id','context_id','source_hu_sha256','geometry_sha256','segmentation_signature')}
             packet.update(schema=SCHEMA,result_id=self.nodule_job['job_id'],is_test_data=False,
@@ -252,6 +256,58 @@ class NoduleWorkspaceMixin:
                 self._update(phase='error',error=self.nodule_job['error'],board_connected=False)
         finally:
             with (folder/'job.json').open('x',encoding='utf8') as f:json.dump(self.nodule_job,f,ensure_ascii=False,indent=2)
+
+    def filter_nodule(self,values):
+        """Derive a new identified result from saved complete scores, without PL."""
+        began=time.perf_counter()
+        with self.lock:
+            if self.status['phase']in BUSY:raise BlockingIOError('请等待当前任务完成')
+            context=self.nodule_context();packet=self.nodule_result
+            if context is None or packet is None:raise ValueError('先完成当前来源的结节检测')
+            for key in ('case_id','analysis_source_id','context_id'):
+                if values.get(key)!=context[key]:raise ValueError('筛选来源已变化，请刷新网页')
+            if values.get('result_id')!=packet['result_id']:raise ValueError('候选结果已变化，请刷新网页')
+            if packet.get('ingestion_kind')!='computed_live_fpga' or packet.get('is_test_data'):
+                raise ValueError('仅支持本机完成并保存完整评分的真实检测结果')
+            threshold=checked_threshold(values.get('selection_threshold'))
+            old=packet.get('detector_provenance',{})
+            source_id=identifier(old.get('selection_source_result_id',packet['result_id']),'result_id')
+            source_folder=self.case_folder/'nodule'/source_id
+            original=json.loads((source_folder/'prediction.json').read_text(encoding='utf8'))
+            if any(original.get(k)!=context[k]for k in ('case_id','analysis_source_id','context_id','source_hu_sha256','geometry_sha256','segmentation_signature')):
+                raise ValueError('保存的完整候选与当前来源不匹配')
+            ranked_path=source_folder/'all_ranked_candidates.json.gz'
+            # Bounded decode: no unsafe pickle and no imported arbitrary path.
+            with gzip.open(ranked_path,'rt',encoding='utf8')as stream:
+                text=stream.read(32*1024*1024+1)
+            if len(text)>32*1024*1024:raise ValueError('完整候选文件超出上限')
+            rows=json.loads(text)
+            if not isinstance(rows,list)or len(rows)>10000:raise ValueError('完整候选数量无效')
+            checking=copy.deepcopy(original);checking.update(candidates=rows,candidate_count=len(rows))
+            validate_packet(checking,context,allow_enhanced=True)
+            if any(c['score_kind']!='frozen_cross_layer_ranked_score_not_malignancy_probability'for c in rows):
+                raise ValueError('需要冻结跨层评分的完整候选')
+            selected=select_candidates(rows,threshold)
+            derived=copy.deepcopy(packet);result_id='nodule_'+uuid.uuid4().hex
+            derived.update(result_id=result_id,candidates=selected,candidate_count=len(selected))
+            provenance=derived['detector_provenance']
+            provenance.update(additional_score_filter=threshold,selection_source_result_id=source_id,
+                selection_recomputed_without_inference=True,selection_source_sha256=digest(rows))
+            record=provenance.setdefault('score_filter',{})
+            record.update(selection_threshold=threshold,selection_policy='user_selected_development_preset',
+                selected_candidate_count=len(selected),removed_candidate_count=len(rows)-len(selected))
+            derived=validate_packet(derived,context,allow_enhanced=True);derived['ingestion_kind']='computed_live_fpga'
+            folder=self.case_folder/'nodule'/result_id;folder.mkdir(exist_ok=False)
+            job=dict(job_id=result_id,status='COMPLETE',stage='complete',candidate_count=len(selected),
+                case_id=context['case_id'],analysis_source_id=context['analysis_source_id'],
+                operation='threshold_only_no_inference',selection_threshold=threshold,
+                selection_source_result_id=source_id,completed=0,total=0,elapsed_ms=(time.perf_counter()-began)*1000)
+            (folder/'prediction.json').write_text(json.dumps(derived,ensure_ascii=False,allow_nan=False,indent=2),encoding='utf8')
+            (folder/'job.json').write_text(json.dumps(job,ensure_ascii=False,indent=2),encoding='utf8')
+            self.nodule_result=derived;self.nodule_job=job
+            self.nodule_packet_hashes[(context['context_id'],result_id)]=digest(derived)
+            self._update()
+            return self.snapshot()
 
     def nodule_payload(self, case_id, source_id, context_id, result_id):
         with self.lock:

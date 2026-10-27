@@ -5,7 +5,6 @@ OPERATIONS = {
     'window': '窗宽 / 窗位', 'threshold': 'HU 范围阈值',
     'erosion': '二值腐蚀', 'dilation': '二值膨胀',
     'opening': '二值开运算', 'closing': '二值闭运算',
-    'histogram': '直方图均衡', 'pseudocolor': '伪彩映射',
 }
 
 
@@ -58,16 +57,4 @@ def process(hu, params):
         if operation == 'opening': mask = morphology(morphology(mask), True)
         if operation == 'closing': mask = morphology(morphology(mask, True))
         return mask.astype(np.uint8)*255
-    if operation == 'histogram':
-        counts = np.bincount(gray.ravel(), minlength=256); cdf = counts.cumsum()
-        occupied = np.flatnonzero(counts)
-        if len(occupied) <= 1: return gray.copy()
-        first = cdf[occupied[0]]
-        table = np.rint(np.maximum(cdf-first, 0)*255/(gray.size-first)).astype(np.uint8)
-        return table[gray]
-    # Fixed piecewise color ramp, explicitly a display transform, not LDCT enhancement.
-    knots = np.array([0, .25, .5, .75, 1.])
-    colors = np.array([[16, 20, 67], [27, 103, 161], [34, 190, 163],
-                       [241, 218, 94], [250, 111, 73]])
-    x = gray.astype(float)/255
-    return np.stack([np.interp(x, knots, colors[:, c]) for c in range(3)], -1).astype(np.uint8)
+    raise ValueError('不支持的基础处理')

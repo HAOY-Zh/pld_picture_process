@@ -78,7 +78,7 @@ class WorkspaceController(NoduleWorkspaceMixin, ROIWorkspaceMixin, LDCTWorkspace
             value['basic'] = copy.deepcopy(self.basic_result)
             value['threshold_input'] = copy.deepcopy(self.threshold_result)
             value['workspace_history'] = copy.deepcopy(self.history[-30:])
-            value['basic_backend'] = 'FPGA_BASIC' if isinstance(self.client, PlatformClient) else 'PC_REFERENCE'
+            value['basic_backend'] = 'FPGA_BASIC'
             value['basic_pl_configured'] = isinstance(self.client, PlatformClient)
             value['basic_pl_operations'] = list(self.client.manifest['basic']) if isinstance(self.client, PlatformClient) else []
             value['desktop_only'] = self.client is None
@@ -120,14 +120,14 @@ class WorkspaceController(NoduleWorkspaceMixin, ROIWorkspaceMixin, LDCTWorkspace
                 # Freeze an explicitly selected result, not the current HU controls.
                 params = dict(source['parameters'], operation=params['operation'])
                 mask_input = (copy.deepcopy(source), self.threshold_image.copy())
-            backend = values.get('backend', 'PC_REFERENCE')
-            if backend not in ('PC_REFERENCE', 'FPGA_BASIC'): raise ValueError('无效执行位置')
+            backend = values.get('backend', 'FPGA_BASIC')
+            if backend != 'FPGA_BASIC': raise ValueError('基础处理仅支持 FPGA 执行，请先连接开发板')
             if backend == 'FPGA_BASIC':
                 if not isinstance(self.client, PlatformClient):
                     raise ValueError('请使用统一PL服务配置启动网页；不会自动改用电脑计算')
                 if not self.status['board_connected']: raise ValueError('请先连接统一FPGA服务')
                 if params['operation'] not in self.client.manifest['basic']:
-                    raise ValueError('该方法尚无现有PL模块，请明确选择电脑参考预览')
+                    raise ValueError('该方法没有匹配的 PL 模块，不能执行')
                 if self.hu[index].shape != (512,512):
                     raise ValueError('现有基础PL要求原生512×512切片，不自动缩放')
             hu = self.hu[index].copy(); case_id = self.status['case_id']
@@ -174,6 +174,8 @@ class WorkspaceController(NoduleWorkspaceMixin, ROIWorkspaceMixin, LDCTWorkspace
 
     def _basic_work(self, hu, index, source_index, case_id, folder, params, backend,
                     mask_input, request_id, submitted_at):
+        if backend != 'FPGA_BASIC':
+            raise ValueError('基础处理仅支持 FPGA 执行')
         try:
             start = time.perf_counter()
             if mask_input is None:
@@ -355,7 +357,7 @@ workspacePendingSlice=m;workspaceApplySlice();}
 
         def do_POST(self):
             parts = parse.urlsplit(self.path)
-            if parts.path in ('/api/nodule/import','/api/nodule/fixture','/api/nodule/clear','/api/nodule/run','/api/nodule/cancel'):
+            if parts.path in ('/api/nodule/import','/api/nodule/fixture','/api/nodule/clear','/api/nodule/run','/api/nodule/cancel','/api/nodule/filter'):
                 if not self.allowed(True): return
                 try:
                     length = int(self.headers.get('Content-Length', '0'))
@@ -366,6 +368,7 @@ workspacePendingSlice=m;workspaceApplySlice();}
                     if len(raw) != length: raise ValueError('候选传输未完成')
                     values = json.loads(raw)
                     if not isinstance(values,dict): raise ValueError('需要 JSON 对象')
+                    if parts.path.endswith('/filter'):return self.send(200,controller.filter_nodule(values))
                     if parts.path.endswith('/run'):
                         if controller.nodule_provider is None:
                             return self.send(501,dict(error='尚未配置真实整病例检测服务；不会生成模拟检测结果'))
@@ -442,7 +445,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument('--config', type=Path, help='真实板端服务配置；配置错误时直接报错，不回退')
-    mode.add_argument('--desktop', action='store_true', help='电脑浏览与基础参考，不加载模型或连接FPGA')
+    mode.add_argument('--desktop', action='store_true', help='电脑浏览，不执行基础处理或神经分割')
     parser.add_argument('--port', type=int, default=8090)
     parser.add_argument('--ldct-release',type=Path,help='已验证的 LDCT 发布目录；默认采用主模型配置的100MHz版')
     parser.add_argument('--output', type=Path, default=ROOT/'data/ct_workspace_20261017/results')

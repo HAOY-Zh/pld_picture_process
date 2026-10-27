@@ -13,6 +13,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from ct_basic_processing import parameters, process
 from ct_workspace_web import WorkspaceController, workspace_handler
+from ct_platform_client import PlatformClient
 from lung_unet import torch_module
 from test_lung_live import (BoardClient, FakeHardware, InferenceService, MODEL,
     RunningServer, TOKEN, board_handler)
@@ -36,13 +37,13 @@ class BasicReferenceTests(unittest.TestCase):
         b=process(a,dict(operation='window',wl=0,ww=5))
         np.testing.assert_array_equal(b,[[0,0,51,102,153,255,255]])
 
-    def test_processing_does_not_mutate_hu_and_constant_equalization_is_defined(self):
+    def test_processing_does_not_mutate_hu_and_removed_operations_rejected(self):
         a=np.full((16,16),40,np.float32);old=a.copy()
-        for op in ['window','histogram','pseudocolor','opening']:
+        for op in ['window','threshold','erosion','dilation','opening','closing']:
             b=process(a,dict(operation=op))
             self.assertEqual(b.dtype,np.uint8);np.testing.assert_array_equal(a,old)
-        np.testing.assert_array_equal(process(a,dict(operation='histogram')),
-                                      process(a,dict(operation='window')))
+        for op in ('histogram','pseudocolor'):
+            with self.assertRaises(ValueError):process(a,dict(operation=op))
 
     def test_invalid_parameters_and_out_of_int16_hu_rejected(self):
         for values in [dict(ww=0),dict(wl=True),dict(lower=2,upper=1),dict(operation='ldct')]:
@@ -58,19 +59,36 @@ def wait(controller):
     return controller.snapshot()
 
 
+class TestBasicClient(PlatformClient):
+    """Synthetic protocol stub; never labels these tests as physical board tests."""
+    __test__ = False
+    def __init__(self, url):
+        super().__init__(url,TOKEN,dict(basic={op:{} for op in
+            ('window','threshold','erosion','dilation','opening','closing')}))
+        self.basic_calls=0
+    def health(self):
+        return BoardClient.health(self)
+    def basic(self,hu,supplied):
+        self.basic_calls+=1
+        return process(hu,supplied),dict(stats=dict(dma_ms=.2),roundtrip_ms=.3)
+
+
 class WorkspaceTests(unittest.TestCase):
     def setUp(self):
         # Match both production entrypoints; avoid oversubscribing the board
         # build host during the preserved Torch pre/postprocessing checks.
         torch_module().set_num_threads(2)
         self.temp=tempfile.TemporaryDirectory();self.root=Path(self.temp.name)
-        hu=np.full((3,32,32),-800,np.float32)
+        hu=np.full((3,512,512),-800,np.float32)
         self.path=self.root/'ct.npz'
         np.savez(self.path,hu=hu,spacing_zyx_mm=[3.,1.,1.],origin_lps_mm=[0,0,0],
                  orientation=[1,0,0,0,1,0])
         self.hw=FakeHardware();self.board=RunningServer(board_handler(InferenceService(self.hw,TOKEN)))
-        self.controller=WorkspaceController(BoardClient(self.board.url,TOKEN),MODEL,self.root/'results')
+        self.client=TestBasicClient(self.board.url)
+        self.controller=WorkspaceController(self.client,MODEL,self.root/'results')
         self.controller.submit('load',dict(path=str(self.path),confirm_hu=True,load_expert=False))
+        self.assertEqual(wait(self.controller)['phase'],'idle')
+        self.controller.submit('connect',{})
         self.assertEqual(wait(self.controller)['phase'],'idle')
 
     def tearDown(self):
@@ -81,13 +99,13 @@ class WorkspaceTests(unittest.TestCase):
         self.controller.submit('basic',dict(case_id=s['case_id'],index=1,operation='threshold'))
         s=wait(self.controller);self.assertEqual(s['phase'],'done');return s
 
-    def test_basic_has_no_fpga_calls_no_neural_mask_and_preserves_input(self):
+    def test_stub_basic_has_no_neural_calls_or_mask_and_preserves_input(self):
         before=self.controller.hu.copy();s=self.basic()
         self.assertEqual(self.hw.calls,0);self.assertEqual(s['known_slices'],0)
-        self.assertIsNone(s['latest']);self.assertEqual(s['basic']['backend'],'PC_REFERENCE')
+        self.assertIsNone(s['latest']);self.assertEqual(s['basic']['backend'],'FPGA_BASIC');self.assertEqual(self.client.basic_calls,1)
         np.testing.assert_array_equal(before,self.controller.hu)
         p=self.controller.basic_payload(s['case_id'],s['basic']['result_id'])
-        self.assertEqual(len(base64.b64decode(p['image']['pixels'])),32*32)
+        self.assertEqual(len(base64.b64decode(p['image']['pixels'])),512*512)
         self.assertEqual(len(list(self.controller.case_folder.glob('*_basic.json'))),1)
 
     def test_new_case_invalidates_old_basic_result_and_does_not_leak_history(self):
@@ -173,7 +191,7 @@ class WorkspaceTests(unittest.TestCase):
                 'X-UI-Token':TOKEN,'Content-Type':'application/json'})
             self.assertEqual(request.urlopen(req).status,202);wait(self.controller)
             req=request.Request(web.url+'/api/export',headers={'X-UI-Token':TOKEN})
-            value=json.load(request.urlopen(req));self.assertEqual(value['state']['basic']['backend'],'PC_REFERENCE')
+            value=json.load(request.urlopen(req));self.assertEqual(value['state']['basic']['backend'],'FPGA_BASIC')
         finally:web.close()
 
 

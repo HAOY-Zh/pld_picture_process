@@ -14,6 +14,7 @@ from nodule_vendor.nodule_canvas import lower_canvas, extract_tile_heads, valid_
 from nodule_vendor.nodule_fast_input import SharedPlaneSampler
 from nodule_vendor.lung_nodule_cnn import config_from_dict, tiles, decode, consolidate
 from nodule_frozen_scoring import load_scoring, score_candidates
+from nodule_threshold_policy import DEFAULT_THRESHOLD,checked_threshold
 
 PIPELINE = 'int8_canvas_cached_exact_frozen_cross_layer_v3'
 
@@ -52,7 +53,8 @@ class NoduleCaseProvider:
             [Path(__file__),Path(__file__).with_name('nodule_frozen_scoring.py'),Path(__file__).with_name('nodule_exact_host.py')]+list(
                 Path(__file__).parent.joinpath('nodule_vendor').glob('nodule_canvas.py'))}
 
-    def run(self, hu, lung, geometry, context, folder, progress, cancelled):
+    def run(self, hu, lung, geometry, context, folder, progress, cancelled, selection_threshold=DEFAULT_THRESHOLD):
+        selection_threshold=checked_threshold(selection_threshold)
         self.client.health()
         started = time.perf_counter()
         folder = Path(folder)
@@ -108,7 +110,7 @@ class NoduleCaseProvider:
         progress('cross_layer_scoring', len(jobs), len(jobs))
         try:
             selected, score_record = score_candidates(hu, geometry['spacing_zyx_mm'], candidates,
-                self.scoring, self.ranker, folder, cancelled)
+                self.scoring, self.ranker, folder, cancelled, selection_threshold=selection_threshold)
         except InterruptedError as exc: raise Cancelled(str(exc))
         check()
         timing['scoring_ms'] = score_record['scoring_ms']
@@ -120,7 +122,7 @@ class NoduleCaseProvider:
             lung_mask_stage='body',geometry_sha256=context['geometry_sha256'],segmentation_signature=context['segmentation_signature'],
             service_bundle_sha256=self.bundle['service_bundle_sha256'],shared_nodule=self.bundle['shared_nodule'],
             detector_config=self.model['detector_config'],sampling_decode_code_sha256=self.code_hashes,
-            raw_decode_floor=self.config.decode_floor,additional_score_filter=self.scoring['threshold'],
+            raw_decode_floor=self.config.decode_floor,additional_score_filter=selection_threshold,
             ranker_applied=True,score_filter=score_record,schedule=schedule,timing=timing,
             transport=dict(canvases=len(groups),original_tiles=len(jobs),prefetch_canvases=1,
                 sampling_overlaps_transfer=True,input='zlib-five-plane-uint8-native-CMA-binary-persistent',no_patch_fallback=True),

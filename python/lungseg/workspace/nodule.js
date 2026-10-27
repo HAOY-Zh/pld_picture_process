@@ -65,12 +65,15 @@
     $('noduleRun').disabled=!has||busy()||!ready||!state.nodule.service_available||!state.board_connected;
     $('noduleRun').textContent=running?`检测中 · ${job.completed}/${job.total||'…'} patch`:'检测当前 CT · 整层加速＋冻结评分';
     $('noduleCancel').hidden=!running;
+    $('noduleThreshold').disabled=busy();
+    $('noduleFilter').disabled=!online||busy();
     $('noduleManualRoi').disabled=!has||busy();
     $('noduleBadge').textContent=!packet?'尚无候选结果':packet.is_test_data?'联动测试 · 非检测结果':online?(packet.detector_provenance?.ranker_applied?'FPGA 候选 · 冻结跨层评分':'FPGA 历史候选 · 原始分数'):'导入候选 · 本机未执行检测';
     $('noduleBadge').className='chip'+(packet?.is_test_data?' amber':'');
     $('noduleCount').textContent=!packet?'尚无结果':packet.candidate_count?`${packet.is_test_data?'测试候选':'候选'} ${packet.candidate_count} 项 · 保持服务排序`:'未检出满足当前条件的候选'+(packet.is_test_data?'（测试空结果）':'');
+    if(packet?.detector_provenance?.additional_score_filter!==undefined)$('noduleCount').textContent+=` · 已应用阈值 ${Number(packet.detector_provenance.additional_score_filter).toFixed(4)}`;
     const jobMessage=running?`${state.analysis_source.label} · ${job.stage==='search'?'生成搜索区域':job.stage==='merge'?'合并三维候选':`实际 FPGA 推理 ${job.completed}/${job.total} patch`}；完成后发布完整候选。`:job?.status==='FAILED'?job.error:job?.status==='CANCELLED'?'检测已停止，未发布部分候选。':null;
-    const elapsedNote=online&&job?.status==='COMPLETE'&&job.job_id===packet.result_id&&Number.isFinite(job.elapsed_ms)?`实际检测完成 · ${(job.elapsed_ms/1000).toFixed(2)} 秒 · ${job.completed} patch。 `:'';
+    const elapsedNote=job?.operation==='threshold_only_no_inference'?`仅重新筛选 · ${(job.elapsed_ms/1000).toFixed(3)} 秒，未重跑 CNN。 `:online&&job?.status==='COMPLETE'&&job.job_id===packet.result_id&&Number.isFinite(job.elapsed_ms)?`实际检测完成 · ${(job.elapsed_ms/1000).toFixed(2)} 秒 · ${job.completed} patch。 `:'';
     status(localError||jobMessage||(!has?'先加载 CT；候选绑定当前 HU 来源与几何。':packet?.is_test_data?'当前是几何联动测试数据，未执行检测，不代表检出效果。':online?`${elapsedNote}${state.analysis_source.label} · ${packet.detector_provenance?.ranker_applied?'实际 FPGA 整层复用＋冻结跨层评分':'历史 FPGA 原始候选'}；分数非恶性概率，当前输入的检测质量尚未验收。`:packet?'已导入匹配当前上下文的候选；推理来源以导入记录为准。':ready?state.nodule.service_status:'先完成当前所选 CT 的整例肺分割。也可直接框选 ROI，无需先检测。'),!!localError||job?.status==='FAILED');
     for(const button of $('noduleList').querySelectorAll('button')){button.setAttribute('aria-pressed',String(button.dataset.candidateId===selectedId));button.disabled=busy();}
     $('noduleSelected').textContent=c?`${c.candidate_id} · 中心 ZYX [${c.center_index_zyx.join(', ')}] · ${c.score_kind}`:'尚未选择候选。';
@@ -146,7 +149,8 @@
   }
   function download(value,name){const link=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
   $('noduleFixture').onclick=()=>action('fixture');$('noduleClear').onclick=()=>action('clear');
-  $('noduleRun').onclick=()=>action('run',{scoring_mode:'frozen_cross_layer'});
+  $('noduleRun').onclick=()=>action('run',{scoring_mode:'frozen_cross_layer',selection_threshold:Number($('noduleThreshold').value)});
+  $('noduleFilter').onclick=()=>action('filter',{result_id:packet.result_id,selection_threshold:Number($('noduleThreshold').value)});
   $('noduleCancel').onclick=()=>action('cancel',{job_id:state.nodule.job.job_id});
   $('noduleFile').onchange=async()=>{try{const file=$('noduleFile').files[0];if(!file)return;if(file.size>8*1024*1024)throw Error('候选 JSON 超过 8MB');const p=JSON.parse(await file.text());await action('import',{packet:p});}catch(e){localError=e.message;render();}finally{$('noduleFile').value='';}};
   $('noduleContext').onclick=()=>download({schema:'ct_nodule_context_v1',context:context()},'ct-nodule-context.json');

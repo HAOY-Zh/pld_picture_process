@@ -1,4 +1,4 @@
-"""Desktop mode uses real software processing and never pretends to infer on PL."""
+"""Desktop mode browses CT and rejects removed software execution paths."""
 import base64
 from pathlib import Path
 import sys
@@ -22,7 +22,7 @@ def wait(controller):
 
 
 class DesktopTests(unittest.TestCase):
-    def test_load_and_reference_without_model_credentials_or_torch(self):
+    def test_load_without_model_credentials_and_reject_reference_execution(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             path = root/'synthetic.npz'
@@ -34,16 +34,16 @@ class DesktopTests(unittest.TestCase):
             controller.submit('load', dict(path=str(path), confirm_hu=True, load_expert=False))
             state = wait(controller)
             self.assertEqual(state['phase'], 'idle')
-            controller.submit('basic', dict(case_id=state['case_id'], index=1,
-                              backend='PC_REFERENCE', operation='threshold', lower=-1000, upper=-400))
-            state = wait(controller)
-            self.assertEqual(state['phase'], 'done')
-            self.assertEqual(state['basic']['backend'], 'PC_REFERENCE')
+            for backend in ('PC_REFERENCE','FPGA_BASIC'):
+                with self.assertRaises(ValueError):
+                    controller.submit('basic',dict(case_id=state['case_id'],index=1,
+                        backend=backend,operation='threshold',lower=-1000,upper=-400))
+            state=controller.snapshot()
+            self.assertEqual(state['phase'],'idle')
+            self.assertIsNone(state['basic'])
             self.assertIsNone(state['latest'])
-            self.assertEqual(state['known_slices'], 0)
-            payload = controller.basic_payload(state['case_id'], state['basic']['result_id'])
-            self.assertEqual(set(base64.b64decode(payload['image']['pixels'])), {255})
-            self.assertNotIn('torch', sys.modules)
+            self.assertEqual(state['known_slices'],0)
+
 
     def test_hardware_actions_are_rejected_and_never_report_connected(self):
         with tempfile.TemporaryDirectory() as tmp:
