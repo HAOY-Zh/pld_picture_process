@@ -1,0 +1,34 @@
+{
+  "status": "FRESH_INSTALL_ACTUAL_WEB_PASS",
+  "modes": {
+    "configured": {
+      "http_200": true,
+      "profile": "exact_host_raw_r3",
+      "synthetic_shape": [
+        8,
+        128,
+        128
+      ],
+      "all_three_mpr_hu_exact": true,
+      "board_connected": false,
+      "fpga_calls": 0
+    },
+    "desktop": {
+      "http_200": true,
+      "profile": "exact_host_raw_r3",
+      "synthetic_shape": [
+        8,
+        128,
+        128
+      ],
+      "all_three_mpr_hu_exact": true,
+      "board_connected": false,
+      "fpga_calls": 0
+    }
+  },
+  "patient_data_used": false,
+  "board_accessed": false,
+  "tested_source_commit": "40e4cc0",
+  "validation_environment": "Author verified Python 3.11 dependencies; fresh committed tree and fresh generated runtime, not a clean OS dependency installation",
+  "pinned_distribution_availability_checked_on_official_pypi": true
+}
