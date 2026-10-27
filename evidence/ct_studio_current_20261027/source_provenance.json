@@ -17,7 +17,7 @@
     "lungseg/workspace/series.js": "b6d4b5c8f2dade11cbc207dd28ff119eb0dc2f0173346bbf38a9da55fb8d70df",
     "lungseg/live_viewer.html": "ca89aa4deb486266f4b6da77e73ace275cd50c2417af2767f48b5ae1bdc6d3f2"
   },
-  "launcher_only_changes": "Portable installed config default and default port 8099; bat setup/aliases added.",
+  "launcher_only_changes": "Portable current config and LDCT default paths, port 8099; setup and bat aliases. No numerical algorithm changes.",
   "default_ldct_route": "/v1/ldct",
   "host_speed_profile": "exact_host_raw_r3",
   "default_cleanup": "legacy",
@@ -34,5 +34,7 @@
   },
   "models_and_bits_unchanged": true,
   "credentials_included": false,
-  "patient_data_included": false
+  "patient_data_included": false,
+  "protected_numerical_assets_exact": 21,
+  "committed_core_host_bytes_exact": true
 }

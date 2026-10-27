@@ -30,5 +30,6 @@
   "board_accessed": false,
   "tested_source_commit": "40e4cc0",
   "validation_environment": "Author verified Python 3.11 dependencies; fresh committed tree and fresh generated runtime, not a clean OS dependency installation",
-  "pinned_distribution_availability_checked_on_official_pypi": true
+  "pinned_distribution_availability_checked_on_official_pypi": true,
+  "subsequent_source_adjustment": "Preserve the original lung_live_web.py CRLF bytes in Git; no code behavior change."
 }
