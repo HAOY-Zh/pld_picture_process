@@ -4,9 +4,9 @@
   "source_checkpoint_sha256": "0fd09c0901d395384d7d28d272935d121bb005dc2ef318f31add8a06b1ce24f5",
   "integer_weights_sha256": "00d7d04f33219c381ad748ae4c869a046538ef7c176e96e2031202b15b0ae022",
   "primary_model": "new_epoch118_equalized_channel5_qsafe",
-  "model_dir": "data/ct_studio_current_20261026/ct_studio/ldct/model",
-  "preferred_release": "data/ct_studio_current_20261026/ct_studio/ldct",
+  "model_dir": "data/ct_studio_current_20261027/ct_studio/ldct/model",
+  "preferred_release": "data/ct_studio_current_20261027/ct_studio/ldct",
   "preferred_clock_mhz": 100.0,
   "status": "50MHz and 100MHz timing/simulation/borrowed-interface/actual-FPGA qualification PASS",
-  "upgrade_100mhz": "data/ct_studio_current_20261026/ct_studio/ldct"
+  "upgrade_100mhz": "data/ct_studio_current_20261027/ct_studio/ldct"
 }
