@@ -35,3 +35,4 @@ python/lung_live_web.py -text -whitespace
 python/lungseg/workspace/series.js -text -whitespace
 python/lungseg/live_viewer.html -text -whitespace
 pynq/ct_dual_io_service.py -text -whitespace
+pynq/shared_patch_contract.py -text -whitespace
