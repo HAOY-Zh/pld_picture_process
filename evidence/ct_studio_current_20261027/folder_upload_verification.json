@@ -1,0 +1,14 @@
+{
+  "status": "ACTUAL_IAB_FOLDER_PICKER_IMPORT_300_PASS",
+  "url": "http://127.0.0.1:8099/",
+  "synthetic_only": true,
+  "files": 300,
+  "all_uploaded_bytes_exact": true,
+  "visible_series_count": 1,
+  "visible_slices": 300,
+  "visible_geometry_check_passed": true,
+  "frontend_file_body": "ArrayBuffer",
+  "network_retries": 2,
+  "duplicate_upload_requires_same_name_size_and_sha256": true,
+  "board_service_restarted": false
+}

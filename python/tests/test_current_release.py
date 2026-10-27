@@ -43,6 +43,7 @@ class CurrentReleaseTests(unittest.TestCase):
             release.verify(folder)
             client,manifest=configuration(folder/'host_config.json')
             self.assertEqual(client.__class__.__name__,'DualSegStudioClient')
+            self.assertEqual(manifest['ldct_lossless_interface'],'ct_ldct_zlib_v1')
             provider=NoduleCaseProvider(folder,client)
             self.assertEqual(provider.scoring['threshold'],0.6418673229668569)
             self.assertEqual(provider.client.bundle['dual_io_interface'],'ct_dual_exact_io_v3')
@@ -51,7 +52,7 @@ class CurrentReleaseTests(unittest.TestCase):
 
     def test_boot_unit_uses_current_owner_and_generated_identity(self):
         text=unit_text('/home/xilinx/ct_test/ct_studio_current','a'*64)
-        self.assertIn('ct_dual_io_owner.py',text)
+        self.assertIn('ct_ldct_lossless_owner.py',text)
         self.assertIn('--expected-manifest '+('a'*64),text)
         self.assertIn('SendSIGKILL=no',text)
         self.assertNotIn('Requires=ct-studio-shared-batch.service',text)

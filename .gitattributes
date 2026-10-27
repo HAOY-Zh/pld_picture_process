@@ -15,3 +15,23 @@ runtime/ct_studio_integration_20261025/** -text whitespace=cr-at-eol
 runtime/ct_studio_current_20261026/** -text whitespace=cr-at-eol
 hardware/ct_studio_current_20261026/** -text -whitespace
 /start_ct_studio_current.cmd text eol=crlf
+
+runtime/ct_studio_current_20261027/** -text whitespace=cr-at-eol
+hardware/ct_studio_current_20261027/** -text -whitespace
+/setup_ct_studio_current.cmd text eol=crlf
+/start_ct_studio_preview.cmd text eol=crlf
+
+# Preserve exact current host source provenance across Windows checkouts.
+python/ct_workspace_web.py -text -whitespace
+python/ct_series_import.py -text -whitespace
+python/ldct_workspace.py -text -whitespace
+python/nodule_detector.py -text -whitespace
+python/nodule_exact_host.py -text -whitespace
+python/lung_structural_cleanup.py -text -whitespace
+python/nodule_frozen_scoring.py -text -whitespace
+python/ct_dual_io_client.py -text -whitespace
+python/ct_ldct_lossless_client.py -text -whitespace
+python/lung_live_web.py -text -whitespace
+python/lungseg/workspace/series.js -text -whitespace
+python/lungseg/live_viewer.html -text -whitespace
+pynq/ct_dual_io_service.py -text -whitespace

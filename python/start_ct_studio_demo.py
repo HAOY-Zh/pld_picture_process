@@ -62,6 +62,8 @@ def web_info(url,manifest):
     info=read_web_info(url)
     if info is None:return None
     opener,headers,state=info
+    if state.get('host_speed_profile')!='exact_host_raw_r3':
+        raise ValueError('Port belongs to another host version; preserve it and select a new port')
     if (state.get('desktop_only') is not False or not state.get('fast_platform_active')
             or state.get('ldct',{}).get('identity')!=manifest['ldct']
             or not state['ldct'].get('fpga_configured')):
@@ -220,14 +222,14 @@ def launch(args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config',type=Path,default=ROOT/'data/ct_studio_ldct_fast_03/host_config.json')
-    parser.add_argument('--desktop',action='store_true',help='电脑参考模式，不连接开发板；默认端口8096')
-    parser.add_argument('--port',type=int,help='实板默认8095，电脑模式默认8096')
+    parser.add_argument('--config',type=Path,default=ROOT/'data/ct_studio_current_20261027/host_config.json')
+    parser.add_argument('--desktop',action='store_true',help='电脑参考模式，不连接开发板；默认端口8099')
+    parser.add_argument('--port',type=int,help='默认8099；并行查看其他页面时显式选择另一端口')
     parser.add_argument('--check-only',action='store_true',help='只读检查，不启动或打开网页')
     parser.add_argument('--no-browser',action='store_true',help='检查或启动服务，但不打开浏览器')
     parser.add_argument('--wait-seconds',type=int,default=300,help='等待板端开机就绪的最长秒数，默认300')
     args=parser.parse_args()
-    if args.port is None:args.port=8096 if args.desktop else 8095
+    if args.port is None:args.port=8099
     if not 1<=args.port<=65535:parser.error('端口须为1至65535')
     if not 0<=args.wait_seconds<=900:parser.error('等待时间须为0至900秒')
     try:return launch_desktop(args) if args.desktop else launch(args)

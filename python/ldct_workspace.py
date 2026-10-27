@@ -1,5 +1,6 @@
 """LDCT jobs and immutable, independently cached analysis sources on the PC."""
 import base64
+from concurrent.futures import ThreadPoolExecutor
 import copy
 import hashlib
 import json
@@ -110,22 +111,7 @@ class LDCTWorkspaceMixin:
             if backend=='CPU_REFERENCE' and self._ldct_arrays is None:
                 from ctdenoise.cnn_fixed import load_quantized
                 self._ldct_arrays,self._ldct_spec=load_quantized(self.ldct_release/'model')
-            for done,z in enumerate(indices,1):
-                if self.cancel.is_set():
-                    self._update(phase='cancelled'); return
-                original=quantize_slice(self.original_hu[z])
-                start=time.perf_counter(); receipt=None
-                if backend=='FPGA_LDCT':
-                    output,receipt=self.client.denoise(original,method)
-                    elapsed=receipt['stats']['total_ms']
-                else:
-                    if method=='cnn':
-                        from ctdenoise.cnn_fixed import infer_fixed
-                        output=infer_fixed(original,self._ldct_arrays,self._ldct_spec)[0]
-                    else:
-                        from ctdenoise.pl_reference import fixed_filter
-                        output=fixed_filter(original,METHODS[method])
-                    elapsed=(time.perf_counter()-start)*1000
+            def save_slice(done,z,original,output,elapsed,receipt):
                 if output.dtype!=np.int16 or output.shape!=original.shape:
                     raise ValueError('LDCT 输出形状/类型与原始 CT 不一致')
                 result_id=uuid.uuid4().hex
@@ -142,6 +128,27 @@ class LDCTWorkspaceMixin:
                 with self.lock:
                     self.ldct_groups[group_id][z]=dict(hu=output.copy(),metadata=metadata)
                     self._update(completed=done)
+            with ThreadPoolExecutor(max_workers=1,thread_name_prefix='ldct-save') as writer:
+                pending=None
+                for done,z in enumerate(indices,1):
+                    if self.cancel.is_set():
+                        self._update(phase='cancelled'); return
+                    original=quantize_slice(self.original_hu[z])
+                    start=time.perf_counter(); receipt=None
+                    if backend=='FPGA_LDCT':
+                        output,receipt=self.client.denoise(original,method)
+                        elapsed=receipt['stats']['total_ms']
+                    else:
+                        if method=='cnn':
+                            from ctdenoise.cnn_fixed import infer_fixed
+                            output=infer_fixed(original,self._ldct_arrays,self._ldct_spec)[0]
+                        else:
+                            from ctdenoise.pl_reference import fixed_filter
+                            output=fixed_filter(original,METHODS[method])
+                        elapsed=(time.perf_counter()-start)*1000
+                    if pending is not None:pending.result()
+                    pending=writer.submit(save_slice,done,z,original,output.copy(),elapsed,receipt)
+                if pending is not None:pending.result()
             with self.lock:
                 self._register_enhanced_source(group_id,backend,method)
                 self._update(phase='done')

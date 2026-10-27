@@ -1,0 +1,38 @@
+{
+  "base_commit": "58ec1d49cfdcceb6e70ddcde41af2a7c7ad763bd",
+  "branch": "codex/ct-studio-current-20261027",
+  "teammate_commits_merged": false,
+  "source": "Author accepted current app, after folder upload recovery",
+  "core_host_files_exact": {
+    "ct_workspace_web.py": "d799be0456c47e62abc3f6baaa4a6de7fd4164608e9cd44df9417e8c6db30d27",
+    "ct_series_import.py": "df1faf0eb1df65e69b781710fbc85b75612c2519c8881f0677ab8554dc7f5012",
+    "ldct_workspace.py": "d8c290bcd6a2455f8542e4d3dba6438ea7ff038e836f064a18738d3d0a0c9794",
+    "nodule_detector.py": "10f862802f27fe9f198df91c201424fdfd410212c34b27bfa54434b50a384275",
+    "nodule_exact_host.py": "06488c23d16aa9beb0325a9cb3dcbf8893a7f6b3cda4021ad5504b62c05e4615",
+    "lung_structural_cleanup.py": "19aab0c49651d7689cf71e4f72d6c628368953a44ac6b38023741de9ee76ba72",
+    "nodule_frozen_scoring.py": "5a9bfbbbbaa0bd19a745a6c8b4f93106c6463af4121c8e16f01f9bc13f9aaf4a",
+    "ct_dual_io_client.py": "d2cc7df08bfe7dcc62766188e090bc242cd08fe49d59312b617284b8e0f64eb8",
+    "ct_ldct_lossless_client.py": "583c04a5cbc1edb0e13ce56b2b47dfad3b374654b5ac320974f2f5712ea6a601",
+    "lung_live_web.py": "1020e9c24c85e1faa4d1b0c275cc8f51aacdff613d6ca2ddb8b173353dbaf262",
+    "lungseg/workspace/series.js": "b6d4b5c8f2dade11cbc207dd28ff119eb0dc2f0173346bbf38a9da55fb8d70df",
+    "lungseg/live_viewer.html": "ca89aa4deb486266f4b6da77e73ace275cd50c2417af2767f48b5ae1bdc6d3f2"
+  },
+  "launcher_only_changes": "Portable installed config default and default port 8099; bat setup/aliases added.",
+  "default_ldct_route": "/v1/ldct",
+  "host_speed_profile": "exact_host_raw_r3",
+  "default_cleanup": "legacy",
+  "environment": {
+    "python": "3.11",
+    "numpy": "1.26.4",
+    "scipy": "1.16.0",
+    "pydicom": "3.0.2",
+    "matplotlib": "3.10.3",
+    "nibabel": "5.4.2",
+    "scikit_image": "0.26.0",
+    "plotly": "6.9.0",
+    "torch": "2.8.0"
+  },
+  "models_and_bits_unchanged": true,
+  "credentials_included": false,
+  "patient_data_included": false
+}

@@ -13,7 +13,7 @@ import numpy as np
 
 ROOT=Path(__file__).resolve().parents[2]
 APP=ROOT
-PACKAGE=ROOT/'data/ct_studio_current_20261026'
+PACKAGE=ROOT/'data/ct_studio_current_20261027'
 BOARD=PACKAGE/'ct_studio'
 sys.path[:0]=[str(APP/'python'),str(BOARD)]
 from dual_io_contract import PlaneCache,digest,inflate_exact

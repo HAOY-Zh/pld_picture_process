@@ -1,0 +1,95 @@
+{
+  "status": "PHYSICAL_FULL_CASE_EXACT_ACCEPTED",
+  "host_speed_profile": "exact_host_raw_r3",
+  "default_ldct_transport": "original_v1_raw",
+  "cleanup": "legacy",
+  "tested_case_native_slices": 351,
+  "expert_accuracy_re_evaluated": false,
+  "results": {
+    "ldct": {
+      "baseline": {
+        "task_ms": 201691.1072999999,
+        "ldct_transport": "original_v1_raw",
+        "roundtrip_mean_ms": 516.261854985755,
+        "module_mean_ms": 376.1565288319037,
+        "slices_exact": 351
+      },
+      "optimized": {
+        "task_ms": 183628.1647999999,
+        "ldct_transport": "original_v1_raw",
+        "roundtrip_mean_ms": 514.0566663817617,
+        "module_mean_ms": 373.0248003162322,
+        "slices_exact": 351
+      },
+      "latency_reduction_percent": 8.955745616058696,
+      "all_outputs_exact": true
+    },
+    "segmentation": {
+      "baseline": {
+        "task_ms": 199902.72690000007,
+        "slices_exact": 351,
+        "all_native_masks_exact": true,
+        "volume_ml": 3629.09912109375,
+        "roundtrip_mean_ms": 462.28064358974035,
+        "network_mean_ms": 425.65964279201495,
+        "pl_active_mean_ms": 348.4829153846154
+      },
+      "optimized": {
+        "task_ms": 195089.56729999976,
+        "slices_exact": 351,
+        "all_native_masks_exact": true,
+        "volume_ml": 3629.09912109375,
+        "roundtrip_mean_ms": 460.8992461538392,
+        "network_mean_ms": 425.22723421083134,
+        "pl_active_mean_ms": 348.4837523361823
+      },
+      "all_outputs_exact": true,
+      "latency_reduction_percent": 2.4077508469447007
+    },
+    "nodule": {
+      "baseline": {
+        "task_ms": 80241.27660000022,
+        "full_heads_exact": 225,
+        "ranked_candidates_exact": 5753,
+        "selected_candidates_exact": 9,
+        "timing": {
+          "search_ms": 14161.937199999556,
+          "sampling_ms": 22649.04110000589,
+          "sampling_wait_ms": 28.477800002292497,
+          "canvas_roundtrip_ms": 58980.06289999833,
+          "network_ms": 35248.5817999987,
+          "pl_active_ms": 23900.47468000001,
+          "canvas_setup_ms": 3189.8945059999733,
+          "decode_ms": 3418.6121000029743,
+          "merge_ms": 544.5635000000948,
+          "scoring_ms": 2386.3123999999516,
+          "whole_case_ms": 80115.7889000001
+        }
+      },
+      "optimized": {
+        "task_ms": 72726.83740000002,
+        "full_heads_exact": 225,
+        "ranked_candidates_exact": 5753,
+        "selected_candidates_exact": 9,
+        "timing": {
+          "search_ms": 9612.950799999908,
+          "sampling_ms": 4664.846600000601,
+          "sampling_wait_ms": 33.30870000172581,
+          "canvas_roundtrip_ms": 58585.96400000258,
+          "network_ms": 35262.603417000486,
+          "pl_active_ms": 23900.20783,
+          "canvas_setup_ms": 3127.2581290013477,
+          "decode_ms": 2696.2235000000874,
+          "merge_ms": 161.02170000021943,
+          "scoring_ms": 1041.8161000002328,
+          "whole_case_ms": 72620.57639999967
+        }
+      },
+      "all_outputs_exact": true,
+      "latency_reduction_percent": 9.36480514568505
+    }
+  },
+  "scope": "Author private paired service; one full same-input case per function, outputs exact. Public synthetic installation requires recipient board startup selftests.",
+  "board_service_bundle_sha256": "ee06e8fddd97ba4a316b68dd4781affe4c362d41cb1616c156eb01299d1d1d3e",
+  "first_bit_switch_and_browser_drawing_included": false
+}

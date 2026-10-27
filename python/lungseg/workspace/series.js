@@ -1,4 +1,25 @@
 'use strict';
+async function uploadSeriesFile(task,index,file,onRetry,fetcher=fetch){
+  // Keep one bounded file in memory: avoid a disk-backed File upload failing
+  // after the browser has already started sending the request.
+  let payload;
+  try{payload=await file.arrayBuffer();}
+  catch(e){throw Error(`无法读取本机文件“${file.name}”：${e.message}。可改用 CT 路径直接读取。`);}
+  const query=new URLSearchParams({import:task.import_id,index,name:file.webkitRelativePath||file.name});
+  for(let attempt=0;attempt<3;attempt++){
+    const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),120000);
+    try{
+      const response=await fetcher('/api/import/file?'+query,{method:'POST',headers:{'Content-Type':'application/dicom','X-UI-Token':document.querySelector('meta[name="ui-token"]').content},body:payload,signal:abort.signal});
+      const value=await response.json();
+      if(!response.ok){const error=Error(value.error||'文件传输失败');error.uploadRejected=response.status!==408;throw error;}
+      return value;
+    }catch(e){
+      if(e.uploadRejected)throw e;
+      if(attempt===2)throw Error(`第 ${index+1} 个文件“${file.name}”传输中断，已安全重试 2 次。可重新选择文件夹，或改用 CT 路径直接读取。`);
+      onRetry(attempt+1);
+    }finally{clearTimeout(timer);}
+  }
+}
 let seriesInspection=null,seriesImportBusy=false;
 function seriesSelected(){return seriesInspection?.series.find(row=>row.series_uid===$('seriesChoice').value);}
 function seriesControls(){
@@ -47,12 +68,15 @@ $('folderFiles').onchange=async()=>{
     for(let i=0;i<files.length;i++){
       if(files[i].size>task.max_file_bytes)throw Error('单个文件超过 64MB 限制');
       $('seriesStatus').textContent=`正在导入 ${i+1} / ${files.length} 个文件，请保持页面打开…`;
-      const query=new URLSearchParams({import:task.import_id,index:i,name:files[i].webkitRelativePath||files[i].name});
-      const response=await fetch('/api/import/file?'+query,{method:'POST',headers:{'Content-Type':'application/dicom','X-UI-Token':document.querySelector('meta[name="ui-token"]').content},body:files[i]});
-      const value=await response.json();if(!response.ok)throw Error(value.error||'文件传输失败');
+      await uploadSeriesFile(task,i,files[i],retry=>{
+        $('seriesStatus').textContent=`第 ${i+1} / ${files.length} 个文件传输中断，正在安全重试 ${retry} / 2…`;
+      });
     }
     showSeriesInspection(await api('/api/import/finish',{import_id:task.import_id}));
-  }catch(e){$('seriesStatus').textContent='导入未完成：'+e.message;message(e.message,true);}
+  }catch(e){
+    const detail=e.message==='Failed to fetch'?'浏览器与本机网页服务的连接中断。请刷新网页后重试，或填写 CT 路径直接读取。':e.message;
+    $('seriesStatus').textContent='导入未完成：'+detail;message(detail,true);
+  }
   finally{seriesImportBusy=false;$('folderFiles').value='';seriesControls();}
 };
 const seriesOriginalLoad=$('load').onclick;

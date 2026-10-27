@@ -12,17 +12,17 @@ def unit_text(folder, expected):
     if not re.fullmatch(r'/[A-Za-z0-9_./-]+', folder) or not re.fullmatch('[0-9a-f]{64}', expected):
         raise ValueError('Need an absolute board path and SHA256')
     return f'''[Unit]
-Description=CT Studio current dual-model owner
+Description=CT Studio current exact host and shared-model owner
 After=network.target bootpy.service
 RequiresMountsFor={folder}
-Conflicts=ct-studio.service ct-studio-shared.service ct-studio-shared-batch.service ct-studio-shared-seg.service ct-studio-nodule-full.service ct-studio-nodule-compact.service ct-studio-dual-exact.service ct-studio-dual-exact-r2.service ct-studio-roi-statistics.service
+Conflicts=ct-studio.service ct-studio-shared.service ct-studio-shared-batch.service ct-studio-shared-seg.service ct-studio-nodule-full.service ct-studio-nodule-compact.service ct-studio-dual-exact.service ct-studio-dual-exact-r2.service ct-studio-exact-speed-r4.service ct-studio-roi-statistics.service
 [Service]
 Type=simple
 User=root
 WorkingDirectory={folder}
 Environment=PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 XILINX_XRT=/usr VIRTUAL_ENV=/usr/local/share/pynq-venv
 Environment=PATH=/usr/local/share/pynq-venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-ExecStart=/usr/local/share/pynq-venv/bin/python3 -B -u {folder}/ct_dual_io_owner.py --folder {folder} --expected-manifest {expected} --port 8766
+ExecStart=/usr/local/share/pynq-venv/bin/python3 -B -u {folder}/ct_ldct_lossless_owner.py --folder {folder} --expected-manifest {expected} --port 8766
 Restart=no
 TimeoutStopSec=infinity
 SendSIGKILL=no
@@ -39,7 +39,7 @@ def main():
     p.add_argument('--enable-next-boot',action='store_true')
     a=p.parse_args();folder=a.folder.resolve()
     expected=hashlib.sha256((folder/'platform_manifest.json').read_bytes()).hexdigest()
-    if not (folder/'ct_dual_io_owner.py').is_file():raise ValueError('Current owner missing')
+    if not (folder/'ct_ldct_lossless_owner.py').is_file():raise ValueError('Current owner missing')
     text=unit_text(folder,expected)
     if os.name!='posix' or os.geteuid()!=0:raise PermissionError('Run as board administrator')
     sys_path=str(folder)

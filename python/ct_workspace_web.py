@@ -74,6 +74,7 @@ class WorkspaceController(NoduleWorkspaceMixin, ROIWorkspaceMixin, LDCTWorkspace
         with self.lock:
             value = super().snapshot()
             value['segmentation_engine'] = self.client.manifest.get('shared_segmentation') if self.client is not None and hasattr(self.client, 'manifest') else None
+            value['host_speed_profile']='exact_host_raw_r3'
             value['basic'] = copy.deepcopy(self.basic_result)
             value['threshold_input'] = copy.deepcopy(self.threshold_result)
             value['workspace_history'] = copy.deepcopy(self.history[-30:])
@@ -375,6 +376,9 @@ workspacePendingSlice=m;workspaceApplySlice();}
             if parts.path == '/api/import/file':
                 if not self.allowed(True): return
                 try:
+                    # Local file reads/virus scanning can stall a browser upload.
+                    # This timeout applies only to bounded DICOM transfer, not PL.
+                    self.connection.settimeout(120)
                     length = int(self.headers.get('Content-Length', '0'))
                     if (self.headers.get('Transfer-Encoding') or self.headers.get('Content-Type') != 'application/dicom'
                             or not 0 < length <= MAX_FILE):
@@ -386,6 +390,12 @@ workspacePendingSlice=m;workspaceApplySlice();}
                     return self.send(200, value)
                 except (ValueError, KeyError) as exc:
                     return self.send(400, dict(error=str(exc)))
+                except TimeoutError:
+                    self.close_connection = True
+                    return self.send(408, dict(error='DICOM 文件上传超时，可安全重试；也可使用本机路径直接读取'))
+                except OSError as exc:
+                    self.close_connection = True
+                    return self.send(503, dict(error='接收或保存 DICOM 文件失败：'+str(exc)))
             if parts.path in ('/api/series/inspect', '/api/import/start', '/api/import/finish'):
                 if not self.allowed(True): return
                 try:
@@ -438,7 +448,13 @@ def main():
     parser.add_argument('--output', type=Path, default=ROOT/'data/ct_workspace_20261017/results')
     parser.add_argument('--nodule-package',type=Path,help='已验收共享核的运行包；启用原始 CNN 分数实验检测')
     parser.add_argument('--resume-session',type=Path,help='恢复本机已保存的病例、增强、分割与ROI会话状态')
+    parser.add_argument('--cleanup-policy',choices=('legacy','structural-preview'),default='legacy',help='Structural preview changes only optional 3-D cleanup; model/ROI body mask unchanged')
     args = parser.parse_args()
+    if args.cleanup_policy=='structural-preview':
+        if args.resume_session:raise ValueError('Preview requires new computation; old saved cleanup is preserved')
+        import lung_live_web as core
+        from lung_structural_cleanup import clean_for_display
+        core.clean_prediction=clean_for_display
     default_config = ROOT/'data/ct_platform_20261017_v2/host_config.json'
     config_path = args.config or (default_config if not args.desktop and default_config.is_file() else None)
     if config_path is None:
@@ -453,7 +469,7 @@ def main():
             manifest = json.loads((config_path.parent/config['platform_manifest']).read_text(encoding='utf-8'))
             if manifest.get('roi'):
                 from ct_studio_roi_client import ROIStudioClient
-                from ct_shared_seg_client import SharedSegStudioClient
+                from ct_dual_io_client import DualSegStudioClient as SharedSegStudioClient
                 client=(SharedSegStudioClient if manifest.get('shared_segmentation') else ROIStudioClient)(config['board_url'],token,manifest)
             else:client = (StudioClient if manifest.get('ldct') else PlatformClient)(config['board_url'], token, manifest)
         else:
@@ -462,13 +478,14 @@ def main():
         from lung_unet import torch_module
         torch_module().set_num_threads(2)
     controller = WorkspaceController(client, model, args.output)
+    controller.status['cleanup_policy']=args.cleanup_policy
     primary=ROOT/'configs/ldct_primary_model.json'
     ldct_release=args.ldct_release
     if ldct_release is None and config_path is not None and config.get('ldct_release'):
         ldct_release=ROOT/config['ldct_release']
     if ldct_release is None and primary.is_file():
         ldct_release=ROOT/json.loads(primary.read_text(encoding='utf-8'))['preferred_release']
-    if ldct_release is not None and (not args.desktop or ldct_release.is_dir()):
+    if ldct_release is not None:
         controller.configure_ldct(ldct_release)
     nodule_package=args.nodule_package or (ROOT/config['nodule_package'] if config_path is not None and config.get('nodule_package') else None)
     nodule_primary=ROOT/'configs/nodule_primary_runtime.json'

@@ -4,7 +4,7 @@ from pathlib import Path,PurePosixPath
 import numpy as np
 
 ROOT=Path(__file__).resolve().parents[1]
-PUBLIC=ROOT/'runtime/ct_studio_current_20261026'
+PUBLIC=ROOT/'runtime/ct_studio_current_20261027'
 CREDENTIALS=('platform_token.txt','segmentation/live_token.txt')
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -52,11 +52,11 @@ def build(source,out):
     if out.exists():raise FileExistsError('Use a new release directory')
     old=read(source/'platform_manifest.json');out.mkdir(parents=True)
     staging=out/'staging';board=staging/'ct_studio';board.mkdir(parents=True)
-    keep={'.py','.cpp','.h','.v','.sv','.vh','.tcl','.ps1','.hex','.json','.npz','.bit','.hwh'}
+    keep={'.py','.cpp','.h','.v','.sv','.vh','.tcl','.xdc','.xml','.ps1','.hex','.json','.npz','.bit','.hwh'}
     for name,expected in old['files_sha256'].items():
         src=source/name
         if sha(src)!=expected:raise ValueError('Changed accepted source: '+name)
-        if (name in CREDENTIALS or name.startswith(('ldct/fixtures/','ldct/source/','ldct/verification/','ldct/samples/'))
+        if (name in CREDENTIALS or name.startswith(('ldct/fixtures/','ldct/verification/','ldct/samples/'))
                 or (src.suffix not in keep and 'LICENSE'not in src.name.upper())):continue
         dst=board/name;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
     shutil.copy2(source/'platform_manifest.json',board/'platform_manifest.json')
@@ -118,7 +118,7 @@ def install(release,out,url):
     manifest=bind_manifests(board,add_credentials=True);validate(board)
     legacy=read(board/'legacy_platform_manifest.json');legacy_sha=sha(board/'legacy_platform_manifest.json')
     current_fields={k:manifest[k]for k in ('shared_nodule','shared_batch','shared_segmentation',
-        'canvas_interface','compact_interface','dual_io_interface')}
+        'canvas_interface','compact_interface','dual_io_interface','ldct_lossless_interface')if k in manifest}
     write(out/'host_platform.json',dict(legacy,platform_manifest_sha256=legacy_sha,
         service_bundle_sha256=sha(board/'platform_manifest.json'),**current_fields))
     write(out/'shared_host_platform.json',dict(service_bundle_sha256=sha(board/'platform_manifest.json'),
@@ -145,8 +145,8 @@ def verify(out):
 if __name__=='__main__':
     p=argparse.ArgumentParser();commands=p.add_subparsers(dest='command',required=True)
     b=commands.add_parser('build');b.add_argument('--source',type=Path,required=True);b.add_argument('--out',type=Path,default=PUBLIC)
-    i=commands.add_parser('install');i.add_argument('--release',type=Path,default=PUBLIC);i.add_argument('--output',type=Path,default=ROOT/'data/ct_studio_current_20261026');i.add_argument('--board-url',default='http://192.168.2.99:8766')
-    v=commands.add_parser('verify');v.add_argument('--output',type=Path,default=ROOT/'data/ct_studio_current_20261026')
+    i=commands.add_parser('install');i.add_argument('--release',type=Path,default=PUBLIC);i.add_argument('--output',type=Path,default=ROOT/'data/ct_studio_current_20261027');i.add_argument('--board-url',default='http://192.168.2.99:8766')
+    v=commands.add_parser('verify');v.add_argument('--output',type=Path,default=ROOT/'data/ct_studio_current_20261027')
     a=p.parse_args()
     if a.command=='build':build(a.source,a.out)
     elif a.command=='install':install(a.release,a.output,a.board_url)

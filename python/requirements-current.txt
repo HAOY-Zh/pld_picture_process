@@ -1,3 +1,10 @@
-# Exact numerical environment: NumPy scalar promotion affects sampling.
--r requirements-web-fpga.txt
+# Python 3.11. Same CPU numerical libraries as the accepted 2026-10-27 app.
+# NumPy scalar promotion affects sampling; do not upgrade it silently.
 numpy==1.26.4
+scipy==1.16.0
+pydicom==3.0.2
+matplotlib==3.10.3
+nibabel==5.4.2
+scikit-image==0.26.0
+plotly==6.9.0
+torch==2.8.0

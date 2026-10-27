@@ -37,7 +37,7 @@ function message(t,error=false){$('message').textContent=t;$('message').classNam
 async function api(path,value){const opt={headers:{'X-UI-Token':TOKEN}};if(value!==undefined){opt.method='POST';opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(value);}const r=await fetch(path,opt);const v=await r.json();if(!r.ok)throw Error(v.error||r.statusText);return v;}
 function bits(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
 function bit(a,i){return (a[i>>3]>>(i&7))&1;}
-function validStage(){if($('stage').value==='cleaned'&&!state?.full_volume_ready)$('stage').value='body';}
+function validStage(){$('stage').querySelector('[value=cleaned]').textContent=state?.cleanup_policy==='structural-preview'?'结构清理预览 · 近主肺15mm保护':'三维清理后（整例完成）';if($('stage').value==='cleaned'&&!state?.full_volume_ready)$('stage').value='body';}
 async function command(action,body={}){try{const next=await api('/api/'+action,body);if(next.phase)apply(next);else message(next.message);}catch(e){message(e.message,true);}}
 $('load').onclick=()=>command('load',{path:$('path').value,confirm_hu:$('confirm').checked,series_uid:$('uid').value.trim(),load_slices:$('loadSlices').value,load_expert:$('loadExpert').checked,expert_path:$('expertPath').value});
 $('connect').onclick=()=>command('connect');

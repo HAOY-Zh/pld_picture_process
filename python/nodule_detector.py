@@ -6,12 +6,13 @@ from pathlib import Path
 import time
 import numpy as np
 from ct_dual_io_client import CachedCanvasClient as CanvasClient
-from nodule_canvas_contract import quantize_canvas, digest, shapes
+from nodule_canvas_contract import digest, shapes
+from nodule_exact_host import quantize_exact as quantize_canvas, search_mask_exact as search_mask, ExactSamplerCache
 from dual_io_contract import INTERFACE
 from shared_patch_contract import validate_assets
 from nodule_vendor.nodule_canvas import lower_canvas, extract_tile_heads, valid_dependency_proof
 from nodule_vendor.nodule_fast_input import SharedPlaneSampler
-from nodule_vendor.lung_nodule_cnn import config_from_dict, search_mask, tiles, decode, consolidate
+from nodule_vendor.lung_nodule_cnn import config_from_dict, tiles, decode, consolidate
 from nodule_frozen_scoring import load_scoring, score_candidates
 
 PIPELINE = 'int8_canvas_cached_exact_frozen_cross_layer_v3'
@@ -48,7 +49,7 @@ class NoduleCaseProvider:
         self.proof = valid_dependency_proof(self.model)
         self.default_scoring_mode = 'frozen_cross_layer'
         self.code_hashes = {str(p.relative_to(Path(__file__).parent)):digest(p.read_bytes()) for p in
-            [Path(__file__),Path(__file__).with_name('nodule_frozen_scoring.py')]+list(
+            [Path(__file__),Path(__file__).with_name('nodule_frozen_scoring.py'),Path(__file__).with_name('nodule_exact_host.py')]+list(
                 Path(__file__).parent.joinpath('nodule_vendor').glob('nodule_canvas.py'))}
 
     def run(self, hu, lung, geometry, context, folder, progress, cancelled):
@@ -65,10 +66,11 @@ class NoduleCaseProvider:
         timing = dict(search_ms=(time.perf_counter()-tick)*1000, sampling_ms=0., sampling_wait_ms=0.,
             canvas_roundtrip_ms=0., network_ms=0., pl_active_ms=0., canvas_setup_ms=0., decode_ms=0., merge_ms=0.)
         points = [[], [], []]
+        sampler_cache=ExactSamplerCache(hu,geometry['spacing_zyx_mm'])
         def prepare(index):
             check(); tick = time.perf_counter()
             group = groups[index]
-            sampler = SharedPlaneSampler(hu, geometry['spacing_zyx_mm'], group, self.config)
+            sampler = sampler_cache.sample(group,self.config)
             h, w = sampler.context.shape[1:]
             codes = quantize_canvas(sampler.context)
             return group, sampler.y0, sampler.x0, h, w, codes, (time.perf_counter()-tick)*1000

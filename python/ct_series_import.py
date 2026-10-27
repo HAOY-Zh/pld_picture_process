@@ -54,10 +54,17 @@ class FolderImports:
             if not isinstance(key, str) or key not in self.sessions:
                 raise ValueError('文件夹导入任务不存在或已完成')
             session = self.sessions[key]
-            if (type(index) is not int or not 0 <= index < session['count'] or index in session['files']
-                    or not isinstance(name, str) or len(name) > 1024 or not 0 < len(raw) <= MAX_FILE
-                    or session['received'] + len(raw) > session['total']):
+            if (type(index) is not int or not 0 <= index < session['count']
+                    or not isinstance(name, str) or len(name) > 1024 or not 0 < len(raw) <= MAX_FILE):
                 raise ValueError('文件编号、大小或导入状态无效')
+            checksum = hashlib.sha256(raw).hexdigest()
+            prior = session['files'].get(index)
+            if prior is not None:
+                if prior != dict(original_name=name, size=len(raw), sha256=checksum):
+                    raise ValueError('同一文件编号的重试内容不一致；未覆盖已接收文件')
+                return dict(completed_files=len(session['files']), total_files=session['count'], already_received=True)
+            if session['received'] + len(raw) > session['total']:
+                raise ValueError('文件总大小超出导入声明')
             # Client filenames never determine a filesystem path.
             path = session['folder'] / ('%06d.dcm' % index)
             import io
@@ -69,7 +76,7 @@ class FolderImports:
                 raise ValueError('文件不是可识别的 DICOM；请只选择 CT 序列文件夹') from exc
             with path.open('xb') as out:
                 out.write(raw)
-            session['files'][index] = dict(original_name=name, size=len(raw), sha256=hashlib.sha256(raw).hexdigest())
+            session['files'][index] = dict(original_name=name, size=len(raw), sha256=checksum)
             session['received'] += len(raw)
             return dict(completed_files=len(session['files']), total_files=session['count'])
 
