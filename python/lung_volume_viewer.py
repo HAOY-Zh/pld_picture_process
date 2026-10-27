@@ -41,15 +41,22 @@ def to_world(vertices_zyx, geom):
 def mesh(mask, geom):
     from skimage.measure import marching_cubes
     array = np.asarray(mask)
-    if array.ndim != 3 or not np.isin(array, [0, 1, 255]).all():
+    if array.ndim != 3 or (array.dtype != np.bool_ and not np.isin(array, [0, 1, 255]).all()):
         raise ValueError('Need a native binary 3-D mask')
     if not array.any():
         return dict(voxels=np.empty((0, 3), np.float32), world=np.empty((0, 3), np.float32),
                     faces=np.empty((0, 3), np.uint32))
-    # Padding closes masks touching the acquisition boundary without editing GT.
-    vertices, faces, _, _ = marching_cubes(np.pad(array != 0, 1).astype(np.uint8),
+    # Empty borders have no surface. Crop only zeros, preserving the native
+    # grid and restoring the exact native half-voxel coordinates afterward.
+    binary = array if array.dtype == np.bool_ else array != 0
+    bounds = [np.flatnonzero(binary.any(axis=tuple(j for j in range(3) if j != i)))
+              for i in range(3)]
+    start = np.array([v[0] for v in bounds], dtype=np.int64)
+    region = tuple(slice(int(v[0]), int(v[-1])+1) for v in bounds)
+    vertices, faces, _, _ = marching_cubes(np.pad(binary[region], 1).astype(np.uint8),
         level=.5, step_size=1, allow_degenerate=False)
     vertices = vertices - 1
+    vertices += start.astype(np.float32)
     return dict(voxels=vertices.astype(np.float32), world=to_world(vertices, geom).astype(np.float32),
                 faces=faces.astype(np.uint32))
 

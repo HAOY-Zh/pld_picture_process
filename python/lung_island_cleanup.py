@@ -23,9 +23,9 @@ GRID = [dict(max_island_ml=v, min_distance_mm=d) for v in [1., 3., 5.] for d in 
 
 def binary_volume(value):
     a = np.asarray(value)
-    if a.ndim != 3 or not a.size or not np.isin(a, [0, 1, 255]).all():
+    if a.ndim != 3 or not a.size or (a.dtype != np.bool_ and not np.isin(a, [0, 1, 255]).all()):
         raise ValueError('Need a nonempty 3D binary mask')
-    return a != 0
+    return a if a.dtype == np.bool_ else a != 0
 
 
 def analyze(prediction, spacing, max_query_ml=5., minimum_main_ml=50., anchor_fraction=.02):

@@ -133,7 +133,18 @@ def restore_session(c,state_file):
     for key in ('revision','completed','total','latest','active_slice','elapsed_ms'):
         if key in state:c.status[key]=copy.deepcopy(state[key])
     c.status.update(phase='done' if c.known.any() else 'idle',error=None,board_connected=False)
-    if c.client is not None:c.client.health();c.status['board_connected']=True
+    if c.client is not None:
+        # Saved result verification is independent of a temporary LAN outage.
+        # Keep actual connection status false; never substitute CPU inference.
+        from urllib.error import HTTPError, URLError
+        try:
+            c.client.health()
+        except HTTPError:
+            raise  # Authentication/identity rejection must remain explicit.
+        except (TimeoutError, ConnectionError, URLError, OSError) as exc:
+            c.status['board_connection_error']=type(exc).__name__+': '+str(exc)
+        else:
+            c.status['board_connected']=True
     old_context=state.get('nodule',{}).get('context')
     if old_context:
         from nodule_workspace import digest as context_digest

@@ -1,0 +1,66 @@
+{
+  "status": "ALL_NATIVE_MASK_COMPONENTS_AND_MESH_ARRAYS_EXACT_PASS",
+  "synthetic_mesh_tests": 28,
+  "regression_tests": {
+    "run": 53,
+    "errors": 0,
+    "failures": 0
+  },
+  "cases": [
+    {
+      "case": 1,
+      "shape": [
+        351,
+        512,
+        512
+      ],
+      "baseline_cleanup_ms": 7950.2152999994,
+      "optimized_cleanup_ms": 6028.644300000451,
+      "cleanup_mask_and_component_decisions_exact": true,
+      "baseline_body_mesh_ms": 6367.913199999748,
+      "optimized_body_mesh_ms": 1809.8700000009558,
+      "body_mesh_exact": true,
+      "baseline_cleaned_mesh_ms": 5964.032299998507,
+      "optimized_cleaned_mesh_ms": 1507.7898999988975,
+      "cleaned_mesh_exact": true,
+      "baseline_cleanup_and_two_meshes_ms": 20282.160799997655,
+      "optimized_cleanup_and_two_meshes_ms": 9346.304200000304
+    },
+    {
+      "case": 2,
+      "shape": [
+        334,
+        512,
+        512
+      ],
+      "baseline_cleanup_ms": 6964.812999998685,
+      "optimized_cleanup_ms": 5718.4612000019115,
+      "cleanup_mask_and_component_decisions_exact": true,
+      "baseline_body_mesh_ms": 6084.370599997783,
+      "optimized_body_mesh_ms": 1827.9956000005768,
+      "body_mesh_exact": true,
+      "baseline_cleaned_mesh_ms": 6267.695499998808,
+      "optimized_cleaned_mesh_ms": 2010.450400000991,
+      "cleaned_mesh_exact": true,
+      "baseline_cleanup_and_two_meshes_ms": 19316.879099995276,
+      "optimized_cleanup_and_two_meshes_ms": 9556.90720000348
+    }
+  ],
+  "host_files_sha256": {
+    "lung_island_cleanup.py": "82bdcf8fe275b602b49878f5d026b8ad6bf59028c7313f1469b6fbbf26d57e65",
+    "lung_volume_viewer.py": "efcc3c6bb812a5c13418760bf2d286043ac5639e55218027923f7bc5fdba100f",
+    "ct_workspace_resume.py": "86d2e2dfbc8d7f48ca6a7bc9980d03ab48c36bb77739b4414e126f69ec759b29"
+  },
+  "models_or_bitstreams_changed": false,
+  "cleanup_rules_changed": false,
+  "triangle_decimation": false,
+  "new_clinical_accuracy_evaluation": false,
+  "resume_network_timeout_keeps_results_and_disconnected_status": true,
+  "authentication_rejection_still_explicit": true,
+  "local_8099_and_desktop_8100_deployed_and_sessions_preserved": true,
+  "scope": "Two saved real volumes and synthetic boundary cases; CPU cleanup and mesh timing only, not full-system latency or throughput.",
+  "publication_checks": {
+    "full_grid_equivalence_and_invalid_mask_tests_passed": 2,
+    "fresh_install_integrity_tests_passed": 3
+  }
+}

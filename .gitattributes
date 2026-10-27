@@ -36,3 +36,7 @@ python/lungseg/workspace/series.js -text -whitespace
 python/lungseg/live_viewer.html -text -whitespace
 pynq/ct_dual_io_service.py -text -whitespace
 pynq/shared_patch_contract.py -text -whitespace
+
+python/lung_island_cleanup.py -text -whitespace
+python/lung_volume_viewer.py -text -whitespace
+python/ct_workspace_resume.py -text -whitespace
