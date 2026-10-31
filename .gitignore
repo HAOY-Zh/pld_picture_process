@@ -106,3 +106,7 @@ Thumbs.db
 # Accepted 2026-10-27 source snapshot with synthetic-only runtime.
 !/runtime/ct_studio_current_20261027/ct_studio_integration_runtime.zip
 /runtime/ct_studio_current_20261027/staging/
+
+!/models/fp32/lung_unet_fp32.pt
+!/models/fp32/nodule_2p5d_fp32.pt
+!/models/fp32/ldct_cnn_fp32.pt

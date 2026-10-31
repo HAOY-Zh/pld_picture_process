@@ -1,0 +1,66 @@
+{
+  "schema": "ct_studio_tensor_only_checkpoints_v1",
+  "models": {
+    "lung_unet_fp32": {
+      "file": "lung_unet_fp32.pt",
+      "sha256": "fd0938596f31aa8fe0c910f5983d1e6fe248757443e3feeaa6c49c0d8e090d2b",
+      "source_checkpoint_sha256": "9f822eb29910325e92b4cd6912d15c6dd687ca535857ee9c27f629172be47f88",
+      "tensor_count": 86,
+      "architecture": {
+        "base_channels": 8,
+        "image_size": 256,
+        "hu_clip": [
+          -1000,
+          400
+        ],
+        "threshold": 0.5
+      },
+      "all_tensors_exact": true,
+      "training_patient_lists_included": false,
+      "optimizer_included": false
+    },
+    "nodule_2p5d_fp32": {
+      "file": "nodule_2p5d_fp32.pt",
+      "sha256": "19a3e3bff74e87db5ae836570bd0c2f0b16c61d5d385cfa2c43d53ee011b91f0",
+      "source_checkpoint_sha256": "c1fefe55a74d1cdc81ede2f2e249190aef7d0b71a8a81378c950427ddcd8dc06",
+      "tensor_count": 14,
+      "architecture": {
+        "config": {
+          "patch": 128,
+          "halo": 32,
+          "xy_mm": 0.8,
+          "z_step_mm": 1.25,
+          "context_mm": [
+            -2.5,
+            -1.25,
+            0.0,
+            1.25,
+            2.5
+          ],
+          "margin_mm": 5.0,
+          "output_stride": 2,
+          "base": 8,
+          "decode_floor": 0.02,
+          "merge_mm": 2.5
+        }
+      },
+      "all_tensors_exact": true,
+      "training_patient_lists_included": false,
+      "optimizer_included": false
+    },
+    "ldct_cnn_fp32": {
+      "file": "ldct_cnn_fp32.pt",
+      "sha256": "384d42c1e3d6f2a309680563b3ed4da09e7e0d52cb3f9c4fb6490fd10062fd27",
+      "source_checkpoint_sha256": "0fd09c0901d395384d7d28d272935d121bb005dc2ef318f31add8a06b1ce24f5",
+      "tensor_count": 6,
+      "architecture": {
+        "channels": 8,
+        "hu_scale": 1024.0
+      },
+      "all_tensors_exact": true,
+      "training_patient_lists_included": false,
+      "optimizer_included": false
+    }
+  },
+  "note": "Optional offline FP32 weights. The live FPGA runtime continues to use the unchanged frozen integer assets."
+}

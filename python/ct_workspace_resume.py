@@ -10,7 +10,7 @@ from lung_volume_viewer import mesh
 
 def restore_nodule_result(c,state):
     """Restore only the explicitly selected completed live result, in its old context."""
-    from nodule_workspace import digest,identifier,validate_packet
+    from nodule_workspace import digest,identifier,validate_packet,fixed_selection_packet
     selected=state.get('nodule',{}).get('result')
     if not selected:return
     result_id=identifier(selected.get('result_id'),'result_id')
@@ -26,8 +26,21 @@ def restore_nodule_result(c,state):
         raise ValueError('不能恢复未完成或来源不匹配的在线候选')
     for key in ('case_id','analysis_source_id','context_id','result_id','candidate_count','is_test_data','ingestion_kind'):
         if packet.get(key)!=selected.get(key):raise ValueError('保存的候选摘要与结果不一致：'+key)
-    restored=validate_packet(packet,context,allow_enhanced=True)
+    restored=fixed_selection_packet(validate_packet(packet,context,allow_enhanced=True))
     restored['ingestion_kind']='computed_live_fpga'
+    if restored['result_id']!=result_id:
+        # Raising the display threshold only removes old candidates; retain
+        # immutable source files and persist a separately identified result.
+        job=copy.deepcopy(job)
+        job.update(job_id=restored['result_id'],candidate_count=restored['candidate_count'],
+            operation='fixed_threshold_restore_no_inference',
+            selection_threshold=restored['detector_provenance']['additional_score_filter'],
+            selection_source_result_id=result_id)
+        folder=c.case_folder/'nodule'/restored['result_id']
+        folder.mkdir(exist_ok=False)
+        (folder/'prediction.json').write_text(json.dumps(restored,ensure_ascii=False,allow_nan=False,indent=2),encoding='utf8')
+        (folder/'job.json').write_text(json.dumps(job,ensure_ascii=False,allow_nan=False,indent=2),encoding='utf8')
+        result_id=restored['result_id']
     c.nodule_result=restored
     c.nodule_packet_hashes[(context['context_id'],result_id)]=digest(restored)
     c.nodule_job=job

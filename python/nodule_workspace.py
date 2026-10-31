@@ -119,6 +119,28 @@ def test_packet(context, empty=False):
     return result
 
 
+def fixed_selection_packet(packet):
+    """Derive a higher-threshold display result; never overwrite saved predictions."""
+    if packet.get('is_test_data'):
+        return packet
+    old=packet.get('detector_provenance',{})
+    rows=packet['candidates']
+    selected=select_candidates(rows,DEFAULT_THRESHOLD)
+    if (old.get('additional_score_filter')==DEFAULT_THRESHOLD
+            and len(selected)==len(rows)):
+        return packet
+    result=copy.deepcopy(packet)
+    source_id=old.get('selection_source_result_id',packet['result_id'])
+    result.update(result_id='nodule_'+uuid.uuid4().hex,candidates=selected,candidate_count=len(selected))
+    provenance=result.setdefault('detector_provenance',{})
+    provenance.update(additional_score_filter=DEFAULT_THRESHOLD,selection_source_result_id=source_id,
+        fixed_policy_source_result_id=packet['result_id'],selection_recomputed_without_inference=True)
+    provenance.setdefault('score_filter',{}).update(selection_threshold=DEFAULT_THRESHOLD,
+        selection_policy='fixed_low_false_positive',selected_candidate_count=len(selected),
+        fixed_policy_input_candidate_count=len(rows),fixed_policy_removed_count=len(rows)-len(selected))
+    return result
+
+
 class NoduleWorkspaceMixin:
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -158,8 +180,8 @@ class NoduleWorkspaceMixin:
             context = self.nodule_context()
             packet = self.nodule_result
             value['nodule'] = dict(service_available=self.nodule_provider is not None,
-                default_threshold=DEFAULT_THRESHOLD,threshold_presets=[BASE_THRESHOLD,DEFAULT_THRESHOLD,LOW_FP_THRESHOLD],
-                service_status=('INT8整层复用＋冻结跨层评分；默认严格档0.7656，原档可切换。提高阈值可能漏检，分数不是恶性概率。'
+                default_threshold=DEFAULT_THRESHOLD,fixed_threshold=DEFAULT_THRESHOLD,threshold_selectable=False,threshold_presets=[DEFAULT_THRESHOLD],
+                service_status=('INT8整层复用＋冻结跨层评分；固定低误报档0.8738，分数不是恶性概率。'
                     if self.nodule_provider is not None else '等待整病例检测服务与冻结评分参数；可导入匹配结果进行联动'),
                 job=copy.deepcopy(self.nodule_job),context=context,
                 result={k:packet[k] for k in ('case_id','analysis_source_id','context_id','result_id',
@@ -192,7 +214,7 @@ class NoduleWorkspaceMixin:
                     if type(values.get('empty', False)) is not bool: raise ValueError('empty 须为布尔值')
                     packet = test_packet(context, values.get('empty', False))
                 else: packet = values.get('packet')
-                record = validate_packet(packet, context)
+                record = fixed_selection_packet(validate_packet(packet, context))
                 key = (record['context_id'],record['result_id'])
                 fingerprint = digest(record)
                 if key in self.nodule_packet_hashes and self.nodule_packet_hashes[key] != fingerprint:
@@ -269,7 +291,7 @@ class NoduleWorkspaceMixin:
             if values.get('result_id')!=packet['result_id']:raise ValueError('候选结果已变化，请刷新网页')
             if packet.get('ingestion_kind')!='computed_live_fpga' or packet.get('is_test_data'):
                 raise ValueError('仅支持本机完成并保存完整评分的真实检测结果')
-            threshold=checked_threshold(values.get('selection_threshold'))
+            threshold=checked_threshold(values.get('selection_threshold',DEFAULT_THRESHOLD))
             old=packet.get('detector_provenance',{})
             source_id=identifier(old.get('selection_source_result_id',packet['result_id']),'result_id')
             source_folder=self.case_folder/'nodule'/source_id
@@ -294,7 +316,7 @@ class NoduleWorkspaceMixin:
             provenance.update(additional_score_filter=threshold,selection_source_result_id=source_id,
                 selection_recomputed_without_inference=True,selection_source_sha256=digest(rows))
             record=provenance.setdefault('score_filter',{})
-            record.update(selection_threshold=threshold,selection_policy='user_selected_development_preset',
+            record.update(selection_threshold=threshold,selection_policy='fixed_low_false_positive',
                 selected_candidate_count=len(selected),removed_candidate_count=len(rows)-len(selected))
             derived=validate_packet(derived,context,allow_enhanced=True);derived['ingestion_kind']='computed_live_fpga'
             folder=self.case_folder/'nodule'/result_id;folder.mkdir(exist_ok=False)

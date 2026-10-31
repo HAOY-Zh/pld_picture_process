@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-31",
+  "status": "PASS",
+  "fixed_threshold": 0.8738163050576156,
+  "current_threshold_policy_tests": {
+    "passed": 8,
+    "total": 8,
+    "real_local_http": true
+  },
+  "current_nodule_roi_mpr_tests": {
+    "passed": 11,
+    "total": 11,
+    "real_local_http": true
+  },
+  "fresh_runtime_install": "PASS: new empty directory, per-file hashes and nested contracts",
+  "fresh_runtime_verify": "PASS: manifests, pairing identity and generated local credentials",
+  "python_syntax_errors": [],
+  "credential_scan_hits": [],
+  "runtime_verified_files": 178,
+  "models_and_bitstreams_changed": false,
+  "hardware_tested_in_this_packaging_task": false,
+  "note": "Synthetic tests and installation checks; no new medical accuracy or speed claim.",
+  "clean_checkout_web_smoke": {
+    "status": "PASS",
+    "source": "clean staged Git tree",
+    "tree": "bcd5f4a3540271b036d7db0525ef30293cea74a2",
+    "installation": "PASS",
+    "runtime_contracts": "PASS",
+    "web_http": "PASS",
+    "authenticated_state": "PASS",
+    "mode": "desktop browsing; board not contacted",
+    "private_author_data_required": false
+  },
+  "privacy_audit": {
+    "status": "PASS",
+    "files": 1346,
+    "bytes": 63057104,
+    "credential_hits": [],
+    "python_syntax_errors": [],
+    "current_runtime_all_files_verified": 178,
+    "board_program_changed": false
+  }
+}

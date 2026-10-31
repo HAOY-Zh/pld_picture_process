@@ -1,0 +1,131 @@
+'use strict';
+const $=id=>document.getElementById(id),TOKEN=document.querySelector('meta[name=ui-token]').content;
+const ACTIVE=['loading','connecting','computing','reconstructing','processing','detecting'];
+let state=null,plane=null,result=null,index=0,planeTicket=0,resultTicket=0,lastCase=null,lastResult=null,lastRevision=-1,previewTimer;
+let maskPlane=null,maskTicket=0,lastMask=null,pendingBasic=null;
+let desiredSegSlice=null;
+const browserTimings=new Map(),MORPHOLOGY=['erosion','dilation','opening','closing'];
+const rasterCache=new WeakMap();
+const isMorphology=()=>MORPHOLOGY.includes($('operation').value);
+const currentMask=()=>state?.threshold_input?.index===index&&state.threshold_input.case_id===state.case_id?state.threshold_input:null;
+const operationNames={window:'窗宽 / 窗位',threshold:'HU 范围阈值',erosion:'二值腐蚀',dilation:'二值膨胀',opening:'二值开运算',closing:'二值闭运算',histogram:'直方图均衡',pseudocolor:'伪彩映射'};
+const phaseNames={empty:'等待输入',idle:'就绪',loading:'正在读取 CT',connecting:'正在连接 FPGA',computing:'FPGA 正在分割',reconstructing:'正在重建三维',processing:'正在执行基础处理',detecting:'电脑正在检测肺结节',done:'计算完成',cancelled:'任务已停止',error:'任务已停止'};
+function message(text,error=false){$('message').textContent=text;$('message').parentElement.classList.toggle('error',error);}
+async function api(path,data){const opt={headers:{'X-UI-Token':TOKEN}};if(data!==undefined){opt.method='POST';opt.headers['Content-Type']='application/json';opt.body=JSON.stringify(data);}const r=await fetch(path,opt),v=await r.json();if(!r.ok)throw Error(v.error||r.statusText);return v;}
+async function command(path,body){try{apply(await api(path,body));}catch(e){message(e.message,true);}}
+function showTab(name){for(const button of document.querySelectorAll('[data-tab]')){const active=button.dataset.tab===name;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active));}for(const panel of document.querySelectorAll('.tab-content'))panel.hidden=panel.id!=='tab-'+name;
+const titles={basic:['基础处理','从一张 CT，开始处理'],segmentation:['智能分割与三维','从切片到三维，查看肺区结构'],performance:['性能记录','每次计算，都有据可查']};$('crumb').textContent=titles[name][0];$('title').textContent=titles[name][1];requestAnimationFrame(drawAll);
+$('segmentationFrame').contentWindow?.postMessage({type:'ct-workspace-visible',visible:name==='segmentation'},location.origin);}
+document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+$('load').onclick=()=>command('/api/load',{path:$('path').value,load_slices:$('loadSlices').value,confirm_hu:$('confirm').checked,series_uid:$('uid').value.trim(),load_expert:$('loadExpert').checked,expert_path:$('expertPath').value});
+$('connect').onclick=()=>command('/api/connect',{});
+$('connectFast').onclick=()=>command('/api/connect-fast',{});
+function params(){const op=$('operation').value;if(isMorphology())return {...currentMask()?.parameters,operation:op};const p={operation:op},keys=op==='threshold'?['lower','upper']:['wl','ww'];for(const k of keys){const field=$(k);if(!field.checkValidity()||field.value.trim()==='')throw Error('请输入有效的 '+k+' 参数');p[k]=Number(field.value);if(!Number.isInteger(p[k]))throw Error('参数须为整数');}return p;}
+$('apply').onclick=async()=>{if(pendingBasic)return;try{const p=params(),requestId=crypto.randomUUID().replaceAll('-','');pendingBasic={requestId,started:performance.now(),caseId:state.case_id};updateBackend();message('正在执行基础处理，完成后立即取图…');apply(await api('/api/basic/run',{case_id:state.case_id,index,backend:$('backend').value,...p,ui_request_id:requestId,wait_for_result:true,mask_result_id:isMorphology()?currentMask()?.result_id:undefined}));}catch(e){pendingBasic=null;updateBackend();message(e.message,true);}};
+function preset(name){const pair={lung:[-600,1500],soft:[40,400],bone:[400,1800]}[name];if(pair){$('wl').value=pair[0];$('ww').value=pair[1];}markDirty();}
+$('preset').onchange=()=>preset($('preset').value);
+function operationChanged(){const op=$('operation').value,morph=isMorphology();$('thresholdFields').hidden=op!=='threshold';$('windowFields').hidden=morph||op==='threshold';$('morphologyFields').hidden=!morph;$('maskCard').hidden=!morph;$('resultOrder').textContent=morph?'03':'02';$('imagePair').classList.toggle('with-mask',morph);
+$('operationNote').textContent=morph?'使用当前切片已保存的阈值二值图，不重新读取可编辑的 HU 范围。3×3 方形核、各阶段零填充。':op==='threshold'?'单独按 HU 范围生成二值图；白色表示范围内，体外空气也可能被选中。结果可作为后续形态学输入。':op==='histogram'?'对输出窗设置下的灰度图做全局直方图均衡；不是低剂量 CT 去噪。':op==='pseudocolor'?'对输出窗内灰度做固定伪彩映射，仅辅助显示。':'应用后在右侧显示窗映射结果；左侧固定参考图不随参数变化。';refreshMask();markDirty();requestAnimationFrame(drawAll);}
+$('prepareMask').onclick=()=>{$('operation').value='threshold';operationChanged();updateBackend();};
+$('operation').onchange=()=>{operationChanged();updateBackend();};
+$('backend').onchange=()=>{updateBackend();markDirty();};
+function markDirty(){if(!result)return;let changed=true;try{const op=$('operation').value,p=isMorphology()?{operation:op}:params(),keys=['window','histogram','pseudocolor'].includes(op)?['operation','wl','ww']:op==='threshold'?['operation','lower','upper']:['operation'];changed=keys.some(k=>p[k]!==result.parameters[k])||index!==result.index||$('backend').value!==result.backend||(isMorphology()&&currentMask()?.result_id!==result.input_mask?.result_id);}catch{}$('resultBadge').textContent=changed?'参数 / 切片已变 · 待应用':result.backend==='FPGA_BASIC'?'实际 PL 输出 · 参考一致':'电脑参考预览';}
+for(const name of ['wl','ww'])$(name).oninput=()=>{$('preset').value='custom';markDirty();};
+for(const name of ['lower','upper'])$(name).oninput=markDirty;
+$('reset').onclick=()=>{$('operation').value='window';$('preset').value='lung';$('lower').value=-1000;$('upper').value=-400;preset('lung');operationChanged();updateBackend();};
+function setIndex(value){if(!state?.shape)return;index=Math.max(0,Math.min(state.shape[0]-1,Math.round(Number(value)||0)));$('sliceSlider').value=$('sliceIndex').value=index;updateSliceLabel();refreshMask();updateBackend();markDirty();clearTimeout(previewTimer);previewTimer=setTimeout(fetchPlane,90);}
+$('sliceSlider').oninput=()=>setIndex($('sliceSlider').value);$('sliceIndex').oninput=()=>setIndex($('sliceIndex').value);
+$('syncSlice').onclick=()=>{desiredSegSlice={type:'ct-workspace-slice',case_id:state.case_id,index};showTab('segmentation');$('segmentationFrame').contentWindow?.postMessage(desiredSegSlice,location.origin);};
+$('segmentationFrame').addEventListener('load',()=>{const frame=$('segmentationFrame').contentWindow;frame.postMessage({type:'ct-workspace-visible',visible:document.querySelector('[data-tab="segmentation"]').classList.contains('active')},location.origin);if(desiredSegSlice?.case_id===state?.case_id)frame.postMessage(desiredSegSlice,location.origin);});
+function updateSliceLabel(){const source=state?.source?.source_slice_indices?.[index];$('sliceLabel').textContent=state?.shape?`轴位 ${index} / ${state.shape[0]-1}`:'轴位 · 等待影像';$('originalInfo').textContent=state?.shape?`源序列第 ${source} 层 · 原始 HU · ${state.shape[1]} × ${state.shape[2]}`:'原始 HU · 不修改输入';}
+function apply(s){if(state&&s.revision<state.revision)return;const changed=s.case_id!==lastCase;state=s;const busy=ACTIVE.includes(s.phase);$('load').disabled=$('connect').disabled=busy;$('apply').disabled=busy||!s.shape;updateBackend();
+if(s.desktop_only){$('backend').value='PC_REFERENCE';$('backend').disabled=true;updateBackend();}
+$('connect').hidden=s.desktop_only===true;
+if(s.desktop_only)$('executionNote').textContent='电脑模式：可读取CT、浏览切片并运行基础参考。神经分割需连接真实FPGA。';
+$('connectFast').hidden=!s.fast_platform_available||s.fast_platform_active;$('connectFast').disabled=busy||!!pendingBasic;
+for(const k of ['sliceSlider','sliceIndex','syncSlice'])$(k).disabled=!s.shape;
+$('boardDot').className='status-dot'+(s.board_connected?' on':'');$('boardLabel').textContent=s.desktop_only?'电脑浏览模式':s.board_connected?(s.fast_platform_active?'FPGA 加速服务已连接':'FPGA 已连接'):'FPGA 未连接';$('connect').textContent=s.board_connected?'重新核对':'连接';
+$('taskDot').className='status-dot'+(s.phase==='error'?' error':busy?' busy':s.shape?' on':'');$('progress').hidden=!busy;$('progress').max=Math.max(1,s.total);$('progress').value=s.completed;
+message((phaseNames[s.phase]||s.phase)+(busy&&s.total?` · ${s.completed}/${s.total}`:'')+(s.error?' · '+s.error:''),s.phase==='error');
+$('caseLabel').textContent=s.source?.source_name||s.source?.source?.split(/[\\/]/).filter(Boolean).at(-1)||(s.shape?'已加载 CT':'尚未加载 CT');
+$('sourceInfo').textContent=s.shape?`${s.shape.join(' × ')} · ${s.geometry.spacing_zyx_mm.map(v=>Number(v).toFixed(2)).join(' / ')} mm`:'加载一次，在各工作区共享。';
+$('expertBadge').textContent=s.expert_present?'已加载专家标注':'无专家标注';$('expertBadge').className='chip'+(s.expert_present?' teal':'');
+if(changed){lastCase=s.case_id;lastResult=null;lastRevision=-1;plane=null;result=null;planeTicket++;resultTicket++;maskTicket++;maskPlane=null;lastMask=null;pendingBasic=null;desiredSegSlice=null;browserTimings.clear();index=s.shape?Math.floor(s.shape[0]/2):0;
+$('sliceSlider').max=$('sliceIndex').max=s.shape?s.shape[0]-1:0;$('sliceSlider').value=$('sliceIndex').value=index;$('processedEmpty').hidden=false;$('resultTitle').textContent='处理结果';$('resultBadge').textContent='等待计算';$('resultInfo').textContent='尚无处理结果';$('basicSummary').textContent='基础处理输出独立保存，不覆盖原始 CT，也不会自动送入分割模型。';drawAll();}
+updateSliceLabel();if(s.shape&&(changed||!plane&&s.revision!==lastRevision))fetchPlane();lastRevision=s.revision;
+if(s.phase==='error')pendingBasic=null;
+refreshMask();updateBackend();
+if(s.basic&&s.basic.case_id===s.case_id&&s.basic.result_id!==lastResult){lastResult=s.basic.result_id;fetchResult(s.basic);}
+updateMetrics(s);updateNodules(s);}
+function bytes(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
+async function fetchPlane(){if(!state?.shape)return;const ticket=++planeTicket,caseId=state.case_id,z=index;try{const p=await api('/api/plane?'+new URLSearchParams({case:caseId,axis:0,index:z,stage:'body'}));if(ticket!==planeTicket||caseId!==state.case_id||z!==index)return;p.values=new Float32Array(bytes(p.hu).buffer);plane=p;$('originalEmpty').hidden=true;drawAll();}catch(e){if(ticket===planeTicket)message(e.message,true);}}
+const ms=value=>Number.isFinite(value)?value.toFixed(2)+' ms':'—';
+async function refreshMask(){const m=currentMask();$('maskSource').textContent=m?`源序列第 ${m.source_slice_index} 层 · HU ${m.parameters.lower}～${m.parameters.upper} · ${m.backend==='FPGA_BASIC'?'实际PL':'电脑参考'}结果 · ${m.result_id.slice(0,8)}`:'请先对当前切片执行 HU 范围阈值。';if(!m){maskTicket++;lastMask=null;maskPlane=null;$('maskEmpty').hidden=false;drawAll();return;}if(m.result_id===lastMask)return;const ticket=++maskTicket;lastMask=m.result_id;maskPlane=null;$('maskEmpty').hidden=false;try{const r=await api('/api/basic/image?'+new URLSearchParams({case:m.case_id,result:m.result_id}));if(ticket!==maskTicket||currentMask()?.result_id!==r.result_id)return;r.pixels=bytes(r.image.pixels);maskPlane=r;$('maskEmpty').hidden=true;$('maskBadge').textContent=`HU ${m.parameters.lower}～${m.parameters.upper}`;$('maskInfo').textContent=`已保存输入 · SHA ${m.output_sha256.slice(0,16)}…`;drawAll();}catch(e){if(ticket===maskTicket){lastMask=null;message(e.message,true);}}}
+async function fetchResult(metadata){const ticket=++resultTicket;try{const r=await api('/api/basic/image?'+new URLSearchParams({case:metadata.case_id,result:metadata.result_id}));if(ticket!==resultTicket||r.case_id!==state.case_id)return;r.pixels=bytes(r.image.pixels);result=r;$('processedEmpty').hidden=true;$('resultTitle').textContent=r.label+(['window','histogram','pseudocolor'].includes(r.operation)?` · WL ${r.parameters.wl} / WW ${r.parameters.ww}`:'');$('resultInfo').textContent=`源序列第 ${r.source_slice_index} 层 · ${r.backend==='FPGA_BASIC'?'PL / DMA':'电脑运算'} ${ms(r.processing_ms)} · ${r.image.shape.slice(0,2).join(' × ')}`;$('basicSummary').textContent=`${r.label} · 输出 SHA ${r.output_sha256.slice(0,16)}… · ${r.input_mask?'输入为已保存二值图 '+r.input_mask.result_id.slice(0,8)+' · ':''}不修改原始 CT 或分割输入。`;drawAll();markDirty();await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));if(ticket!==resultTicket||r.case_id!==state.case_id)return;if(pendingBasic?.requestId===r.ui_request_id){browserTimings.set(r.result_id,{result_id:r.result_id,ui_request_id:r.ui_request_id,click_to_display_ms:performance.now()-pendingBasic.started,scope:'本浏览器点击应用至结果绘制后下一帧；含状态轮询等待，不是硬件耗时'});pendingBasic=null;updateBackend();}updateMetrics(state);}catch(e){if(ticket===resultTicket){lastResult=null;pendingBasic=null;updateBackend();message(e.message,true);}}}
+function paint(canvas,pixels,h,w,channels,spacing){const rect=canvas.parentElement.getBoundingClientRect();canvas.width=Math.max(1,Math.round(rect.width));canvas.height=Math.max(1,Math.round(rect.height));const ctx=canvas.getContext('2d');ctx.fillStyle='#09121d';ctx.fillRect(0,0,canvas.width,canvas.height);if(!pixels)return;
+let off=rasterCache.get(pixels);if(!off){off=document.createElement('canvas');off.width=w;off.height=h;const oc=off.getContext('2d'),image=oc.createImageData(w,h);for(let n=0;n<h*w;n++){image.data[4*n]=pixels[channels*n];image.data[4*n+1]=pixels[channels*n+(channels===3?1:0)];image.data[4*n+2]=pixels[channels*n+(channels===3?2:0)];image.data[4*n+3]=255;}oc.putImageData(image,0,0);rasterCache.set(pixels,off);}const ratio=w*spacing[1]/(h*spacing[0]),dw=Math.min(canvas.width,canvas.height*ratio),dh=dw/ratio;ctx.imageSmoothingEnabled=false;ctx.drawImage(off,(canvas.width-dw)/2,(canvas.height-dh)/2,dw,dh);}
+function drawAll(){const spacing=state?.geometry?.spacing_zyx_mm?.slice(1)||[1,1];let gray=null;if(plane){gray=plane.referencePixels??=Uint8Array.from(plane.values,v=>Math.max(0,Math.min(255,Math.floor((Math.round(v)+1350)*255/1500))));}
+paint($('original'),gray,plane?.shape[0]||1,plane?.shape[1]||1,1,spacing);paint($('processed'),result?.pixels,result?.image.shape[0]||1,result?.image.shape[1]||1,result?.image.shape[2]||1,spacing);paint($('maskInput'),maskPlane?.pixels,maskPlane?.image.shape[0]||1,maskPlane?.image.shape[1]||1,1,spacing);$('originalBadge').textContent='固定参考 · WL -600 / WW 1500';}
+function textCell(row,value){const c=document.createElement('td');c.textContent=value;row.append(c);}
+function updateMetrics(s){$('metricSlices').textContent=s.shape?`${s.known_slices} / ${s.shape[0]}`:'—';const r=s.latest;
+$('metricPL').textContent=r?`${r.stats.host_total_ms.toFixed(1)} ms`:'—';$('metricRoundtrip').textContent=r?`${r.roundtrip_ms.toFixed(1)} ms`:'—';const b=s.basic,t=b?browserTimings.get(b.result_id):null,hw=b?.hardware_receipt;
+$('metricBasic').textContent=ms(t?.click_to_display_ms);$('metricBasicNote').textContent=t?'本浏览器实测 · 含等待、取图与绘制':b?'本浏览器无该次点击记录，不能补算总耗时':'尚无实际结果';
+$('metricBasicKernel').textContent=ms(b?.processing_ms);$('metricBasicKernelCaption').textContent=b?.backend==='PC_REFERENCE'?'基础处理 · 电脑参考运算':'基础处理 · PL / DMA';$('metricBasicKernelNote').textContent=hw?'含DMA传输与驱动轮询；不含bit切换和通信':'电脑参考耗时，不代表 PL 性能';
+$('basicTiming').textContent=b?`执行位置：${hw?'实际 FPGA PL':'电脑参考'}；点击至显示 ${ms(t?.click_to_display_ms)}；后台至图像落盘 ${ms(b.host_result_ready_ms)}；${hw?`板端往返 ${ms(hw.roundtrip_ms)}（其中 bit切换 ${ms(hw.stats.overlay_switch_ms)}、PS准备 ${ms(hw.stats.preparation_ms)}、PL/DMA ${ms(b.processing_ms)}）${hw.transport?`；${hw.transport.input_cache_hit?'复用已上传切片，PL仍重新运行':'首次上传切片'}；上传 ${hw.transport.request_body_bytes} B / 返回 ${hw.transport.response_body_bytes} B`:''}`:`电脑参考运算 ${ms(b.processing_ms)}`}。`:'尚无实际结果。';
+$('receipt').textContent=r?JSON.stringify({backend:r.backend,source_slice_index:r.source_slice_index,request_id:r.request_id,bit_sha256:r.bit_sha256,input_sha256:r.input_sha256,head_sha256:r.head_sha256,command_count:r.stats.command_count,clock:r.stats.clock_after,fpga_host_total_ms:r.stats.host_total_ms,roundtrip_ms:r.roundtrip_ms},null,2):'尚未执行智能分割。不会用历史测速填充本次指标。';
+const tbody=$('historyRows');tbody.replaceChildren();for(const h of [...s.workspace_history||[]].reverse()){const tr=document.createElement('tr');for(const value of [h.label,h.source_slice_index,h.backend==='FPGA_BASIC'?'实际 FPGA PL':'电脑参考预览',ms(h.processing_ms),ms(h.host_result_ready_ms),ms(browserTimings.get(h.result_id)?.click_to_display_ms)])textCell(tr,value);tbody.append(tr);}if(!tbody.childElementCount){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=6;td.textContent='暂无记录';tr.append(td);tbody.append(tr);}}
+async function loadBenchmarks(){try{const data=await api('/api/benchmarks'),tbody=$('benchmarkRows');tbody.replaceChildren();for(const b of data.rows){const tr=document.createElement('tr');for(const value of [b.title,b.cpu_ms.toFixed(2)+' ms',b.pl_ms.toFixed(2)+' ms',b.speedup.toFixed(2)+' ×',b.experimental?'实验候选 · 精度有退化':'独立实板核验通过'])textCell(tr,value);tbody.append(tr);}if(!data.rows.length){const tr=document.createElement('tr');textCell(tr,'本机暂无已核验历史证据');tbody.append(tr);}}catch(e){$('benchmarkRows').replaceChildren();const tr=document.createElement('tr');textCell(tr,'历史记录读取失败：'+e.message);$('benchmarkRows').append(tr);}}
+$('export').onclick=async()=>{try{const value=await api('/api/export');value.browser_display_timings=[...browserTimings.values()];const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='ct-workspace-session.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){message(e.message,true);}};
+new ResizeObserver(drawAll).observe(document.querySelector('.images-area'));
+async function poll(){try{apply(await api('/api/state'));}catch(e){message('电脑后端连接失败：'+e.message,true);}setTimeout(poll,800);}
+operationChanged();updateBackend();loadBenchmarks();poll();
+
+function updateBackend(){
+const pl=$('backend').value==='FPGA_BASIC',op=$('operation').value;
+const supported=state?.basic_pl_operations?.includes(op),shapeOK=state?.shape?.[1]===512&&state?.shape?.[2]===512;
+const available=state?.basic_pl_configured&&state?.board_connected&&supported&&shapeOK;
+$('basicBackendBadge').textContent=pl?(available?'真实 FPGA PL · 可运行':'真实 FPGA PL · 待就绪'):'电脑参考预览 · 非 PL 实测';
+$('basicBackendBadge').className='chip '+(pl?'teal':'amber');
+$('backendNote').textContent=!pl?'明确选择的软件对照，不会运行 FPGA。':!state?.basic_pl_configured?'请使用统一 PL 服务配置启动网页。':!state?.board_connected?'请先连接统一 FPGA 服务；不会自动改用电脑。':!supported?'该方法目前仅有电脑参考，请手动切换执行位置。':!shapeOK?'现有基础 PL 要求原生 512×512 CT，不自动缩放。':state.fast_platform_active?'六种基础方法共用bit，换方法不重载；切换到智能分割仍单独计时。':'已连接：基础 PL 与分割按任务切换，切换开销单独记录。';
+$('apply').disabled=!!pendingBasic||!state?.shape||ACTIVE.includes(state?.phase)||(pl&&!available)||(isMorphology()&&!currentMask());
+}
+
+let noduleResult=null,nodulePlane=null,noduleIndex=0,noduleTicket=0,nodulePlaneTicket=0,noduleFetching=null;
+$('detectNodules').onclick=()=>command('/api/nodule/run',{case_id:state.case_id,backend:'PC_CNN_FP32'});
+$('cancelNodules').onclick=async()=>{try{const v=await api('/api/nodule/cancel',{case_id:state.case_id});message(v.message);}catch(e){message(e.message,true);}};
+$('noduleSlice').oninput=()=>setNoduleIndex($('noduleSlice').value);
+function clearNodules(){noduleTicket++;nodulePlaneTicket++;noduleResult=nodulePlane=noduleFetching=null;$('noduleResults').hidden=true;$('noduleRows').replaceChildren();}
+function updateNodules(s){const n=s.nodule,busy=ACTIVE.includes(s.phase),detecting=s.phase==='detecting';
+$('detectNodules').disabled=busy||!n?.ready||!!n?.result;$('cancelNodules').hidden=!detecting;
+$('noduleHint').textContent=detecting?`${n.stage||'准备检测'} · ${s.completed}/${s.total} · 复用已完成肺掩膜，不重新分割`:n?.result?`完成：${n.result.candidate_count}个候选 · ${n.result.device==='cuda'?'电脑GPU':'电脑CPU'} FP32 · 当前分割结果已复用`:n?.stage==='已停止'?'检测已停止，可重新开始':n?.reason||'肺分割已完成，可开始电脑FP32结节检测。';
+if(!n?.result){if(noduleResult||noduleFetching)clearNodules();return;}
+if(noduleResult?.result_id===n.result.result_id)return;
+if(noduleFetching===n.result.result_id)return;
+const ticket=++noduleTicket,caseId=s.case_id,resultId=n.result.result_id;noduleFetching=resultId;
+api('/api/nodule/result?'+new URLSearchParams({case:caseId,result:resultId})).then(r=>{
+if(ticket!==noduleTicket||state.case_id!==caseId||state.nodule?.result?.result_id!==resultId)return;
+noduleResult=r;noduleFetching=null;$('noduleResults').hidden=false;
+$('noduleSummary').textContent=`当前阈值 ${r.threshold.toFixed(6)} · ${r.candidate_count}个三维候选；未读取专家标注。`;
+$('noduleTiming').textContent=`本次后台 ${(r.host_result_ready_ms/1000).toFixed(2)}秒，其中检测 ${(r.timing.inference_ms/1000).toFixed(2)}秒；后台含首次环境和模型初始化、校验，不含已完成肺分割及浏览器取图显示。不是FPGA耗时。`;
+$('noduleSlice').max=s.shape[0]-1;const rows=$('noduleRows');rows.replaceChildren();
+for(const [i,c] of r.candidates.entries()){const tr=document.createElement('tr'),td=document.createElement('td'),button=document.createElement('button');button.className='text-button';button.textContent=`候选${i+1}`;button.onclick=()=>setNoduleIndex(c.center_index_zyx[0]);td.append(button);tr.append(td);
+const z=Math.max(0,Math.min(s.shape[0]-1,Math.round(c.center_index_zyx[0])));for(const value of [s.source.source_slice_indices[z],c.estimated_scale_diameter_mm.toFixed(1)+' mm',c.score.toFixed(3)])textCell(tr,value);rows.append(tr);}
+if(!r.candidates.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=4;td.textContent='当前阈值下没有候选';tr.append(td);rows.append(tr);}
+setNoduleIndex(r.candidates[0]?.center_index_zyx[0]??Math.floor(s.shape[0]/2));
+}).catch(e=>{if(ticket===noduleTicket){noduleFetching=null;$('noduleHint').textContent='结节结果读取失败：'+e.message;}});
+}
+async function setNoduleIndex(value){if(!noduleResult||noduleResult.case_id!==state.case_id)return;
+noduleIndex=Math.max(0,Math.min(state.shape[0]-1,Math.round(Number(value)||0)));$('noduleSlice').value=noduleIndex;
+const z=noduleIndex,ticket=++nodulePlaneTicket,caseId=state.case_id;nodulePlane=null;
+$('noduleSliceLabel').textContent=`轴位索引 ${z} · 源序列第 ${state.source.source_slice_indices[z]} 层`;$('noduleSliceValue').textContent=`${z} / ${state.shape[0]-1}`;drawNodule();
+try{const p=await api('/api/plane?'+new URLSearchParams({case:caseId,axis:0,index:z,stage:'body'}));
+if(ticket!==nodulePlaneTicket||caseId!==state.case_id||!noduleResult)return;
+p.pixels=Uint8Array.from(new Float32Array(bytes(p.hu).buffer),v=>Math.max(0,Math.min(255,Math.floor((Math.round(v)+1350)*255/1500))));nodulePlane=p;drawNodule();
+}catch(e){if(ticket===nodulePlaneTicket)$('noduleHint').textContent=e.message;}}
+function drawNodule(){const canvas=$('noduleCanvas'),p=nodulePlane;
+paint(canvas,p?.pixels,p?.shape[0]||1,p?.shape[1]||1,1,p?.spacing||[1,1]);if(!p||!noduleResult)return;
+const [h,w]=p.shape,[sy,sx]=p.spacing,ratio=w*sx/(h*sy),dw=Math.min(canvas.width,canvas.height*ratio),dh=dw/ratio,ox=(canvas.width-dw)/2,oy=(canvas.height-dh)/2,ctx=canvas.getContext('2d');
+ctx.strokeStyle='#ffb347';ctx.fillStyle='#ffb347';ctx.lineWidth=2;ctx.font='12px sans-serif';
+for(const [i,c] of noduleResult.candidates.entries()){const [z0,z1,y0,y1,x0,x1]=c.bbox_zyx;if(noduleIndex<z0||noduleIndex>=z1)continue;
+ctx.strokeRect(ox+(x0-.5)*dw/w,oy+(y0-.5)*dh/h,(x1-x0)*dw/w,(y1-y0)*dh/h);ctx.fillText(String(i+1),ox+(x1+.5)*dw/w,oy+(y0-.5)*dh/h);}}
+new ResizeObserver(drawNodule).observe($('noduleCanvas').parentElement);

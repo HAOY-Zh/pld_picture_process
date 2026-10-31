@@ -1,0 +1,6 @@
+# Optional candidate-development training/evaluation, tested on Python 3.11.
+# Do not add these to the desktop web or board runtime requirements.
+-r requirements-lung.txt
+scikit-learn>=1.6,<1.7
+# The six-scan check additionally uses the existing frozen PyTorch/CUDA setup.
+# Exported feature-table scoring itself only needs NumPy.

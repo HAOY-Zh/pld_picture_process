@@ -86,7 +86,7 @@
           </details>
         </div>
         <aside class="card nodule-candidates">
-          <h3>肺结节可疑候选</h3><label>最终筛选档位<select id="noduleThreshold"><option value="0.7655561641768475" selected>严格 · 0.7656（默认）</option><option value="0.6418673229668569">原档 · 0.6419（更多候选）</option><option value="0.8738163050576156">低误报 · 0.8738（可能漏更多）</option></select></label><button id="noduleFilter" class="button secondary wide" disabled>按所选档位重新筛选 · 不重跑CNN</button><p class="helper">阈值越高，保留候选越少，也可能漏掉真实结节。分数不是恶性概率。</p><button id="noduleRun" class="button primary wide" disabled>检测当前 CT · 整层加速＋冻结评分</button><button id="noduleCancel" class="button secondary wide" hidden>完成当前整层后停止</button><p id="noduleStatus" class="helper" role="status">加载 CT 并完成当前来源的整例肺分割后检测。采用冻结跨层评分；筛选档位来自历史开发集，不修改模型或评分。</p>
+          <h3>肺结节可疑候选</h3><p class="helper">固定低误报档 · 0.8738。分数不是恶性概率。</p><button id="noduleRun" class="button primary wide" disabled>检测当前 CT · 整层加速＋冻结评分</button><button id="noduleCancel" class="button secondary wide" hidden>完成当前整层后停止</button><p id="noduleStatus" class="helper" role="status">加载 CT 并完成当前来源的整例肺分割后检测。采用冻结跨层评分，固定低误报档 0.8738。</p>
           <div class="nodule-list-tools"><label class="checkbox"><input id="noduleShowAll" type="checkbox" checked>显示全部三维标记</label><button id="noduleLocate" class="text-button" disabled>定位当前候选</button></div>
           <p id="noduleCount" class="helper">尚无结果</p><div id="noduleList" class="nodule-list" role="group" aria-label="结节候选列表"></div><p id="noduleSelected" class="helper" aria-live="polite">尚未选择候选。</p>
           <p class="helper">分数保持结果原值，不表示恶性概率。估计直径、包围框与 ROI 统计不代表精确病灶轮廓或体积。</p>

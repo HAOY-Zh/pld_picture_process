@@ -65,8 +65,6 @@
     $('noduleRun').disabled=!has||busy()||!ready||!state.nodule.service_available||!state.board_connected;
     $('noduleRun').textContent=running?`检测中 · ${job.completed}/${job.total||'…'} patch`:'检测当前 CT · 整层加速＋冻结评分';
     $('noduleCancel').hidden=!running;
-    $('noduleThreshold').disabled=busy();
-    $('noduleFilter').disabled=!online||busy();
     $('noduleManualRoi').disabled=!has||busy();
     $('noduleBadge').textContent=!packet?'尚无候选结果':packet.is_test_data?'联动测试 · 非检测结果':online?(packet.detector_provenance?.ranker_applied?'FPGA 候选 · 冻结跨层评分':'FPGA 历史候选 · 原始分数'):'导入候选 · 本机未执行检测';
     $('noduleBadge').className='chip'+(packet?.is_test_data?' amber':'');
@@ -149,8 +147,7 @@
   }
   function download(value,name){const link=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));link.href=url;link.download=name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
   $('noduleFixture').onclick=()=>action('fixture');$('noduleClear').onclick=()=>action('clear');
-  $('noduleRun').onclick=()=>action('run',{scoring_mode:'frozen_cross_layer',selection_threshold:Number($('noduleThreshold').value)});
-  $('noduleFilter').onclick=()=>action('filter',{result_id:packet.result_id,selection_threshold:Number($('noduleThreshold').value)});
+  $('noduleRun').onclick=()=>action('run',{scoring_mode:'frozen_cross_layer'});
   $('noduleCancel').onclick=()=>action('cancel',{job_id:state.nodule.job.job_id});
   $('noduleFile').onchange=async()=>{try{const file=$('noduleFile').files[0];if(!file)return;if(file.size>8*1024*1024)throw Error('候选 JSON 超过 8MB');const p=JSON.parse(await file.text());await action('import',{packet:p});}catch(e){localError=e.message;render();}finally{$('noduleFile').value='';}};
   $('noduleContext').onclick=()=>download({schema:'ct_nodule_context_v1',context:context()},'ct-nodule-context.json');

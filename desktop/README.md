@@ -1,0 +1,7 @@
+# 上位机EXE外壳源码
+
+launcher/Launcher.cs是Windows启动窗口源码，app/desktop_bootstrap.py是实际环境、配对、启动和会话复用引导代码。
+EXE外壳本身不执行CNN。运行时需要完整的app源码/模型/板端配套包、Python便携环境和对应的来源哈希；只编译一个EXE不能替代这些依赖。
+作者现有便携目录已同步固定0.8738策略，并通过离线诊断。其私有凭据、病例和完整便携Python环境没有复制到本源码仓库。
+新电脑请先使用仓库根目录setup_ct_studio_current.cmd和start_ct_studio_current.cmd，得到同一处理网页。
+维护脚本python/integrate_desktop_dual_exact.py、python/update_desktop_exact_current.py保留了各阶段打包机制；这些维护脚本使用指定阶段的目录契约，不作为普通用户首次安装入口。
