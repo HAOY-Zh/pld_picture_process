@@ -1,0 +1,74 @@
+{
+  "status": "PASS",
+  "actual_PL_execution": true,
+  "verified_outputs": [
+    {
+      "patient": "C067",
+      "stage": "legacy48",
+      "sha256": "24389d9a4b56c59599f88880aa9115a110c4b138b2ae8627160ee207ad763e22",
+      "max_error_hu": 0,
+      "rmse_vs_normal_hu": 76.12333697427083
+    },
+    {
+      "patient": "C067",
+      "stage": "fast48",
+      "sha256": "24389d9a4b56c59599f88880aa9115a110c4b138b2ae8627160ee207ad763e22",
+      "max_error_hu": 0,
+      "rmse_vs_normal_hu": 76.12333697427083
+    },
+    {
+      "patient": "C067",
+      "stage": "fast58",
+      "sha256": "24389d9a4b56c59599f88880aa9115a110c4b138b2ae8627160ee207ad763e22",
+      "max_error_hu": 0,
+      "rmse_vs_normal_hu": 76.12333697427083
+    },
+    {
+      "patient": "C067",
+      "stage": "compact58",
+      "sha256": "24389d9a4b56c59599f88880aa9115a110c4b138b2ae8627160ee207ad763e22",
+      "max_error_hu": 0,
+      "rmse_vs_normal_hu": 76.12333697427083
+    },
+    {
+      "patient": "C077",
+      "stage": "legacy48",
+      "sha256": "ae6c5973a69a2ad1fb83f139d166f2ed530b10b1ef7b2c58a41e9356c113a979",
+      "max_error_hu": 0,
+      "rmse_vs_normal_hu": 70.76221371424151
+    },
+    {
+      "patient": "C077",
+      "stage": "fast48",
+      "sha256": "ae6c5973a69a2ad1fb83f139d166f2ed530b10b1ef7b2c58a41e9356c113a979",
+      "max_error_hu": 0,
+      "rmse_vs_normal_hu": 70.76221371424151
+    },
+    {
+      "patient": "C077",
+      "stage": "fast58",
+      "sha256": "ae6c5973a69a2ad1fb83f139d166f2ed530b10b1ef7b2c58a41e9356c113a979",
+      "max_error_hu": 0,
+      "rmse_vs_normal_hu": 70.76221371424151
+    },
+    {
+      "patient": "C077",
+      "stage": "compact58",
+      "sha256": "ae6c5973a69a2ad1fb83f139d166f2ed530b10b1ef7b2c58a41e9356c113a979",
+      "max_error_hu": 0,
+      "rmse_vs_normal_hu": 70.76221371424151
+    }
+  ],
+  "downloaded_output_arrays": 8,
+  "each_output_pixels": 262144,
+  "bit_sha256": "d33786c2f16f8cf717ee4231a1d85ebb4d8c66ea95891df2c723730c137e0913",
+  "old_board_outputs_identical": true,
+  "integer_reference_identical": true,
+  "baseline_ms": 760.2535310000178,
+  "optimized_ms": 523.2258854999827,
+  "speedup": 1.4530120777062412,
+  "time_reduction_percent": 31.17744750073769,
+  "optimized_fps": 1.911220426421416,
+  "timing_scope": "Frame packing, DMA/cache, PL compute, polling and assembly; excludes files, reference computation and display.",
+  "limits": "2 demonstration slices, 5 measured repeats per stage/slice; not a population benchmark."
+}
