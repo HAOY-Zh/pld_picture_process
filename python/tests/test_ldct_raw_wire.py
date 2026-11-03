@@ -12,6 +12,9 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[2]
 APP=ROOT/'data/CT_Studio_ExactSpeed_20261027_04'
 PACKAGE=APP/'data/ct_studio_integration_20261025'
+if not (PACKAGE/'host_platform.json').is_file():
+    APP=ROOT
+    PACKAGE=ROOT/'data/ct_studio_current_20261027'
 sys.path[:0]=[str(ROOT/'python'),str(APP/'python'),str(ROOT/'pynq'),str(PACKAGE/'ct_studio')]
 from ct_ldct_raw_client import RawLDCTStudioClient
 from ldct_raw_contract import INTERFACE,encode_raw,decode_raw

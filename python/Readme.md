@@ -1,27 +1,8 @@
-用于智能分析算法的离线训练与验证。
+# 最终运行版 Python 目录
 
-主要内容包括：
-
-CT 数据集预处理
-智能分割模型训练
-轻量化网络实验
-INT8 / INT4 量化
-Dice / IoU 等精度评价
-FPGA 部署所需权重和参数导出
-
-注意：Python 主要作为离线开发工具，最终作品中的核心图像处理与主要计算任务应由 FPGA PL 完成或加速。
-
-新增肺分割离线开发入口：`lung_segmentation.py`。
-支持 LCTSC CT/RTSTRUCT 清点、人工肺轮廓转换、规则基线与 Dice/IoU 评价。
-这是 CPU 数据/算法验证流程，不是已部署的 FPGA 分割，也不是训练好的模型。
-详细步骤见 [肺分割开发说明](../docs/lung_segmentation.md)。
-
-轻量学习型模型入口：`lung_unet.py`，包括患者级缓存、训练与原始分辨率评价。
-使用电脑的 `.venv-lung` 环境，不是板卡程序；INT8/PL 部署尚未完成。
-步骤见 [轻量模型训练说明](../docs/lung_unet_training.md)。
-
-在项目根目录运行测试：
-
-```powershell
-python -m unittest discover -s python/tests -v
-```
+入口为 start_ct_studio_demo.py 与 ct_workspace_web.py，安装器为 ct_studio_current_release.py。
+这里保留网页、影像输入、算法主机调度、后处理、协议和必要验证依赖。
+模型主要推理由板端PL执行，PS负责硬件调度，PC负责输入、后处理与显示。
+未被当前依赖链使用的训练、旧实验和打包脚本已从当前发布目录移除，可在历史提交d18bbf0查阅。
+部分共用模块同时包含模型定义与数值工具，因当前程序或验证代码引用而保留。
+启动和部署请从仓库根目录README.md开始，不直接使用历史文档中的旧命令。

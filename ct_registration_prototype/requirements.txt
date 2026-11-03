@@ -1,3 +1,0 @@
-numpy>=1.26,<3
-Pillow>=10,<13
-# Optional: pydicom>=3,<4 for DICOM/IMA input. PYNQ is board-image-provided.
